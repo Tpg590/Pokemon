@@ -42,3 +42,19 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
   - Các chỉ số: Rút gọn `HP (Máu)` ➔ `HP`, `Tấn công (Atk)` ➔ `Tấn công`, `Phòng thủ (Def)` ➔ `Phòng thủ`, `Tốc độ (Speed)` ➔ `Tốc độ`.
   - Việt hóa popup cập nhật `What's new` (Có gì mới).
 - **Biên dịch:** Chạy `node tools/build.js` để đóng gói lại bản `js/app.min.js` chuẩn và đẩy lên Vercel.
+
+## ⏱️ [2026-10-23 02:15:00] — Đại tu toàn diện 100% Tiếng Việt (Triệt tiêu toàn bộ tiếng Anh còn sót)
+- **Nguyên nhân tiếng Anh xuất hiện:**
+  - `mons.js`: Trước đây khai báo cứng `LANG_I = { ... vi: 1 }`, khiến Bản tính (Natures) và Đặc tính (Abilities) luôn hiển thị bằng tiếng Anh (ví dụ `Careful`, `Cloud Nine`).
+  - `lang-updates.js`: Chứa hơn 500 dòng cập nhật của game nhưng tác giả gốc chỉ nạp cho 5 thứ tiếng (`fr, it, pt, zh-Hans, zh-Hant`), còn tiếng Việt bị bỏ sót nên tự động nhảy về tiếng Anh.
+  - `changelog.js`: Toàn bộ tin tức cập nhật game hiển thị bằng tiếng Anh do chưa có cặp dịch tiếng Việt tương ứng.
+  - Bộ kiểm thử tự động `tests/i18n.test.cjs` trước đây chưa đưa `vi` vào danh sách kiểm duyệt nghiêm ngặt.
+- **Giải pháp xử lý triệt để:**
+  1. **Hệ thống Pokémon (`mons.js`):** Nâng cấp hàm `G.Mons.name(n)` cho phép tra cứu trực tiếp bản dịch tiếng Việt qua `G.T()` cho cả 25 Bản tính (`Cẩn trọng`, `Kiên cường`, `Khiêm tốn`, `Vui vẻ`...) và toàn bộ Đặc tính (`Vô hiệu thời tiết`, `Ngọn lửa lớn`, `Bền bỉ`, `Thích nghi`...).
+  2. **Nâng cấp từ điển (`lang-vi.js`):** Tăng dung lượng từ điển tiếng Việt lên **155 KB** với **2.402 khóa dịch hoàn chỉnh**:
+     - **Cài đặt & Điều khiển:** Việt hóa 100% tab `Thông tin` (`About`), hướng dẫn tay cầm Xbox/PlayStation/Switch, độ rung phản hồi, phím bấm, cần ảo di động, nút đặt vị trí.
+     - **Mô tả chiêu thức & Đặc tính:** `Single type: +20% damage...` ➔ `Đơn hệ: +20% sát thương với chiêu thức hệ Nước`, `+8% damage with Nước-type moves.` ➔ `+8% sát thương với chiêu thức hệ Nước.`, `It has not learned any yet` ➔ `Chưa học chiêu thức nào`, `Starts with Confusion` ➔ `Bắt đầu với Confusion`.
+     - **Bản tin cập nhật (`G.CHANGELOG`):** Dịch chuẩn ngữ nghĩa toàn bộ 145 mục tin mới từ phiên bản đầu đến mới nhất ngày 22/10/2026.
+  3. **Kiểm thử tự động (`tests/i18n.test.cjs`):** Thêm mã ngôn ngữ `vi` và từ khóa `Lưu` vào bộ test. Chạy `node --test tests/i18n.test.cjs` đạt kết quả tuyệt đối **20/20 tests passed**.
+  4. **Đóng gói & Phát hành:** Chạy `node tools/build.js` thành công, tạo `js/app.min.js` mới kèm chữ ký số và cập nhật `js/lang/vi.js`. Đã đẩy toàn bộ mã nguồn lên GitHub `Tpg590/Pokemon` để Vercel tự động triển khai.
+

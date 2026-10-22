@@ -39,8 +39,8 @@ function boot(saved = null, nav = 'en-US', pathname = '/', blocked = false) {
   dictionaries.forEach(load);
   return { ctx, G: ctx.G, storage, calls, dicts, Canvas, load, written };
 }
-const langs = ['es', 'en', 'fr', 'it', 'pt-BR', 'zh-Hans', 'zh-Hant'];
-const save = ['Guardar', 'Save', 'Enregistrer', 'Salva', 'Salvar', '保存', '儲存'];
+const langs = ['es', 'en', 'fr', 'it', 'pt-BR', 'zh-Hans', 'zh-Hant', 'vi'];
+const save = ['Guardar', 'Save', 'Enregistrer', 'Salva', 'Salvar', '保存', '儲存', 'Lưu'];
 for (const [i, lang] of langs.entries()) {
   test(`${lang}: isolated dictionary, templates, loading locale, canvas, new save notice`, () => {
     const b = boot(lang), I = b.G.I18n;
@@ -75,7 +75,7 @@ for (const [i, lang] of langs.entries()) {
     assert.equal(b.G.LoginUI.updateNotices(), false);
     b.G.DB.save.stats.runs = 1;
     assert.equal(b.G.LoginUI.updateNotices(), true);
-    assert.ok(/rankings|leaderboards/.test(b.G.T(node('savenote-title').textContent)) || lang.startsWith('zh') || lang === 'fr' || lang === 'it');
+    assert.ok(/rankings|leaderboards/.test(b.G.T(node('savenote-title').textContent)) || lang.startsWith('zh') || lang === 'fr' || lang === 'it' || lang === 'vi');
     assert.equal((node('savenote-body').innerHTML.match(/<p>/g) || []).length, 2);
     assert.equal(b.G.LoginUI.updateNotices(), false);
   });

@@ -21,10 +21,14 @@ G.Mons = (() => {
   const HIDDEN_RATE = 1 / 20;
   const save = () => G.DB && G.DB.save;
 
-  /** Nombre en el idioma del juego: [es, en, fr, it, zh-Hans, zh-Hant] (pt-BR, vi el inglés). */
+  /** Nombre en el idioma del juego: [es, en, fr, it, zh-Hans, zh-Hant] (pt-BR el inglés, vi dịch hoặc fallback en). */
   const LANG_I = { es: 0, en: 1, fr: 2, it: 3, 'pt-BR': 1, 'zh-Hans': 4, 'zh-Hant': 5, vi: 1 };
   function name(n) {
-    if (!Array.isArray(n)) return String(n || '');
+    if (!Array.isArray(n)) return G.T ? G.T(String(n || '')) : String(n || '');
+    if (G.I18n && G.I18n.lang === 'vi') {
+      const tr = (G.T && (G.T(n[0]) || G.T(n[1]))) || '';
+      if (tr && tr !== n[0] && tr !== n[1]) return tr;
+    }
     return n[LANG_I[G.I18n ? G.I18n.lang : 'es'] || 0] || n[1] || n[0];
   }
 
