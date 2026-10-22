@@ -1,4 +1,16 @@
-# PokéSurvivor · Mundo Misterioso
+# PokéSurvivor (Community Fork / Custom Deployment)
+
+> [!IMPORTANT]
+> **Attribution & Credits:**
+> This repository is a fork and custom deployment based on **PokéSurvivor**, an open-source game created and owned by **Jonathan Piera Torregrosa ([JPTER78](https://github.com/JPTER78))**.
+> - **Original Repository:** [https://github.com/JPTER78/pokesurvivor](https://github.com/JPTER78/pokesurvivor)
+> - **Official Game Website:** [https://pokesurvivor.com](https://pokesurvivor.com)
+> - **Required Notice:** Copyright 2026 JPTER78 (https://github.com/JPTER78/pokesurvivor)
+> - **License:** [PolyForm Noncommercial License 1.0.0](LICENSE-NONCOMMERCIAL.md) (Strictly non-commercial fan-made project).
+>
+> All core engine development, game design, and original chiptune music are created by **JPTER78**. This repository is maintained for personal study, server latency optimization, and non-commercial community play.
+
+---
 
 Bullet-heaven con Pokémon al estilo de Survivor.io y Megabonk, con sprites de
 *Pokémon Mundo Misterioso*, capa roguelike, **966 Pokémon de las 9 generaciones**,
@@ -6,15 +18,6 @@ shinies y gacha por región. Música y efectos compuestos para el juego.
 
 HTML + CSS + JavaScript vanilla sobre Canvas 2D. Sin build, sin dependencias y
 **todo local**: no necesita internet para jugar.
-
-> **Autoría / Authorship**
->
-> PokéSurvivor (su código y su música original) lo ha escrito y es de
-> **Jonathan Piera Torregrosa**, dueño de esta cuenta (JPTER78) y de pokesurvivor.com.
-> The source code and original music of PokéSurvivor are written and owned by
-> **Jonathan Piera Torregrosa**, owner of this GitHub account (JPTER78) and of
-> pokesurvivor.com. Google copyright removal request **4-2352000042234**
-> (against pokesurvivor.co) was submitted by me.
 
 > **Aviso sobre criptomonedas / Crypto disclaimer**
 >
