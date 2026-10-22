@@ -73,6 +73,7 @@ G.DB = (() => {
       created: Date.now(),
       updated: Date.now(),    // última modificación (para fusionar)
       coins: START_COINS,
+      gems: 3,
       owned: {},              // dex -> { at, from: 'starter'|'gacha'|'wild' }
       shiny: {},              // dex -> { at, from } — variantes shiny conseguidas
       partner: null,          // dex del Pokémon con el que juegas
@@ -120,6 +121,7 @@ G.DB = (() => {
       s.pupgDone = true;
     }
     s.tickets = Object.assign({ t1: 0, t10: 0 }, s.tickets);
+    if (s.gems == null) s.gems = 3;
     sanitize(s);
     s.v = VERSION;
     return s;
@@ -134,6 +136,7 @@ G.DB = (() => {
   function sanitize(s) {
     const n = v => (Number.isFinite(+v) && +v > 0 ? Math.floor(+v) : 0);
     s.coins = n(s.coins);
+    s.gems = n(s.gems);
     s.tickets.t1 = n(s.tickets.t1);
     s.tickets.t10 = n(s.tickets.t10);
     if (isObj(s.led)) {
@@ -233,6 +236,7 @@ G.DB = (() => {
    */
   const CUR = {
     c: [s => s.coins, (s, v) => { s.coins = v; }],
+    gems: [s => (s.gems || 0), (s, v) => { s.gems = v; }],
     t1: [s => s.tickets.t1, (s, v) => { s.tickets.t1 = v; }],
     t10: [s => s.tickets.t10, (s, v) => { s.tickets.t10 = v; }]
   };

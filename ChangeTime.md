@@ -81,4 +81,26 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
      - Biên dịch ra `js/lang/vi.js` với kết quả: `vi: faltan 0` (không còn thiếu bất kỳ chuỗi nào).
      - Chạy kiểm thử tự động `tests/i18n.test.cjs`: **20/20 tests passed**, đảm bảo 100% khớp tham số động `{x}`, `{name}`.
      - Đóng gói bản mã hóa sản phẩm `node tools/build.js` thành công (`app.min.js?v=338b0a77e1`).
-     - Đẩy mã nguồn lên GitHub `Tpg590/Pokemon` nhánh `main`.
+ ## ⏱️ [2026-10-23 03:35:00] — Triển khai Giai đoạn 1: Đại tu UI Dooforaft VN Edition (Retro Pixel RPG / Mystery Dungeon)
+- **Tài nguyên đồ họa & Font chữ:**
+  - Tải và tích hợp bộ font pixel chuẩn `PixelifyPS-400.ttf`, `PixelifyPS-700.ttf` vào thư mục `fonts/` và `assets/fonts/`.
+  - Tải kết cấu sàn cát pixel `ui/floor.png` phục vụ hiển thị sân khấu Pokémon đồng hành.
+- **Tiền tệ mới — Kim Cương (`gems 💎`):**
+  - Cập nhật `js/core/db.js`: Khởi tạo mặc định `gems: 3` cho người chơi mới và tự động bổ sung cho các tài khoản hiện tại qua cơ chế `migrate()` và `sanitize()`.
+  - Đăng ký `gems` vào hệ thống sổ cái đồng bộ đám mây `CUR` và thiết kế pixel icon `gem` (viên kim cương xanh) trong `js/ui/icons.js`.
+- **Hệ thống giao diện nền tảng (`css/style.css`):**
+  - Khởi tạo hệ thống màu sắc retro pixel: `--bg: #272223`, `--rule: #4d4240`, `--gold: #ffd65c`, `--bar: #d9cdb5`.
+  - Tích hợp hiệu ứng viền khung pixel RPG procedurally generated đa dải (`.win`, `.box`, `.talk-box`).
+  - Thiết kế con trỏ danh mục tam giác Pokémon Mystery Dungeon (`.cursor-item.on:before`) kèm hiệu ứng nhấp nháy động.
+- **Màn hình Đăng nhập (`scr-login`):**
+  - Tiêu đề game: `PokéSurvivor` kèm phụ đề **`DOOFORAFT VN EDITION`**.
+  - Thiết kế bảng form tối giản, gọn gàng theo chuẩn mẫu `Reference/login.png`.
+- **Màn hình chính & Topbar (`scr-menu` & `topbar`):**
+  - **Header Bar:** Tích hợp bộ đếm `987 online`, nút Discord, thanh pill thống nhất hiển thị Vàng 🪙, Vé 🎫, Kim cương 💎 3, Trạng thái phòng `Room 1/4`, Tên người chơi và nút Cài đặt ⚙️.
+  - **Partner Pokémon Card:** Thiết kế khung thẻ bên trái gồm sàn diễn sprite pixel động, Tên, Số hiệu Dex, Huy hiệu hệ và bảng chỉ số Runs, Best time, Best level, Defeated. Nút tin tức `Tin mới · v31`.
+  - **Thanh Menu dọc bên phải:** Chia rõ 2 chế độ `Solo` và `Multiplayer`, danh mục `Pokémon (0/966)`, `Gacha`, `Nâng cấp`, `Nhiệm vụ`, `Xếp hạng`, `Bạn bè`, `Cài đặt`, `Đăng xuất`.
+  - **Hộp thoại Bạn Đồng Hành tương tác (Partner Talk Box):** Khung avatar nhỏ của Pokémon đồng hành trên nền màu hệ, tên màu cam và lời thoại thay đổi mượt mà theo từng mục menu đang chọn hoặc di chuột vào (hỗ trợ câu thoại thông minh khi ở trong phòng chờ, khi có nhiệm vụ chưa nhận thưởng, hoặc chào đón người chơi).
+  - **Điều khiển phím:** Hỗ trợ phím mũi tên `↑` / `↓` để chuyển con trỏ menu và phím `Enter` để chọn, kèm gợi ý phím `[Enter] Chọn | [↑ ↓] Di chuyển` ở góc dưới.
+- **Đóng gói & Kiểm thử:**
+  - `tests/i18n.test.cjs`: **20/20 tests passed**.
+  - `node tools/build.js`: Biên dịch và mã hóa thành công ra `js/app.min.js?v=293bc58e48` và `index.html`.
