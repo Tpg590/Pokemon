@@ -947,5 +947,22 @@ G.I18n.add({
   "Objetos: {x} · MT: {x}": "Items: {x} · TMs: {x}",
   // ---------------- Cooperativo: mirar a un compañero estando caído (21-10-2026) ----------------
   "Ver a un compañero": "Watch a teammate", "Viendo a {x}": "Watching {x}", "cambiar": "switch",
-  "Saltar": "Skip", "Saltar ⏭️": "Skip ⏭️"
+  "Saltar": "Skip", "Saltar ⏭️": "Skip ⏭️",
+  "Solo": "Solo",
+  "Multiplayer": "Multiplayer",
+  "Create a room": "Create a room",
+  "Friends": "Friends",
+  "Public": "Public",
+  "Public Rooms": "Public Rooms",
+  "Leave the room": "Leave the room",
+  "Change Pokémon": "Change Pokémon",
+  "Waiting for:": "Waiting for:",
+  "I'm ready": "I'm ready",
+  "Start game": "Start game",
+  "Invite friends": "Invite friends",
+  "Free": "Free",
+  "Connected": "Connected",
+  "Connecting…": "Connecting…",
+  "Online": "Online",
+  "Offline": "Offline"
 });

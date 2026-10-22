@@ -136,10 +136,22 @@ G.Social = (() => {
   function online() {
     if (beatT) return;                        // ya estaba en marcha
     beatT = 1;
-    if (fb.rtdb) fb.rtdb.goOffline();         // se conecta sólo al entrar en una sala
+    rtOn();
+    setupPresence();
     let known = false;
     try { known = localStorage.getItem(hasFrKey()) === '1'; } catch (e) { /* nada */ }
     if (known) listenInvites();
+  }
+
+  function setupPresence() {
+    if (!fb || !fb.rtdb || !uid || !me) return;
+    const myPresRef = fb.rtdb.ref('presence/' + uid);
+    fb.rtdb.ref('.info/connected').on('value', snap => {
+      if (snap.val() === true) {
+        myPresRef.onDisconnect().remove();
+        myPresRef.set({ online: true, name: me.name, at: ts() });
+      }
+    });
   }
 
   /** Carga la lista de amigos (y la sigue escuchando) la primera vez que hace falta. */
@@ -214,17 +226,25 @@ G.Social = (() => {
 
   // ---------------- amigos ----------------
 
+  const trackedPresence = new Set();
+
   function listenFriends(ready) {
     unFriends = fb.fs.collection('friendships').where('users', 'array-contains', uid).onSnapshot(snap => {
       const next = new Map();
       snap.forEach(d => {
         const f = d.data();
         const other = f.users[0] === uid ? f.users[1] : f.users[0];
+        const prev = friends.get(other) || {};
         next.set(other, Object.assign({
           uid: other, pid: d.id, name: (f.names && f.names[other]) || '???',
           status: f.status === 'ok' ? 'ok' : f.to === uid ? 'in' : 'out',
-          online: false, play: false, room: '', seen: 0
+          online: prev.online || false, play: false, room: '', seen: 0
         }, pres.get(other) || {}));
+
+        if (f.status === 'ok' && !trackedPresence.has(other)) {
+          trackedPresence.add(other);
+          trackPresence(other);
+        }
       });
       friends = next;
       emit('friends');
@@ -235,7 +255,17 @@ G.Social = (() => {
     }, e => { console.warn('[Social] amigos:', e.code || e.message); if (ready) { ready(); ready = null; } });
   }
 
-  /** (Quitado el 20-10-2026 con el "en línea": ya no lee nada.) */
+  function trackPresence(other) {
+    if (!fb || !fb.rtdb) return;
+    fb.rtdb.ref('presence/' + other).on('value', s => {
+      const f = friends.get(other);
+      if (f) {
+        f.online = s.exists() && s.val() && s.val().online === true;
+        emit('friends');
+      }
+    });
+  }
+
   async function refreshPresence() {}
 
   /** Envía una solicitud de amistad (o acepta la que ya te había mandado). */
@@ -286,17 +316,78 @@ G.Social = (() => {
 
   function memberInfo() {
     const s = G.DB.save;
-    return { name: me.name, dex: s.partner, shiny: !!s.partnerShiny && G.DB.ownsShiny(s.partner), at: ts() };
+    return { name: me.name, dex: s.partner, shiny: !!s.partnerShiny && G.DB.ownsShiny(s.partner), at: ts(), ready: false };
   }
 
   /**
-   * La Realtime Database sólo se conecta mientras estás en una sala: cada
-   * conexión abierta gasta descargas (se pagan a partir de 360 MB al día).
-   * (El 11-10-2026 hubo un contador de gente en línea que la tenía siempre
-   * conectada; se quitó por eso.)
+   * La Realtime Database se conecta mientras juegas online con amigos / salas.
    */
-  function rtOn() { if (fb.rtdb) fb.rtdb.goOnline(); }
-  function rtOff() { if (fb && fb.rtdb && !room) fb.rtdb.goOffline(); }
+  function rtOn() { if (fb && fb.rtdb) fb.rtdb.goOnline(); }
+  function rtOff() { if (fb && fb.rtdb && !room && !browsing) fb.rtdb.goOffline(); }
+
+  let isRoomPublic = false;
+
+  async function setRoomPublic(pub) {
+    if (!room || !room.isHost) return;
+    isRoomPublic = !!pub;
+    room.isPublic = isRoomPublic;
+    const ref = fb.rtdb.ref('public_rooms/' + room.id);
+    if (isRoomPublic) {
+      const s = G.DB.save;
+      const st = s.stats || {};
+      const fav = (s.profile && s.profile.favs && s.profile.favs[0] && s.profile.favs[0].dex) || s.partner;
+      await ref.set({
+        roomId: room.id,
+        host: uid,
+        hostName: me.name,
+        dex: s.partner,
+        shiny: !!s.partnerShiny,
+        bestTime: st.bestTime || 0,
+        bestLevel: st.bestLevel || 1,
+        bestDex: fav,
+        memberCount: room.members.length,
+        maxPlayers: MAX_PLAYERS,
+        at: ts()
+      });
+      ref.onDisconnect().remove();
+    } else {
+      await ref.remove().catch(() => {});
+    }
+    emit('room');
+  }
+
+  function updatePublicMemberCount() {
+    if (room && room.isHost && isRoomPublic) {
+      fb.rtdb.ref('public_rooms/' + room.id + '/memberCount').set(room.members.length).catch(() => {});
+    }
+  }
+
+  function toggleReady() {
+    if (!room || !me) return;
+    const m = room.members.find(x => x.uid === uid);
+    const next = !(m && m.ready);
+    fb.rtdb.ref('rooms/' + room.id + '/m/' + uid + '/ready').set(next).catch(() => {});
+    return next;
+  }
+
+  let browsing = false;
+  function listenPublicRooms(callback) {
+    if (!fb || !fb.rtdb) return () => {};
+    rtOn();
+    browsing = true;
+    const ref = fb.rtdb.ref('public_rooms');
+    const onVal = s => {
+      const val = s.val() || {};
+      const list = Object.keys(val).map(k => val[k]).filter(r => r && r.roomId && r.memberCount < MAX_PLAYERS);
+      callback(list);
+    };
+    ref.on('value', onVal);
+    return () => {
+      ref.off('value', onVal);
+      browsing = false;
+      rtOff();
+    };
+  }
 
   async function createRoom() {
     if (room) return room;
@@ -331,7 +422,8 @@ G.Social = (() => {
   }
 
   function enterRoom(id, host) {
-    room = { id, host, isHost: host === uid, members: [], open: true, lost: false };
+    isRoomPublic = false;
+    room = { id, host, isHost: host === uid, members: [], open: true, lost: false, isPublic: false };
     watchRoom(id);
     writeStatus();
     emit('room');
@@ -349,6 +441,7 @@ G.Social = (() => {
       room.members = Object.keys(m).map(k => Object.assign({ uid: k }, m[k]))
         .sort((a, b) => (a.uid === room.host ? -1 : b.uid === room.host ? 1 : (a.at || 0) - (b.at || 0)));
       if (room.isHost && playing) keepMates(id, prev);
+      updatePublicMemberCount();
       emit('room');
     }, () => lostRoom(id));
     const href = fb.rtdb.ref('rooms/' + id + '/host');
@@ -407,7 +500,7 @@ G.Social = (() => {
         if (host !== uid) {
           if (host) throw Error('otra');
           const m = {};
-          for (const x of room.members) m[x.uid] = { name: x.name, dex: x.dex, shiny: !!x.shiny, at: x.at || 0 };
+          for (const x of room.members) m[x.uid] = { name: x.name, dex: x.dex, shiny: !!x.shiny, at: x.at || 0, ready: !!x.ready };
           m[uid] = Object.assign(memberInfo(), m[uid] ? { at: m[uid].at } : {});
           await within(base.set({ host: uid, open: playing ? false : room.open, at: ts(), m }), 5000);
         }
@@ -444,7 +537,7 @@ G.Social = (() => {
       setTimeout(() => {
         if (!room || room.id !== id || !playing || room.members.some(m => m.uid === x.uid)) return;
         if (!G.Coop.keeps(x.uid)) return;
-        fb.rtdb.ref('rooms/' + id + '/m/' + x.uid).set({ name: x.name, dex: x.dex, shiny: !!x.shiny, at: x.at || 0 }).catch(() => {});
+        fb.rtdb.ref('rooms/' + id + '/m/' + x.uid).set({ name: x.name, dex: x.dex, shiny: !!x.shiny, at: x.at || 0, ready: !!x.ready }).catch(() => {});
       }, 3000);
     }
   }
@@ -456,8 +549,10 @@ G.Social = (() => {
 
   function closedRoom() {
     if (!room) return;
+    const r = room;
     detachRoom();
     room = null;
+    if (r.isHost && fb && fb.rtdb) fb.rtdb.ref('public_rooms/' + r.id).remove().catch(() => {});
     retractInvites();
     writeStatus();
     rtOff();
@@ -469,6 +564,7 @@ G.Social = (() => {
     const r = room;
     detachRoom();
     room = null;
+    if (r.isHost && fb && fb.rtdb) fb.rtdb.ref('public_rooms/' + r.id).remove().catch(() => {});
     const ref = r.isHost ? fb.rtdb.ref('rooms/' + r.id) : fb.rtdb.ref('rooms/' + r.id + '/m/' + uid);
     ref.onDisconnect().cancel().catch(() => {});
     await ref.remove().catch(() => {});
@@ -480,13 +576,33 @@ G.Social = (() => {
 
   /** El anfitrión cierra la sala a nuevos jugadores al empezar la partida. */
   function setOpen(open) {
-    if (room && room.isHost) fb.rtdb.ref('rooms/' + room.id + '/open').set(!!open).catch(() => {});
+    if (room && room.isHost) {
+      fb.rtdb.ref('rooms/' + room.id + '/open').set(!!open).catch(() => {});
+      if (!open && fb && fb.rtdb) fb.rtdb.ref('public_rooms/' + room.id).remove().catch(() => {});
+    }
   }
 
   /** Actualiza tu Pokémon en la sala (si cambias de compañero). */
-  function refreshMember() {
-    if (room && me) fb.rtdb.ref('rooms/' + room.id + '/m/' + uid).update(
-      { dex: G.DB.save.partner, shiny: !!G.DB.save.partnerShiny && G.DB.ownsShiny(G.DB.save.partner) }).catch(() => {});
+  function refreshMember(dex, shiny) {
+    if (!room || !me) return;
+    const s = G.DB.save;
+    if (dex !== undefined) {
+      s.partner = dex;
+      if (shiny !== undefined) s.partnerShiny = shiny;
+      G.DB.commit();
+    }
+    const myShiny = !!s.partnerShiny && G.DB.ownsShiny(s.partner);
+    fb.rtdb.ref('rooms/' + room.id + '/m/' + uid).update({
+      dex: s.partner,
+      shiny: myShiny
+    }).catch(() => {});
+    if (room.isPublic && room.isHost) {
+      fb.rtdb.ref('public_rooms/' + room.id).update({
+        dex: s.partner,
+        shiny: myShiny
+      }).catch(() => {});
+    }
+    emit('room');
   }
 
   // ---------------- invitaciones ----------------
@@ -615,6 +731,7 @@ G.Social = (() => {
   return {
     start, stop, claimNick, request, accept, remove, publishProfile, getProfile, profileData,
     createRoom, joinRoom, leaveRoom, setOpen, refreshMember, dropMember, setPlaying, refreshPresence, ensureFriends,
+    setRoomPublic, listenPublicRooms, toggleReady,
     invite, acceptInvite, declineInvite,
     on(fn) { listeners.add(fn); }, off(fn) { listeners.delete(fn); },
     get me() { return me; },

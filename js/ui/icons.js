@@ -200,7 +200,20 @@ G.Icons = (() => {
       'kbkkkkkkkkbk', 'kbkllllllkbk', 'kbklgggglkbk', 'kbkllllllkbk', 'kdkllllllkdk', 'kkkkkkkkkkkk'] },
     ball: { pal: { r: '#ff4d4d', w: '#f4f4f4', s: '#c23a3a' }, rows: [
       '....kkkk....', '..kkrrrrkk..', '.krwrrrrrrk.', '.krwrrrrrsk.', 'krrrrkkrrssk', 'kkkkkwwkkkkk',
-      'kwwwkwwkwwwk', 'kwwwwkkwwwwk', '.kwwwwwwwwk.', '.kwwwwwwwwk.', '..kkwwwwkk..', '....kkkk....'] }
+      'kwwwkwwkwwwk', 'kwwwwkkwwwwk', '.kwwwwwwwwk.', '.kwwwwwwwwk.', '..kkwwwwkk..', '....kkkk....'] },
+    multi: { pal: { b: '#3d9aff', g: '#44d776' }, rows: [
+      '............',
+      '.bbbb..gggg.',
+      '.bbbb..gggg.',
+      '.bbbb..gggg.',
+      '............',
+      '.bbbb..gggg.',
+      '.bbbb..gggg.',
+      '.bbbb..gggg.',
+      '............',
+      '............',
+      '............',
+      '............'] }
   };
   // Variantes de paleta.
   UI.starDim = { rows: UI.star.rows, pal: { y: '#3a4870', o: '#2a3458', w: '#4a5a88' } };

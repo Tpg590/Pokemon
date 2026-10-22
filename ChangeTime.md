@@ -197,3 +197,40 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
 - **Đóng gói sản phẩm:**
   - `tests/i18n.test.cjs`: **20/20 tests passed**.
   - `node tools/build.js`: Biên dịch ra `app.min.js?v=f9bf112831` và đồng bộ `index.html`.
+
+## ⏱️ [2026-10-23 05:25:00] — Hệ Thống Phòng Chơi Mạng Multiplayer, Sảnh Tổ Đội (Party Lobby) & Trạng Thái Bạn Bè Online/Offline
+- **Nút Menu Mới:**
+  - Đổi nút Play cũ thành `Solo` (với icon Pokéball pixel art).
+  - Thêm nút `Multiplayer` ngay dưới `Solo` với icon pixel art 4 khối màu (2 xanh dương, 2 xanh ngọc) chuẩn theo hình mẫu.
+- **Màn Hình Duyệt Phòng & Tạo Phòng (`#scr-multiplayer` - `G.MultiplayerUI`):**
+  - Thanh tiêu đề: `Room` cùng nút `Back [Esc]`.
+  - Nút `Create a room` để tạo phòng mới và nút `Friends` để xem bạn bè.
+  - Tách bạch danh sách **Public Rooms** theo thời gian thực (lắng nghe Firebase RTDB `/public_rooms`):
+    - Hiển thị tên Chủ phòng (Host name).
+    - Thành tích cao nhất của chủ phòng: Thời gian sống sót lâu nhất (`⏱️ MM:SS`), Cấp độ cao nhất (`Lv XX`), cùng tên & icon Pokémon đạt thành tích.
+    - Số lượng thành viên hiện tại trong phòng (`👥 X / 4`).
+    - Nút `Tham gia` (Join) để lập tức vào phòng khi còn chỗ trống.
+- **Sảnh Tổ Đội Mới Chuẩn Thiết Kế (`#scr-lobby` - `G.LobbyUI`):**
+  - **Điều hướng thông minh:** Nút `Back [Esc]` quay về Menu chính mà **không rời khỏi tổ đội**, người chơi có thể tiếp tục xem Pokédex / Nâng cấp trong khi đang ở trong phòng. Nút `Leave the room` để thoát và giải tán kết nối.
+  - **Khung 4 thành viên (4 Member Cards):**
+    - Hiển thị thẻ của 4 thành viên đặt cạnh nhau: Khung thành viên của bản thân có viền vàng nổi bật (`.lob-card.is-me`), hiển thị sprite nhân vật động, tên nhân vật, tên Pokémon, vai trò (`👑 Host · You` / `👑 Host` / `✋ Member · You` / `✋ Member`), trạng thái sẵn sàng (`Ready` / `Not ready`), kết nối (`Connected`), ping (`📶 -`).
+    - Các ô chưa có người chơi hiển thị thẻ mờ với chữ `Free`.
+  - **Tính năng Đổi Pokémon Ngay Trong Phòng (`#scr-partner-picker` - `G.PartnerPickerUI`):**
+    - Bấm nút `[ Change Pokémon ]` trên thẻ của bản thân để mở bảng chọn nhanh Pokémon từ bộ sưu tập đã sở hữu kèm thanh tìm kiếm tiện lợi.
+    - Chọn Pokémon mới lập tức đồng bộ thời gian thực (`G.Social.refreshMember(dex, shiny)`) đến tất cả người chơi khác trong phòng mà không cần thoát ra Menu.
+  - **Chế độ Phòng Công Khai (Public Toggle):**
+    - Mặc định khi tạo phòng là **Private** (chỉ mời qua bạn bè, không xuất hiện trên danh sách phòng chung).
+    - Chủ phòng có công tắc `Public: [ OFF / ON ]` để công khai đưa phòng vào danh sách cho người khác tự do tham gia.
+  - **Thông báo Chờ Thành Viên Sẵn Sàng (Waiting Bar):**
+    - Hiển thị dòng thông báo: `"Waiting for: <Tên các bạn chưa sẵn sàng>"`.
+    - Khi tất cả đều sẵn sàng: Chuyển thành trạng thái `"✅ All players are ready!"`.
+  - **Hệ thống Nút Hành Động Phân Quyền:**
+    - Thành viên (Member): Nút bật tắt trạng thái sẵn sàng (`I'm ready` / `Not ready`).
+    - Chủ phòng (Host): Có cả nút trạng thái sẵn sàng (`I'm ready` / `Not ready`) và nút `Start game`. Nút `Start game` chỉ sáng khi tất cả người chơi trong phòng đã sẵn sàng và kết nối ổn định.
+- **Hệ Thống Theo Dõi Bạn Bè Online / Offline Thời Gian Thực:**
+  - Tích hợp theo dõi hiện diện (Presence tracking) qua Firebase RTDB `/presence/{uid}` với `onDisconnect().remove()`.
+  - Danh sách bạn bè hiển thị chấm trạng thái xanh lá sáng (`Online`) hoặc xám (`Offline`).
+  - Trong phòng tổ đội, bạn bè `Offline` bị vô hiệu hóa nút mời (`Invite` disabled dạng sọc tối), chỉ bạn bè `Online` mới sáng nút mời (`Invite` gold) để bấm gửi lời mời.
+- **Đóng gói sản phẩm:**
+  - `tests/i18n.test.cjs`: **20/20 tests passed**.
+  - `node tools/build.js`: Biên dịch ra `app.min.js?v=38b2faaec9` và đồng bộ `index.html`.

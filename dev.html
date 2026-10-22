@@ -185,7 +185,8 @@
   <div class="menu-right">
     <div class="box">
       <div class="menu-list">
-        <button class="menu-item play" data-go="play">Jugar<small>Entra en la mazmorra</small></button>
+        <button class="menu-item play" data-go="play">Solo<small>Entra en la mazmorra</small></button>
+        <button class="menu-item multi" data-go="multiplayer">Multiplayer<small>Chơi nhiều người / Co-op</small></button>
         <button class="menu-item" data-go="dex">Pokémon<small id="menu-dex-count">Tu colección</small></button>
         <button class="menu-item" data-go="upgrades">Mejoras<small>Haz más fuerte cada run</small></button>
         <button class="menu-item" data-go="shop">Tienda Kecleon<small>Mentas, Cápsulas y MT</small></button>
@@ -358,6 +359,28 @@
   </div>
 </section>
 
+<!-- ====== Multiplayer: Crear / Buscar Salas ====== -->
+<section id="scr-multiplayer" class="scr dim hidden">
+  <div class="box wide multiplayer-box">
+    <div class="row between">
+      <h2>Room</h2>
+      <button class="btn small ghost" data-back>Back <kbd>Esc</kbd></button>
+    </div>
+    <p class="sub">Play with up to 4 friends: create a room and invite them, or accept an invite.</p>
+    <div class="row" style="gap:10px;margin:12px 0 16px">
+      <button id="multi-create" class="btn gold">Create a room</button>
+      <button id="multi-friends" class="btn ghost">Friends</button>
+    </div>
+    <hr class="multi-sep">
+    <p class="sub" style="margin-top:12px">Or play with anyone: join an open room, or open one for others to find.</p>
+    <div class="row between" style="align-items:center;margin:12px 0 8px">
+      <h3 style="margin:0">Public Rooms</h3>
+      <button id="multi-refresh" class="btn small ghost">🔄 Làm mới</button>
+    </div>
+    <div id="multi-rooms-list" class="multi-rooms-list"></div>
+  </div>
+</section>
+
 <!-- ====== Amigos ====== -->
 <section id="scr-friends" class="scr dim hidden">
   <div class="box wide">
@@ -373,19 +396,62 @@
   </div>
 </section>
 
-<!-- ====== Sala (partida en grupo) ====== -->
+<!-- ====== Sala / Party (Tổ đội) ====== -->
 <section id="scr-lobby" class="scr dim hidden">
-  <div class="box wide">
-    <div class="row between"><h2>Sala</h2>
-      <div class="row"><button id="lobby-menu" class="btn small ghost">Menú</button><button id="lobby-leave" class="btn small ghost">Salir de la sala</button></div></div>
-    <p class="sub" id="lobby-sub"></p>
-    <div id="lobby-members" class="lobby-members"></div>
-    <h3 id="lobby-inv-title" style="margin:14px 0 6px">Invitar amigos</h3>
-    <div id="lobby-invite" class="fr-list"></div>
-    <div class="row" style="margin-top:14px">
-      <button id="lobby-start" class="btn gold grow">Empezar partida</button>
+  <div class="box wide lobby-box">
+    <div class="row between">
+      <h2>Room</h2>
+      <div class="row" style="gap:6px">
+        <button id="lobby-back" class="btn small ghost">Back <kbd>Esc</kbd></button>
+        <button id="lobby-leave" class="btn small ghost">Leave the room</button>
+      </div>
     </div>
-    <p class="note" id="lobby-note"></p>
+    <p class="sub" id="lobby-sub">You're the host. Invite your friends (up to 3) and start when you're ready.</p>
+    
+    <!-- 4 Khung thành viên (Cards) -->
+    <div id="lobby-members" class="lobby-members"></div>
+
+    <!-- Hàng cài đặt Public -->
+    <div class="lobby-setting-row" id="lobby-public-row">
+      <div class="public-label">
+        <b>Public</b>
+        <small>Players searching for an open room can join without an invite.</small>
+      </div>
+      <button id="lobby-public-toggle" class="btn small toggle-btn">OFF</button>
+    </div>
+
+    <!-- Thông báo chờ thành viên sẵn sàng -->
+    <div id="lobby-waiting" class="lobby-waiting-bar">
+      Waiting for: <span id="lobby-waiting-names" class="gold"></span>
+    </div>
+
+    <!-- Các nút hành động chính -->
+    <div class="lobby-actions-row">
+      <button id="lobby-ready" class="btn ready-btn">I'm ready</button>
+      <button id="lobby-start" class="btn gold start-btn hidden">Start game</button>
+    </div>
+
+    <!-- Danh sách bạn bè để mời -->
+    <div class="lobby-invite-section">
+      <h3 id="lobby-inv-title" style="margin:14px 0 8px">Invite friends</h3>
+      <div id="lobby-invite" class="lobby-friends-list"></div>
+    </div>
+    <p class="note center" id="lobby-note" style="margin-top:10px"></p>
+  </div>
+</section>
+
+<!-- ====== Chọn nhanh Pokémon trong phòng ====== -->
+<section id="scr-partner-picker" class="scr dim hidden">
+  <div class="box wide partner-picker-box">
+    <div class="row between">
+      <h2>Change Pokémon</h2>
+      <button class="btn small ghost" id="picker-close">Close <kbd>Esc</kbd></button>
+    </div>
+    <p class="sub">Chọn Pokémon bạn muốn dùng cho trận đấu tổ đội này.</p>
+    <div class="picker-search-bar row" style="gap:8px;margin:10px 0">
+      <input id="picker-search" class="field grow" placeholder="Tìm theo tên hoặc số..." autocomplete="off">
+    </div>
+    <div id="picker-grid" class="picker-grid"></div>
   </div>
 </section>
 
