@@ -105,13 +105,14 @@ G.Combat = (() => {
     const vis = G.VFX.forMove(m);
     const n = Math.max(1, m.count | 0);
     const spread = m.spread || 0;
+    const rMul = (pl && pl.moveRadiusMul) || 1;
     for (let i = 0; i < n; i++) {
       const off = n === 1 ? 0 : (i / (n - 1) - 0.5) * spread * n;
       const a = pl.aim + off + G.U.rand(-0.03, 0.03);
       G.Projectiles.spawn(Object.assign({
         x: pl.x + Math.cos(a) * 3, y: pl.y + Math.sin(a) * 3,
         vx: Math.cos(a) * m.speed, vy: Math.sin(a) * m.speed,
-        dmg: m.dmg * pl.atkFor(m), r: m.size, life: m.life,
+        dmg: m.dmg * pl.atkFor(m), r: m.size * rMul, life: m.life,
         pierce: m.pierce | 0, color: col, homing: m.homing || 0,
         hits: new Set(), vis, ghost, owner: pl
       }, payload(m)));
@@ -124,12 +125,13 @@ G.Combat = (() => {
     const col = G.U.TYPE_COLOR[m.type];
     const vis = G.VFX.forMove(m);
     const n = Math.max(3, m.count | 0);
+    const rMul = (pl && pl.moveRadiusMul) || 1;
     for (let i = 0; i < n; i++) {
       const a = (i / n) * 6.2832 + G.U.rand(-0.06, 0.06);
       G.Projectiles.spawn(Object.assign({
         x: pl.x + Math.cos(a) * 3, y: pl.y + Math.sin(a) * 3,
         vx: Math.cos(a) * m.speed, vy: Math.sin(a) * m.speed,
-        dmg: m.dmg * pl.atkFor(m), r: m.size, life: m.life,
+        dmg: m.dmg * pl.atkFor(m), r: m.size * rMul, life: m.life,
         pierce: m.pierce | 0, color: col, homing: m.homing || 0,
         hits: new Set(), vis, ghost, owner: pl
       }, payload(m)));
@@ -145,14 +147,15 @@ G.Combat = (() => {
   function melee(pl, m) {
     const col = G.U.TYPE_COLOR[m.type];
     const half = Math.min(m.arc, 6.2832) / 2;
-    G.FX.slash(pl.x, pl.y - G.LIFT * 0.5, pl.aim, m.radius, m.arc, col, G.VFX.forMove(m));
+    const rad = m.radius * ((pl && pl.moveRadiusMul) || 1);
+    G.FX.slash(pl.x, pl.y - G.LIFT * 0.5, pl.aim, rad, m.arc, col, G.VFX.forMove(m));
     if (ghost) return;
 
-    for (const e of G.EnemyMgr.queryCircle(pl.x, pl.y, m.radius)) {
+    for (const e of G.EnemyMgr.queryCircle(pl.x, pl.y, rad)) {
       if (!inArc(pl.x, pl.y, e.x, e.y, pl.aim, half)) continue;
       hit(pl, e, m.dmg * pl.atkFor(m), col, e.x - pl.x, e.y - pl.y, m.knock || 0, m);
     }
-    for (const p of G.World.propsInCircle(pl.x, pl.y, m.radius)) {
+    for (const p of G.World.propsInCircle(pl.x, pl.y, rad)) {
       if (inArc(pl.x, pl.y, p.x, p.y, pl.aim, half)) G.World.damageProp(p, m.dmg * pl.atkFor(m), col);
     }
   }

@@ -264,7 +264,9 @@ G.MenuUI = (() => {
     else if (sh) cell.insertAdjacentHTML('beforeend', `<span class="badge-r" title="Tienes su shiny">${G.Icons.html('shiny', 12)}</span>`);
     const useShiny = sh && p.dex === s.partner && s.partnerShiny;
     cell.appendChild(G.UI.spriteCanvas(p.dex, 92, 80, { scale: 2, silhouette: !own, shadow: own, shiny: useShiny }));
-    cell.insertAdjacentHTML('beforeend', `<b>${own ? p.name : '???'}</b>${G.UI.stars(p.rarity, 9)}`);
+    const isMega = G.Mega && G.Mega.isCapable(p.dex);
+    const megaIconHtml = isMega ? `<span class="badge-mega" title="${G.Mega.getStoneName(p.dex)}">${G.Icons.html('mega', 11)}</span>` : '';
+    cell.insertAdjacentHTML('beforeend', `<b>${own ? p.name : '???'}</b><div class="cell-rarity-row">${G.UI.stars(p.rarity, 9)}${megaIconHtml}</div>`);
     cell.onclick = () => {
       dexSel = p.dex;
       $('dex-grid').querySelectorAll('.cell').forEach(c => c.classList.remove('on'));
@@ -276,6 +278,7 @@ G.MenuUI = (() => {
 
   // Variante que se está viendo en la ficha (normal o shiny).
   let viewShiny = false;
+  let viewMega = null; // null: dạng thường, 'x' | 'y' | 'default': dạng Mega
 
   function showDetail(dex) {
     const s = G.DB.save;
@@ -285,20 +288,66 @@ G.MenuUI = (() => {
     const isPartner = dex === s.partner;
     if (!hasSh) viewShiny = false;
     else if (isPartner && dex !== showDetail.last) viewShiny = !!s.partnerShiny;
-    if (dex !== showDetail.last) extraOpen = '';
+    if (dex !== showDetail.last) { extraOpen = ''; viewMega = null; }
     // Al redibujar el mismo Pokémon (abrir el selector de Menta, enseñar una MT...)
     // no se vuelve arriba: se quedaba fuera de la vista lo que acababas de abrir.
     const sameMon = dex === showDetail.last, d0 = $('dex-detail');
     const scrolls = sameMon && d0 ? [d0, d0.closest('.box')].filter(Boolean).map(el => [el, el.scrollTop]) : [];
     showDetail.last = dex;
 
-    const max = { hp: 183, atk: 1.55, spd: 137, def: 160 };
+    const isMega = G.Mega && G.Mega.isCapable(dex);
+    const megaForms = isMega ? G.Mega.getForms(dex) : [];
+    const activeMega = isMega && viewMega ? G.Mega.getFormInfo(dex, viewMega) : null;
+    const isVi = G.I18n && G.I18n.lang === 'vi';
+    const stoneName = isMega ? G.Mega.getStoneName(dex, viewMega || (megaForms[0] && megaForms[0].form)) : '';
+
+    const max = { hp: 183, atk: 2.15, spd: 170, def: 250 };
     // Con su naturaleza (20-10-2026): el stat que sube, en verde; el que baja, en rojo.
-    const nat = own ? G.Mons.natureOf(dex) : null, q = own ? G.Mons.monFor(dex) : p;
-    const natCls = k => (!nat ? '' : nat.up === k ? ' nat-up' : nat.down === k ? ' nat-down' : '');
+    const nat = own ? G.Mons.natureOf(dex) : null;
+    let q = own ? G.Mons.monFor(dex) : p;
+    let dispTypes = p.types;
+    let dispName = own ? p.name : '???';
+
+    if (activeMega) {
+      q = Object.assign({}, q, {
+        hp: activeMega.hp, pa: activeMega.pa, sa: activeMega.sa,
+        df: activeMega.df, sd: activeMega.sd, spd: activeMega.spd
+      });
+      dispTypes = activeMega.types;
+      dispName = activeMega.name;
+    }
+
+    const natCls = k => (!nat || activeMega ? '' : nat.up === k ? ' nat-up' : nat.down === k ? ' nat-down' : '');
     const bar = (label, v, m, txt, k) =>
       `<div class="stat${natCls(k)}"><span>${label}</span><div class="bar"><i style="width:${Math.min(100, v / m * 100)}%"></i></div><span>${txt}</span></div>`;
     const usingThis = isPartner && (!hasSh || !!s.partnerShiny === viewShiny);
+
+    const megaLine = isMega ? `
+      <div class="mega-capable-line">
+        <span class="mega-icon">${G.Icons.html('mega', 15)}</span>
+        <span>${isVi ? `Có thể Tiến hóa Mega · Có thể tiến hóa trong trận đấu bằng ${stoneName}` : `Mega Capable · Can Mega Evolve in runs, using ${stoneName}`}</span>
+      </div>` : '';
+
+    const megaTabs = isMega && own ? `
+      <div class="mega-form-tabs">
+        <button class="mega-form-btn ${!viewMega ? 'on' : ''}" data-mega="base">${isVi ? 'Dạng Thường' : 'Normal'}</button>
+        ${megaForms.map(f => `
+          <button class="mega-form-btn ${viewMega === (f.form || 'default') ? 'on' : ''}" data-mega="${f.form || 'default'}">
+            ${f.form ? f.form.toUpperCase() + ' · ' : ''}${f.name}
+          </button>
+        `).join('')}
+      </div>` : '';
+
+    const hasStone = activeMega ? G.Mega.hasStone(dex, activeMega.form) : false;
+    const equippedForm = isMega ? G.Mega.getEquippedForm(dex) : null;
+    const isEquipped = activeMega ? equippedForm === (activeMega.form || 'default') : false;
+    const megaStoneAction = activeMega ? (hasStone ? `
+      <button id="mega-equip-btn" class="btn ${isEquipped ? 'ghost' : 'gold'} mega-equip-btn">
+        ${isEquipped ? ('✅ ' + (isVi ? 'Đang trang bị ' + stoneName : 'Equipped ' + stoneName)) : ('⚔️ ' + (isVi ? 'Trang bị ' + stoneName : 'Equip ' + stoneName))}
+      </button>` : `
+      <p class="center sub" style="color:#ff9ff3;margin:6px 0 2px">
+        🔒 ${isVi ? `Chưa có ${stoneName} (Đánh bại Boss Mega Rift để nhận)` : `Need ${stoneName} (Defeat Mega Rift Boss)`}
+      </p>`) : '';
 
     const box = $('dex-detail');
     box.innerHTML = `
@@ -308,10 +357,12 @@ G.MenuUI = (() => {
           <button class="${viewShiny ? 'on' : ''}" data-v="1">${G.Icons.html('shiny', 12)} Shiny</button></div>` : ''}
       <div class="center">
         <div style="color:var(--muted);font-size:13px">Nº ${String(p.dex).padStart(3, '0')} · ${GEN_NAMES[p.gen - 1]}</div>
-        <h3>${own ? p.name : '???'}</h3>
+        <h3>${dispName}</h3>
         ${own ? `<button id="dex-fav" class="chip${G.DB.isFav(dex) ? ' on' : ''}" type="button">${G.Icons.html(G.DB.isFav(dex) ? 'star' : 'starDim', 12)} ${G.DB.isFav(dex) ? 'Favorito' : 'Marcar como favorito'}</button>` : ''}
         <div style="color:${G.Gacha.RARITY_COLOR[p.rarity]}">${G.UI.stars(p.rarity, 24)} ${G.Gacha.RARITY_NAME[p.rarity]}</div>
-        <div style="margin:6px 0">${own ? G.UI.typeChips(p.types) : ''}</div>
+        ${megaLine}
+        <div style="margin:6px 0">${own ? G.UI.typeChips(dispTypes) : ''}</div>
+        ${megaTabs}
       </div>
       ${own ? `
         ${bar('Vida', q.hp, max.hp, q.hp)}
@@ -321,8 +372,8 @@ G.MenuUI = (() => {
         ${bar('Def. Esp.', q.sd, max.def, Math.round(q.sd), 'sd')}
         ${bar('Velocidad', q.spd, max.spd, Math.round(q.spd), 'spd')}
         <p class="sub center" style="margin:6px 0 0">Pega mejor con ataques <b class="gold">${G.Stats.sideOf(q) === 'special' ? 'especiales' : 'físicos'}</b></p>
-        ${monExtras(dex)}
-        ${p.types.length === 1 ? `<p class="sub center" style="margin:2px 0 0">Monotipo: +20 % de daño con sus ataques de tipo ${G.U.TYPE_NAME[p.types[0]]}</p>` : ''}
+        ${activeMega ? `<p class="sub center gold" style="margin:6px 0">${activeMega.desc}</p>${megaStoneAction}` : monExtras(dex)}
+        ${dispTypes.length === 1 ? `<p class="sub center" style="margin:2px 0 0">Monotipo: +20 % de daño con sus ataques de tipo ${G.U.TYPE_NAME[dispTypes[0]]}</p>` : ''}
         <p style="font-size:14px;margin:10px 0 4px">Empieza con <b class="gold">${G.T(G.Moves.BY_ID[G.startMoveOf(dex)].name, 'move')}</b></p>
         <p class="move-icons" title="Movimientos que puede aprender">
           ${G.Moves.poolFor(p).map(id => `<span title="${G.T(G.Moves.BY_ID[id].name, 'move')}">${G.Icons.html('move:' + id, 16)}</span>`).join('')}</p>
@@ -333,12 +384,34 @@ G.MenuUI = (() => {
             o derrotándolo cuando salga shiny.</p>`}
     `;
     for (const [el, t] of scrolls) el.scrollTop = t;
-    $('dex-big').style.setProperty('--stage-c', !own ? '#5b83d6' : viewShiny ? '#9ae6ff' : G.U.TYPE_COLOR[p.types[0]]);
+    $('dex-big').style.setProperty('--stage-c', !own ? '#5b83d6' : viewShiny ? '#9ae6ff' : G.U.TYPE_COLOR[dispTypes[0]]);
     $('dex-big').classList.toggle('shiny', own && viewShiny);
     G.UI.sprite($('dex-big'), dex, { lively: own, spin: own, silhouette: !own, scale: 3, hero: true, shiny: own && viewShiny });
     box.querySelectorAll('.seg button').forEach(b => {
       b.onclick = () => { viewShiny = b.dataset.v === '1'; showDetail(dex); };
     });
+    box.querySelectorAll('.mega-form-btn').forEach(b => {
+      b.onclick = () => {
+        const m = b.dataset.mega;
+        viewMega = (m === 'base') ? null : m;
+        showDetail(dex);
+      };
+    });
+    const eqBtn = $('mega-equip-btn');
+    if (eqBtn) {
+      eqBtn.onclick = () => {
+        const cur = G.Mega.getEquippedForm(dex);
+        const target = (activeMega && activeMega.form) || 'default';
+        if (cur === target) {
+          G.Mega.setEquippedForm(dex, null);
+          G.UI.toast(isVi ? `Đã tháo ${stoneName}` : `Unequipped ${stoneName}`);
+        } else {
+          G.Mega.setEquippedForm(dex, target);
+          G.UI.toast(isVi ? `Đã trang bị ${stoneName}!` : `Equipped ${stoneName}!`);
+        }
+        showDetail(dex);
+      };
+    }
     const fav = $('dex-fav');
     if (fav) fav.onclick = () => { G.DB.setFav(dex, !G.DB.isFav(dex)); renderGrid(true); showDetail(dex); };
     const pick = $('dex-pick');
@@ -349,7 +422,7 @@ G.MenuUI = (() => {
       G.UI.toast(p.name + (s.partnerShiny ? ' shiny' : '') + ' es ahora tu compañero');
       renderGrid(true); showDetail(dex);
     };
-    if (own) wireExtras(dex, box);
+    if (own && !activeMega) wireExtras(dex, box);
   }
 
   // ---------------- naturaleza, habilidad y MT (Tienda Kecleon, 20-10-2026) ----------------

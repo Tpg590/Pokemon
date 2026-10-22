@@ -100,10 +100,18 @@ G.Rift = (() => {
   function start(forceType) {
     if (arena) return;
     forceType = forceType || nextType; nextType = null;
-    let pool = G.DEX.filter(p => p.leg && G.SPRITE_META[p.dex]);
+    const isMegaRift = Math.random() < 0.05; // 5% tỉ lệ xuất hiện Mega Rift
+    let pool;
+    if (isMegaRift && G.Mega) {
+      pool = G.Mega.ALL_MEGA_DEX.map(d => G.DEX_BY[d]).filter(p => p && G.SPRITE_META[p.dex]);
+    } else {
+      pool = G.DEX.filter(p => p.leg && G.SPRITE_META[p.dex]);
+    }
     if (forceType && pool.some(p => p.types.includes(forceType))) pool = pool.filter(p => p.types.includes(forceType));
-    // Los legendarios que aún no has vencido salen 4 veces más (menos repetidos).
-    const beaten = (G.DB.save && G.DB.save.legends) || {};
+    if (!pool.length) pool = G.DEX.filter(p => p.leg && G.SPRITE_META[p.dex]);
+
+    // Los legendarios o megas que aún no has vencido salen 4 veces más (menos repetidos).
+    const beaten = isMegaRift ? ((G.DB.save && G.DB.save.megas) || {}) : ((G.DB.save && G.DB.save.legends) || {});
     const ws = pool.map(p => (beaten[p.dex] ? 1 : 4));
     let r = Math.random() * ws.reduce((a, b) => a + b, 0), mi = 0;
     while (mi < pool.length - 1 && (r -= ws[mi]) > 0) mi++;
@@ -111,7 +119,7 @@ G.Rift = (() => {
     const cfg = {
       tx: 5000 + Math.floor(Math.random() * 3000), ty: 5000 + Math.floor(Math.random() * 3000), r: ARENA_R,
       dex: mon.dex, shiny: G.Sprites.hasShiny(mon.dex) && Math.random() < 1 / 512,
-      // La arena es la de uno de sus tipos, al azar.
+      isMega: isMegaRift,
       type: forceType || G.U.pick(mon.types)
     };
     if (G.Coop.isHost) G.Coop.broadcast(['arena', cfg]);
@@ -142,9 +150,9 @@ G.Rift = (() => {
     const ps = G.Game.everyone();
     ps.forEach((p, i) => { p.x = arena.x + (i - (ps.length - 1) / 2) * 34; p.y = arena.y + ts * 3; });
     G.Camera.x = pl.x; G.Camera.y = pl.y;
-    G.Game.flash('#c9a6ff', 0.9);
+    G.Game.flash(cfg.isMega ? '#ff4b72' : '#c9a6ff', 0.9);
     G.Audio.sfx('rift');
-    G.Spawner.say('Has entrado en la grieta…', 2.4, true);
+    G.Spawner.say(cfg.isMega ? '¡Has entrado en la GRIETA MEGA!' : 'Has entrado en la grieta…', 2.8, true);
   }
 
   function spawnLegend() {
@@ -152,24 +160,34 @@ G.Rift = (() => {
     const t = G.Game.st.time;
     const n = G.Game.everyone().length;
     const ts = TS();
+    const isMega = !!arena.isMega;
+    const megaInfo = isMega && G.Mega ? G.Mega.getDefaultForm(arena.dex) : null;
+    const bossName = megaInfo ? megaInfo.name : mon.name;
+    const types = (megaInfo && megaInfo.types) || mon.types;
+    const hpMul = isMega ? 1.5 : 1;
+    const dmgMul = isMega ? 1.3 : 1;
+
     const def = {
-      dex: mon.dex, name: mon.name,
-      hp: Math.round((3200 + t * 9) * G.Coop.scaleHp(n) * (n > 1 ? 1.4 : 1)),
+      dex: mon.dex, name: bossName,
+      hp: Math.round((3200 + t * 9) * G.Coop.scaleHp(n) * (n > 1 ? 1.4 : 1) * hpMul),
       spd: Math.round(G.U.clamp(48 + (mon.spd - 78) * 0.6, 48, 105)),
-      dmg: Math.round(36 + t / 20), xp: Math.round(500 + t * 1.2),
-      behavior: mon.types.some(x => ['psychic', 'electric', 'ghost', 'fairy', 'fire', 'water', 'ice', 'dragon'].includes(x)) ? 'ranged' : 'charger',
-      shotDmg: Math.round(18 + t / 40), shotCd: 0.9, range: 300
+      dmg: Math.round((36 + t / 20) * dmgMul), xp: Math.round((500 + t * 1.2) * (isMega ? 1.5 : 1)),
+      behavior: types.some(x => ['psychic', 'electric', 'ghost', 'fairy', 'fire', 'water', 'ice', 'dragon'].includes(x)) ? 'ranged' : 'charger',
+      shotDmg: Math.round((18 + t / 40) * dmgMul), shotCd: isMega ? 0.75 : 0.9, range: isMega ? 340 : 300
     };
     const e = new G.Enemy(def, arena.x, arena.y - ts * 3.5, { hp: 1, spd: 1, dmg: 1 }, true);
     e.legend = true;
-    // Choca con las paredes y columnas como tú: si volara por encima de las
-    // rocas, tus disparos no podrían alcanzarle (bug de Celebi).
+    e.isMega = isMega;
     e.flying = false;
+    if (isMega) e.scale = (e.scale || 1) * 1.2;
     if (arena.shiny) e.makeShiny();
     G.EnemyMgr.add(e);
     arena.bossId = e.id;
-    G.Spawner.say('¡' + e.name + (e.shiny ? ' shiny' : '') + ' te esperaba en la grieta!', 3.2);
-    G.Camera.kick(1.1);
+    const notice = isMega
+      ? ('⚡ Boss ' + bossName + ' (Mega Rift) te esperaba en la grieta!')
+      : ('¡' + e.name + (e.shiny ? ' shiny' : '') + ' te esperaba en la grieta!');
+    G.Spawner.say(notice, 3.5, true);
+    G.Camera.kick(1.3);
     G.Audio.sfx('boss');
   }
 
@@ -204,13 +222,27 @@ G.Rift = (() => {
     arena.phase = 'won'; arena.endT = 5;
     G.Progress.event('rift', { type: arena.type });
     G.Pickups.pullAll();
-    G.Spawner.say('¡Has vencido a ' + G.DEX_BY[arena.dex].name + '! Recoge el premio…', 3.4, true);
+    const mon = G.DEX_BY[arena.dex];
+    const isMega = !!arena.isMega;
+    const megaInfo = isMega && G.Mega ? G.Mega.getDefaultForm(arena.dex) : null;
+    const bossName = megaInfo ? megaInfo.name : mon.name;
+    G.Spawner.say('¡Has vencido a ' + bossName + '! Recoge el premio…', 3.4, true);
     G.Audio.sfx('legend');
+
+    if (isMega && G.Mega) {
+      G.Mega.unlockStone(arena.dex);
+      const stoneName = G.Mega.getStoneName(arena.dex);
+      const isVi = G.I18n && G.I18n.lang === 'vi';
+      const msg = isVi ? `✨ Bạn đã nhận được ${stoneName}!` : `✨ You obtained ${stoneName}!`;
+      G.UI.toast(msg);
+      G.Spawner.say(msg, 4, true);
+    }
+
     const pl = G.Game.player;
     if (pl) {
       pl.bonds++;
-      G.FX.dmgText(pl.x, pl.y - pl.bodyH - 10, '¡Vínculo!', '#ff8ad8', true);
-      G.FX.ring(pl.x, pl.y, 8, 90, '#ff8ad8', 0.7, 5);
+      G.FX.dmgText(pl.x, pl.y - pl.bodyH - 10, isMega ? '¡Mega Piedra & Vínculo!' : '¡Vínculo!', '#ff4b72', true);
+      G.FX.ring(pl.x, pl.y, 8, 90, '#ff4b72', 0.7, 5);
     }
   }
 

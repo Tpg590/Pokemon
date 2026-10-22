@@ -130,3 +130,33 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
   - Chạy kiểm thử tự động `tests/i18n.test.cjs`: **20/20 tests passed**.
 - **Đóng gói sản phẩm:**
   - Chạy `node tools/build.js` thành công, nén mã hóa `js/app.min.js?v=338b0a77e1` và cập nhật `index.html`.
+
+## ⏱️ [2026-10-23 04:30:00] — Triển khai Hệ thống Tiến Hóa Mega (Mega Evolution System)
+- **Tạo cơ sở dữ liệu Mega (`js/data/mega.js`):**
+  - Tích hợp toàn bộ 46 loài Pokémon có khả năng Mega (48 dạng Mega, bao gồm Charizard X & Y, Mewtwo X & Y, Primal Kyogre & Primal Groudon).
+  - Khai báo đầy đủ tên dạng Mega, Tên đá Mega (tiếng Anh & tiếng Việt), Hệ mới khi biến hình, chỉ số chuẩn (+100 BST), Đặc tính và Mô tả chi tiết.
+  - Các hàm quản lý: `isCapable()`, `getForms()`, `hasStone()`, `unlockStone()`, `getEquippedForm()`, `setEquippedForm()`, `canMegaEvolve()`, `evolve()`.
+- **Thiết kế Icon Pixel Art Mega (`js/ui/icons.js`):**
+  - Vẽ icon pixel art `mega` (vòng tròn hào quang ngũ sắc đỏ/tím/xanh/vàng bao quanh lõi DNA helix trắng phát sáng).
+- **Giao diện Pokédex (`js/ui/menu.js` & `css/style.css`):**
+  - **Trên thẻ Pokédex:** Hiển thị icon DNA Mega ngũ sắc tròn kế bên biểu tượng Ball độ hiếm (đúng chuẩn hình mẫu 006 Charizard).
+  - **Trên bảng chi tiết Pokédex:**
+    - Dưới biểu tượng độ hiếm có dòng chữ màu hồng neon: `[Icon Mega] Mega Capable · Can Mega Evolve in runs, using [Tên Đá Mega]` (hoặc tiếng Việt tương ứng).
+    - Hệ thống Tabs chuyển đổi: `[ Dạng Thường ]` $\leftrightarrow$ `[ Dạng Mega ]` (hoặc `Mega X`, `Mega Y`).
+    - Khi chọn xem dạng Mega: Hiển thị chỉ số cộng thêm +100 BST, hệ mới, mô tả năng lực Mega.
+    - Nút trang bị đá: Nếu đã sở hữu đá Mega sẽ hiển thị nút `[ ⚔️ Trang bị Đá Mega ]` / `[ ✅ Đang trang bị ]`, nếu chưa có sẽ hiển thị hướng dẫn săn Boss Mega Rift.
+- **Cơ chế săn Boss Mega Rift (`js/systems/rift.js`):**
+  - Khi xuất hiện Vết nứt không gian (Rift), có **5% tỉ lệ** mở ra **Mega Rift**.
+  - Người chơi bước vào sẽ đối đầu với Boss Mega tương ứng sở hữu HP x1.5, Sát thương x1.3, kích thước to lớn và hào quang Mega Aura rực rỡ.
+  - Khi tiêu diệt Boss Mega Rift: Rơi rương kho báu, Vínculo và **mở khóa vĩnh viễn Đá Mega** của loài đó cho người chơi (`save.megas`).
+- **Cơ chế biến hình trong trận đấu (In-Run Evolution) (`js/systems/levelup.js` & `js/entities/player.js`):**
+  - Khi Pokémon đã trang bị Đá Mega đạt **Level 50** trong trận, thẻ bài lên cấp tiếp theo sẽ ưu tiên xuất hiện thẻ vàng đặc biệt **`TIẾN HÓA MEGA` (MEGA EVOLUTION)**!
+  - Khi chọn thẻ:
+    - Kích hoạt biến hình: Lóe sáng toàn màn hình, hiệu ứng sóng xung kích và âm thanh huyền thoại.
+    - Tăng chỉ số: **Damage +45%**, **Máu tối đa +35%** (hồi đầy máu), **Giảm hồi chiêu Cooldown -25%**, **Phòng thủ +25%**.
+    - Đổi Hệ theo đúng dạng Mega (ví dụ: Charizard X đổi sang Lửa/Rồng).
+    - **Buff diện tích chiêu (+30% Area):** Tăng 30% bán kính nổ và kích thước của toàn bộ đòn đánh người chơi đang sử dụng (`combat.js`).
+    - Kích thước nhân vật tăng nhẹ (1.18x) và tỏa **Hào quang ngũ sắc Mega Aura** liên tục xoay quanh thân và chân nhân vật.
+- **Đóng gói sản phẩm:**
+  - `tests/i18n.test.cjs`: **20/20 tests passed**.
+  - `node tools/build.js`: Biên dịch ra `app.min.js?v=d7b8ad3834` và đồng bộ `index.html`.

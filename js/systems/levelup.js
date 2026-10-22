@@ -92,6 +92,26 @@ G.LevelUp = (() => {
       });
     }
 
+    // --- tiến hóa mega (Level >= 50 + đã trang bị đá Mega) ---
+    if (G.Mega && G.Mega.canMegaEvolve(pl)) {
+      const dex = pl.dex;
+      const s = G.DB && G.DB.save;
+      const eq = (s && s.megaEquip && s.megaEquip[dex]) || (G.Mega.getForms(dex)[0].form || 'default');
+      const info = G.Mega.getFormInfo(dex, eq);
+      if (info) {
+        const isVi = G.I18n && G.I18n.lang === 'vi';
+        out.push({
+          w: 9999, type: 'mega', key: 'mega:' + dex,
+          icon: 'mega', color: '#ff4b72', tag: isVi ? 'TIẾN HÓA MEGA' : 'MEGA EVOLUTION',
+          title: info.name,
+          desc: isVi
+            ? `Thức tỉnh hình thái ${info.name}! Tăng +45% Damage, +35% Máu tối đa, -25% Hồi chiêu, +30% Diện tích chiêu và chuyển sang hệ ${info.types.map(t => G.U.TYPE_NAME[t] || t).join('/')}.`
+            : `Awaken into ${info.name}! +45% Damage, +35% Max HP, -25% Cooldown, +30% Move Area and types become ${info.types.join('/')}.`,
+          apply: p => G.Mega.evolve(p)
+        });
+      }
+    }
+
     // --- mejoras de movimientos que ya tienes ---
     for (const m of pl.moves) {
       const txt = G.Moves.nextUpText(m);

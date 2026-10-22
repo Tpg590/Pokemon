@@ -735,6 +735,31 @@
       ctx.save();
       ctx.globalAlpha = alpha;
       G.Sprites.drawShadow(ctx, this.dex, this.x, this.y, this.scale);
+
+      if (this.isMega && !this.dead) {
+        const t = performance.now();
+        const pulse = Math.sin(t / 220) * 0.15 + 0.9;
+        const angle = (t / 1100) % 6.2832;
+        ctx.save();
+        ctx.globalAlpha = 0.5 * pulse;
+        const grad = ctx.createRadialGradient(this.x, this.y - this.bodyH * 0.4, this.r * 0.4, this.x, this.y - this.bodyH * 0.4, this.r * 2.8 * pulse);
+        grad.addColorStop(0, 'rgba(255, 75, 114, 0.5)');
+        grad.addColorStop(0.5, 'rgba(165, 94, 234, 0.35)');
+        grad.addColorStop(0.8, 'rgba(72, 219, 251, 0.25)');
+        grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - this.bodyH * 0.4, this.r * 2.8 * pulse, 0, 6.2832);
+        ctx.fill();
+
+        ctx.strokeStyle = '#ff4b72';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(this.x, this.y, this.r * 2.4 * pulse, this.r * 1.0 * pulse, angle, 0, 6.2832);
+        ctx.stroke();
+        ctx.restore();
+      }
+
       // Los que flotan ya van en el aire en su sprite: sólo se mecen un poco.
       // (Y los que saltan, en arco.)
       const lift = (this.flying && !this.boss ? 1 + Math.sin(this.bob) * 1.5 : 0) + (this.jumpLift || 0);

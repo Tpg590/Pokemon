@@ -55,6 +55,9 @@ G.Icons = (() => {
     heart: { pal: { r: '#ff5f6d', s: '#c23a4b', w: '#ffd3d8' }, rows: [
       '............', '.kkk....kkk.', 'kwwrk..krrrk', 'kwrrrkkrrrsk', 'krrrrrrrrrsk', 'krrrrrrrrrsk',
       '.krrrrrrrsk.', '..krrrrrsk..', '...krrrsk...', '....krsk....', '.....kk.....', '............'] },
+    mega: { pal: { r: '#ff4b72', b: '#48dbfb', p: '#c47bff', y: '#ffd32a', w: '#ffffff', d: '#221e3b' }, rows: [
+      '....kkkk....', '..krrrrrkk..', '.krrwwwwppk.', '.kywddddwwk.', 'kywddwdddwbk', 'kywddwwddwbk',
+      'kywddwwddwbk', 'kywdddwddwbk', '.kwwddddwbk.', '.kbbwwwwbbk.', '..kkbbbbkk..', '....kkkk....'] },
     fist: { pal: { r: '#ff5f6d', s: '#c23a4b', w: '#ffd3d8', c: '#e8e8f0' }, rows: [
       '............', '..kkkkkk....', '.krrrrrrk...', 'krwwrrrrrkk.', 'krwrrrrrrrrk', 'krrrrrrrkrsk',
       'krrrrrrrkrsk', '.krrrrrrskk.', '..kssssssk..', '..kcccccck..', '..kkkkkkkk..', '............'] },

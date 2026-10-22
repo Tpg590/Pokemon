@@ -80,6 +80,8 @@ G.Player = class Player {
     this.statsTaken = {};      // mejoras de stat cogidas (condición de evolución)
     this.abil = null;          // efecto de su habilidad (data/ability-fx.js), lo pone game.js
     this.sturdyAt = -999;      // última vez que le salvó Robustez
+    this.isMega = false;
+    this.moveRadiusMul = 1;
   }
 
   /** Pone la habilidad (G.AbilityFX.of) y aplica lo que hace al empezar. */
@@ -557,6 +559,38 @@ G.Player = class Player {
       ctx.globalAlpha = 0.35 + Math.sin(performance.now() / 120) * 0.15;
       ctx.strokeStyle = this.power.def.color; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.ellipse(this.x, this.y, this.r * 2.1, this.r * 0.85, 0, 0, 6.2832); ctx.stroke();
+      ctx.restore();
+    }
+
+    // Hào quang ngũ sắc Mega Aura
+    if (this.isMega && !this.dead) {
+      ctx.save();
+      const t = performance.now();
+      const pulse = Math.sin(t / 220) * 0.15 + 0.9;
+      const angle = (t / 1100) % 6.2832;
+      ctx.globalAlpha = 0.5 * pulse;
+      const grad = ctx.createRadialGradient(this.x, this.y - this.bodyH * 0.4, this.r * 0.4, this.x, this.y - this.bodyH * 0.4, this.r * 2.6 * pulse);
+      grad.addColorStop(0, 'rgba(255, 75, 114, 0.45)');
+      grad.addColorStop(0.5, 'rgba(165, 94, 234, 0.3)');
+      grad.addColorStop(0.8, 'rgba(72, 219, 251, 0.25)');
+      grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y - this.bodyH * 0.4, this.r * 2.6 * pulse, 0, 6.2832);
+      ctx.fill();
+
+      // Vòng hào quang kép xoay quanh chân
+      ctx.strokeStyle = '#ff4b72';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.ellipse(this.x, this.y, this.r * 2.2 * pulse, this.r * 0.9 * pulse, angle, 0, 6.2832);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#48dbfb';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(this.x, this.y, this.r * 1.8 * pulse, this.r * 0.7 * pulse, -angle * 1.4, 0, 6.2832);
+      ctx.stroke();
       ctx.restore();
     }
 
