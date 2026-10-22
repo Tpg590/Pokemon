@@ -12,7 +12,8 @@ G.SupportUI = (() => {
 
   function init() {
     const b = $('btn-support');
-    if (!F.url) return;                       // aún sin cuenta de Ko-fi: no sale
+    if (!b) return;
+    if (!F.url && !F.momo) return;
     b.classList.remove('hidden');
     b.innerHTML = G.Icons.html('heart', 18) + ' <span>Apoyar</span>';
     b.onclick = open;
@@ -21,16 +22,34 @@ G.SupportUI = (() => {
 
   function open() {
     const rows = F.costs.map(([c, v]) => `<tr><td>${c}</td><td class="num">${val(v)}</td></tr>`).join('');
+    const isVi = G.I18n.lang === 'vi';
+    const qrTitle = isVi ? 'Ủng hộ qua MoMo / VietQR' : 'Ủng hộ / Donate (VietQR / MoMo)';
+    const qrSub = isVi ? 'Quét bằng MoMo hoặc mọi app Ngân hàng' : 'MoMo · VietQR · Napas 247';
+
+    const momoHtml = F.momo ? `
+      <div class="sup-qr-card">
+        <div class="sup-qr-title">${qrTitle}</div>
+        <img class="sup-qr-img" src="${F.momo.qr}" alt="MoMo VietQR - ${F.momo.name}">
+        <div class="sup-qr-name">${F.momo.name}</div>
+        <div class="sup-qr-sub">${qrSub}</div>
+      </div>
+    ` : '';
+
     $('sup-body').innerHTML = `
-      <p>PokéSurvivor es y será <b>gratis</b>, sin anuncios ni compras. Si quieres ayudar a que siga en línea, puedes hacer una
-      <b>donación voluntaria</b>: todo el dinero se usa para los <b>servidores y el dominio</b>, nada más.</p>
-      <p class="sub">Donar no da ninguna ventaja en el juego.</p>
-      <h3>Lo que cuesta mantenerlo</h3>
-      <table class="sup-tab">${rows}</table>
-      <p class="sub">Cuanta más gente juega, más cuestan los servidores. Lo que sobre se guarda para los gastos de los meses siguientes.</p>
-      <div class="row wrap" style="gap:8px;justify-content:center;margin-top:10px">
-        <a class="btn gold" href="${F.url}" target="_blank" rel="noopener">${G.Icons.html('heart', 18)} Donar en Ko-fi</a>
-        ${window.PS_PAGES ? `<a class="btn" href="${G.I18n.lang === 'en' ? 'en/support/' : 'apoyar/'}" target="_blank">Más información</a>` : ''}
+      <div class="sup-grid">
+        <div class="sup-info">
+          <p>PokéSurvivor es y será <b>gratis</b>, sin anuncios ni compras. Si quieres ayudar a que siga en línea, puedes hacer una
+          <b>donación voluntaria</b>: todo el dinero se usa para los <b>servidores y el dominio</b>, nada más.</p>
+          <p class="sub">Donar no da ninguna ventaja en el juego.</p>
+          <h3>Lo que cuesta mantenerlo</h3>
+          <table class="sup-tab">${rows}</table>
+          <p class="sub" style="margin-top:8px">Cuanta más gente juega, más cuestan los servidores. Lo que sobre se guarda para los gastos de los meses siguientes.</p>
+          <div class="row wrap" style="gap:8px;align-items:center;margin-top:12px">
+            ${F.url ? `<a class="btn gold" href="${F.url}" target="_blank" rel="noopener">${G.Icons.html('heart', 18)} Donar en Ko-fi</a>` : ''}
+            ${window.PS_PAGES ? `<a class="btn" href="${G.I18n.lang === 'en' ? 'en/support/' : 'apoyar/'}" target="_blank">Más información</a>` : ''}
+          </div>
+        </div>
+        ${momoHtml}
       </div>`;
     $('scr-support').classList.remove('hidden');
   }
@@ -38,3 +57,4 @@ G.SupportUI = (() => {
 
   return { init, open, close };
 })();
+

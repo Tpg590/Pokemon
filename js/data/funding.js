@@ -11,9 +11,14 @@
 G.Funding = {
   kofi: 'jpter78',
   sponsors: 'JPTER78',
+  momo: {
+    name: 'LE THIEN TRI',
+    qr: 'assets/momo_qr.png'
+  },
   costs: [
     ['Servidores (partidas, cuentas, ranking y multijugador)', 'Según cuánta gente juegue'],
     ['Dominio pokesurvivor.com', '≈12 € al año']
   ],
   get url() { return this.kofi ? 'https://ko-fi.com/' + this.kofi : ''; }
 };
+
