@@ -964,5 +964,10 @@ G.I18n.add({
   "Connected": "Connected",
   "Connecting…": "Connecting…",
   "Online": "Online",
-  "Offline": "Offline"
+  "Offline": "Offline",
+  "Cooperativo": "Multiplayer",
+  "Juega en grupo con amigos": "Play with friends",
+  "Volver a tu sala ({x}/{max})": "Back to your room ({x}/{max})",
+  "Movimientos & MT": "Moves & TMs",
+  "Efectos, evoluciones y MTs": "Effects, evolutions & TMs"
 });

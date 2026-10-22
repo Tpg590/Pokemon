@@ -10,18 +10,25 @@ G.MenuUI = (() => {
   const SORTS = [['num', 'Nº'], ['name', 'Nombre'], ['rar', 'Rareza'], ['new', 'Recién conseguidos'], ['used', 'Más usados']];
 
   function init() {
-    const ICON = { play: 'ball', multiplayer: 'multi', dex: 'book', upgrades: 'up', shop: 'shop', bag: 'bag', gacha: 'ball4', goals: 'medal3', friends: 'friends', rank: 'trophy', settings: 'gear' };
+    const ICON = { play: 'ball', multiplayer: 'multi', dex: 'book', moves: 'tm', upgrades: 'up', shop: 'shop', bag: 'bag', gacha: 'ball4', goals: 'medal3', friends: 'friends', rank: 'trophy', settings: 'gear' };
     document.querySelectorAll('#scr-menu [data-go]').forEach(b => {
       b.insertAdjacentHTML('afterbegin', `<span class="mi-ico">${G.Icons.html(ICON[b.dataset.go] || 'ball', 26)}</span>`);
       b.dataset.sfx = (b.dataset.go === 'play' || b.dataset.go === 'multiplayer') ? 'confirm' : 'click';
       b.onclick = () => {
         const go = b.dataset.go;
-        if (go === 'play') G.Flow.play();
+        if (go === 'play') {
+          if (G.Social && G.Social.room) {
+            G.Social.leaveRoom();
+            if (G.Net && G.Net.close) G.Net.close();
+          }
+          G.Flow.play();
+        }
         else if (go === 'multiplayer') {
           if (G.Social.room) G.LobbyUI.open();
           else G.MultiplayerUI.open();
         }
         else if (go === 'dex') openDex();
+        else if (go === 'moves') G.MovesUI.open();
         else if (go === 'upgrades') openUpgrades();
         else if (go === 'shop') G.ShopUI.open();
         else if (go === 'bag') G.ShopUI.openBag();
@@ -107,7 +114,14 @@ G.MenuUI = (() => {
   function socialLine() {
     const room = G.Social.room;
     const play = document.querySelector('#scr-menu [data-go=play] small');
-    if (play) play.textContent = room ? 'Volver a tu sala (' + room.members.length + '/' + G.Social.MAX_PLAYERS + ')' : 'Entra en la mazmorra';
+    if (play) play.textContent = G.T('Entra en la mazmorra');
+
+    const multi = document.querySelector('#scr-menu [data-go=multiplayer] small');
+    if (multi) {
+      multi.textContent = room
+        ? G.T('Volver a tu sala ({x}/{max})', { x: room.members.length, max: G.Social.MAX_PLAYERS })
+        : G.T('Juega en grupo con amigos');
+    }
     const fr = G.Social.friends;
     const req = fr.filter(f => f.status === 'in').length;
     const parts = [];

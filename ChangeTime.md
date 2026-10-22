@@ -234,3 +234,29 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
 - **Đóng gói sản phẩm:**
   - `tests/i18n.test.cjs`: **20/20 tests passed**.
   - `node tools/build.js`: Biên dịch ra `app.min.js?v=38b2faaec9` và đồng bộ `index.html`.
+
+## ⏱️ [2026-10-23 05:52:00] — Khắc phục logic Tổ Đội, Hiện Diện Bạn Bè & Thêm Hệ Thống Tra Cứu Kỹ Năng / Đĩa TM
+- **Khắc Phục & Tinh Chỉnh Sảnh Tổ Đội:**
+  - **Bỏ biểu tượng mạng/ping:** Đã loại bỏ hoàn toàn hiển thị icon mạng (`📶 -`) trên thẻ thành viên trong phòng.
+  - **Phản hồi tức thì nút Public:** Gán phản ứng trực tiếp khi bấm nút Public (cập nhật UI sang `ON` / `OFF` ngay lập tức, không còn hiện tượng gián đoạn hay bị trễ nhịp sang nút sẵn sàng).
+  - **Duy trì kết nối Presence Realtime:** Sửa hàm `setupPresence()` tự động kích hoạt `rtOn()` và ghi nhận trạng thái `{ online: true }` vào RTDB `/presence/{uid}`, giữ kết nối không bị ngắt quãng giữa điện thoại và máy tính.
+  - **Tự động rời tổ đội khi vào Solo:** Khi người chơi bấm vào nút `Solo` để bắt đầu một trận chơi đơn, hệ thống tự động rời khỏi phòng cũ (`G.Social.leaveRoom()`, `G.Net.close()`). Sau khi trận đấu solo kết thúc, người chơi quay về Menu chính mà không còn bị đưa lại phòng cũ.
+  - **Chuẩn hóa chữ Menu và Subtitle:**
+    - Nút Solo luôn giữ mô tả: `"Vào hầm ngục thám hiểm"` (`Entra en la mazmorra`).
+    - Nút Multiplayer có mô tả mặc định: `"Chơi cùng bạn bè"` (`Juega en grupo con amigos`). Khi đang trong phòng sẽ hiển thị: `"Về lại phòng của bạn (X/4)"`.
+    - Loại bỏ hoàn toàn text pha tạp "Chơi nhiều người / Co-op" cứng nhắc, đưa về chuẩn đa ngôn ngữ i18n (`G.T(...)`).
+- **Hệ Thống Tra Cứu Kỹ Năng & Đĩa TM Mới (`#scr-moves` - `G.MovesUI`):**
+  - Bổ sung nút **`Movimientos & MT`** (`Học viện chiêu thức / Kỹ năng & Đĩa TM`) ngay dưới Pokédex trên Menu chính.
+  - **Tab 1: Kỹ năng theo Hệ (Moves by Type):**
+    - Thanh lọc 18 hệ Pokémon chuẩn + nút Tất cả (`🌈 Tất cả`).
+    - Ô tìm kiếm chiêu thức theo tên hoặc mô tả công dụng.
+    - Bảng thông tin chi tiết chiêu thức: Hệ, Phân loại (⚔️ Vật lý / 🔮 Đặc biệt / 🛡️ Buff), Sát thương gốc, Hồi chiêu, Số tia đạn, Hiệu ứng (Bỏng, Độc, Làm chậm).
+    - **Cấp độ lên cấp (Level 1 → 5):** Thể hiện chi tiết chỉ số tăng thêm ở từng cấp (ví dụ: Cấp 2: +45% sát thương; Cấp 3: -25% hồi chiêu; Cấp 4: +1 tia đạn và +1 xuyên thấu; Cấp 5: ...).
+    - **Tiến hóa chiêu thức trong trận (Skill Evolution):** Tên chiêu thức sau khi tiến hóa, món đồ phụ trợ bắt buộc cần có (ví dụ: Băng đeo cơ bắp, Thức ăn hồi phục,...), và hiệu ứng đột phá nhận được (ví dụ: `×1,8 sát thương, +2 tia đạn, +2 xuyên thấu và kích thước đạn lớn hơn`).
+  - **Tab 2: Đĩa TM & Pokémon Học Được (TMs & Compatible Pokémon):**
+    - Danh sách toàn bộ các đĩa TM trong game cùng số lượng Pokémon học được.
+    - Ô tìm kiếm đĩa TM.
+    - Lưới Pokémon tương thích: Hiển thị toàn bộ Pokémon học được chiêu TM đó với sprite hoạt ảnh động, số thứ tự Pokédex, tên, hệ và nhãn đánh dấu những Pokémon bạn đã sở hữu trong kho.
+- **Đóng gói sản phẩm:**
+  - `tests/i18n.test.cjs`: **20/20 tests passed**.
+  - `node tools/build.js`: Biên dịch thành công `app.min.js?v=728c463143` và đồng bộ `index.html`.

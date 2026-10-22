@@ -144,12 +144,13 @@ G.Social = (() => {
   }
 
   function setupPresence() {
-    if (!fb || !fb.rtdb || !uid || !me) return;
+    if (!fb || !fb.rtdb || !uid) return;
+    rtOn();
     const myPresRef = fb.rtdb.ref('presence/' + uid);
     fb.rtdb.ref('.info/connected').on('value', snap => {
       if (snap.val() === true) {
-        myPresRef.onDisconnect().remove();
-        myPresRef.set({ online: true, name: me.name, at: ts() });
+        myPresRef.onDisconnect().remove().catch(() => {});
+        myPresRef.set({ online: true, name: (me && me.name) || '', at: ts() }).catch(() => {});
       }
     });
   }
@@ -323,7 +324,7 @@ G.Social = (() => {
    * La Realtime Database se conecta mientras juegas online con amigos / salas.
    */
   function rtOn() { if (fb && fb.rtdb) fb.rtdb.goOnline(); }
-  function rtOff() { if (fb && fb.rtdb && !room && !browsing) fb.rtdb.goOffline(); }
+  function rtOff() { if (fb && fb.rtdb && !started) fb.rtdb.goOffline(); }
 
   let isRoomPublic = false;
 
@@ -331,27 +332,32 @@ G.Social = (() => {
     if (!room || !room.isHost) return;
     isRoomPublic = !!pub;
     room.isPublic = isRoomPublic;
+    emit('room');
     const ref = fb.rtdb.ref('public_rooms/' + room.id);
     if (isRoomPublic) {
       const s = G.DB.save;
       const st = s.stats || {};
       const fav = (s.profile && s.profile.favs && s.profile.favs[0] && s.profile.favs[0].dex) || s.partner;
-      await ref.set({
-        roomId: room.id,
-        host: uid,
-        hostName: me.name,
-        dex: s.partner,
-        shiny: !!s.partnerShiny,
-        bestTime: st.bestTime || 0,
-        bestLevel: st.bestLevel || 1,
-        bestDex: fav,
-        memberCount: room.members.length,
-        maxPlayers: MAX_PLAYERS,
-        at: ts()
-      });
-      ref.onDisconnect().remove();
+      try {
+        await ref.set({
+          roomId: room.id,
+          host: uid,
+          hostName: (me && me.name) || 'Host',
+          dex: s.partner,
+          shiny: !!s.partnerShiny,
+          bestTime: st.bestTime || 0,
+          bestLevel: st.bestLevel || 1,
+          bestDex: fav,
+          memberCount: room.members.length,
+          maxPlayers: MAX_PLAYERS,
+          at: ts()
+        });
+        ref.onDisconnect().remove().catch(() => {});
+      } catch (err) {
+        console.warn('[Social] setRoomPublic error (kiểm tra rules Firebase):', err);
+      }
     } else {
-      await ref.remove().catch(() => {});
+      try { await ref.remove(); } catch (e) {}
     }
     emit('room');
   }

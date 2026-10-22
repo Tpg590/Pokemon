@@ -637,6 +637,11 @@
     ["cambiar", "changer", "cambia", "trocar", "切换", "切換"],
     ["Saltar", "Passer", "Salta", "Pular", "跳过", "跳過"],
     ["Saltar ⏭️", "Passer ⏭️", "Salta ⏭️", "Pular ⏭️", "跳过 ⏭️", "跳過 ⏭️"],
+    ["Cooperativo", "Coop", "Cooperativa", "Cooperativo", "合作", "合作"],
+    ["Juega en grupo con amigos", "Joue en groupe avec des amis", "Gioca in gruppo con gli amici", "Jogue em grupo com amigos", "与好友组队游玩", "與好友組隊遊玩"],
+    ["Volver a tu sala ({x}/{max})", "Retourner au salon ({x}/{max})", "Torna alla stanza ({x}/{max})", "Voltar para sua sala ({x}/{max})", "返回你的房间 ({x}/{max})", "返回你的房間 ({x}/{max})"],
+    ["Movimientos & MT", "Capacités & CT", "Mosse & MT", "Movimentos & MT", "招式与招式学习器", "招式與招式學習器"],
+    ["Efectos, evoluciones y MTs", "Effets, évolutions et CTs", "Effetti, evoluzioni e MT", "Efeitos, evoluções e MTs", "效果、进化与招式学习器", "效果、進化與招式學習器"],
     ["Cooperativo: si caes, puedes mirar a un compañero que siga en pie mientras esperas a que te levanten. Pulsa el botón que sale debajo del aviso (o Q / E, o LB / RB en el mando) para pasar de uno a otro y volver a ti. Sólo cambia la cámara: no gasta más conexión.", "Coop : si tu es K.O., tu peux regarder un coéquipier encore debout en attendant qu’on te relève. Appuie sur le bouton sous le message (ou Q / E, ou LB / RB à la manette) pour passer de l’un à l’autre et revenir à toi. Seule la caméra change : aucune connexion supplémentaire.", "Cooperativa: se sei a terra, puoi guardare un compagno ancora in piedi mentre aspetti di essere rianimato. Premi il pulsante sotto l’avviso (o Q / E, o LB / RB sul controller) per passare dall’uno all’altro e tornare a te. Cambia solo la visuale: nessun consumo di connessione in più.", "Cooperativo: se você cair, pode assistir um colega que ainda está de pé enquanto espera ser levantado. Toque no botão abaixo do aviso (ou Q / E, ou LB / RB no controle) para passar de um para outro e voltar para você. Só a câmera muda: não gasta mais conexão.", "合作模式：倒下后，在等待队友救起时可以观看仍在战斗的队友。按提示下方的按钮（或 Q / E，控制器上为 LB / RB）在队友之间切换并回到自己。只切换镜头，不会额外消耗网络。", "合作模式：倒下後，在等待隊友救起時可以觀看仍在戰鬥的隊友。按提示下方的按鈕（或 Q / E，控制器上為 LB / RB）在隊友之間切換並回到自己。只切換鏡頭，不會額外消耗網路。"],
   ];
   languages.forEach((lang, i) => G.I18n.add(Object.fromEntries(rows.map(r => [r[0], r[i + 1]])), lang));

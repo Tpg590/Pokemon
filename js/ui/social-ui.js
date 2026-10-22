@@ -308,8 +308,11 @@
       if ($('lobby-public-toggle')) $('lobby-public-toggle').onclick = () => {
         const room = G.Social.room;
         if (room && room.isHost) {
-          G.Social.setRoomPublic(!room.isPublic);
+          const next = !room.isPublic;
+          room.isPublic = next;
+          render();
           G.Audio.sfx('click');
+          G.Social.setRoomPublic(next);
         }
       };
       if ($('lobby-start')) {
@@ -388,7 +391,6 @@
               <span class="card-role">${roleTxt}</span>
               <span class="ready-badge ${readyCls}">${readyTxt}</span>
               <span class="conn" data-u="${m.uid}">Connected</span>
-              <span class="card-ping">📶 -</span>
               ${isMe ? '<button class="change-mon-btn">Change Pokémon</button>' : ''}
             `;
             const avBox = c.querySelector('.card-avatar');

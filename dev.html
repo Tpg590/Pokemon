@@ -185,9 +185,10 @@
   <div class="menu-right">
     <div class="box">
       <div class="menu-list">
-        <button class="menu-item play" data-go="play">Solo<small>Entra en la mazmorra</small></button>
-        <button class="menu-item multi" data-go="multiplayer">Multiplayer<small>Chơi nhiều người / Co-op</small></button>
+        <button class="menu-item play" data-go="play">Solo<small id="menu-play-sub">Entra en la mazmorra</small></button>
+        <button class="menu-item multi" data-go="multiplayer">Cooperativo<small id="menu-multi-sub">Juega en grupo con amigos</small></button>
         <button class="menu-item" data-go="dex">Pokémon<small id="menu-dex-count">Tu colección</small></button>
+        <button class="menu-item" data-go="moves">Movimientos & MT<small>Efectos, evoluciones y MTs</small></button>
         <button class="menu-item" data-go="upgrades">Mejoras<small>Haz más fuerte cada run</small></button>
         <button class="menu-item" data-go="shop">Tienda Kecleon<small>Mentas, Cápsulas y MT</small></button>
         <button class="menu-item" data-go="bag">Mochila<small id="menu-bag-sub">Vacía</small></button>
@@ -452,6 +453,43 @@
       <input id="picker-search" class="field grow" placeholder="Tìm theo tên hoặc số..." autocomplete="off">
     </div>
     <div id="picker-grid" class="picker-grid"></div>
+  </div>
+</section>
+
+<!-- ====== Tra cứu chiêu thức & Đĩa TM ====== -->
+<section id="scr-moves" class="scr dim hidden">
+  <div class="box wide moves-browser-box">
+    <div class="row between">
+      <h2>Movimientos & MT</h2>
+      <button class="btn small ghost" data-back>Volver <kbd>Esc</kbd></button>
+    </div>
+    <div class="tabs" id="moves-main-tabs" style="margin:10px 0 12px">
+      <div class="tab on" data-tab="types">Kỹ năng theo Hệ</div>
+      <div class="tab" data-tab="tms">Đĩa TM & Pokémon học được</div>
+    </div>
+    
+    <!-- Tab 1: Kỹ năng theo hệ -->
+    <div id="moves-tab-types" class="moves-tab-pane">
+      <div class="moves-type-chips" id="moves-type-chips"></div>
+      <div class="row" style="margin:8px 0">
+        <input id="moves-search" class="field grow" placeholder="Tìm theo tên chiêu thức hoặc công dụng..." autocomplete="off">
+      </div>
+      <div class="moves-split-layout">
+        <div id="moves-list" class="moves-list"></div>
+        <div id="move-detail" class="move-detail-panel"></div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Đĩa TM -->
+    <div id="moves-tab-tms" class="moves-tab-pane hidden">
+      <div class="row" style="margin:8px 0">
+        <input id="tms-search" class="field grow" placeholder="Tìm đĩa TM theo tên chiêu..." autocomplete="off">
+      </div>
+      <div class="moves-split-layout">
+        <div id="tms-list" class="moves-list"></div>
+        <div id="tm-detail" class="move-detail-panel"></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -748,6 +786,7 @@
 <script defer src="js/ui/shop-ui.js"></script>
 <script defer src="js/ui/run-ui.js"></script>
 <script defer src="js/ui/social-ui.js"></script>
+<script defer src="js/ui/moves-ui.js"></script>
 <script defer src="js/ui/ranking-ui.js"></script>
 <script defer src="js/ui/mod-ui.js"></script>
 <script defer src="js/ui/goals-ui.js"></script>

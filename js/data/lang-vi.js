@@ -2881,5 +2881,10 @@ G.I18n.add({
   "Connecting…": "Đang kết nối…",
   "Online": "Trực tuyến",
   "Offline": "Ngoại tuyến",
-  "Tham gia": "Tham gia"
+  "Tham gia": "Tham gia",
+  "Cooperativo": "Chơi mạng",
+  "Juega en grupo con amigos": "Chơi cùng bạn bè",
+  "Volver a tu sala ({x}/{max})": "Về lại phòng của bạn ({x}/{max})",
+  "Movimientos & MT": "Kỹ năng & Đĩa TM",
+  "Efectos, evoluciones y MTs": "Công dụng, tiến hóa chiêu & Đĩa TM"
 }, "vi");
