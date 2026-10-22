@@ -12,12 +12,11 @@ G.SupportUI = (() => {
 
   function init() {
     const b = $('btn-support');
-    if (!b || !F.url) return;                       // aún sin cuenta de Ko-fi: no sale
+    if (!F.url) return;                       // aún sin cuenta de Ko-fi: no sale
     b.classList.remove('hidden');
     b.innerHTML = G.Icons.html('heart', 18) + ' <span>Apoyar</span>';
     b.onclick = open;
-    const sc = $('sup-close');
-    if (sc) sc.onclick = close;
+    $('sup-close').onclick = close;
   }
 
   function open() {

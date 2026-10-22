@@ -115,3 +115,18 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
   3. Đổi ID nút tin tức trong màn hình chính thành `menu-btn-news` để tránh xung đột với nút tin tức hệ thống.
   4. Đóng gói lại toàn bộ ứng dụng bằng `node tools/build.js` (`app.min.js?v=0caee839cf`) và đẩy lên nhánh `main`.
 
+
+## ⏱️ [2026-10-23 03:52:00] — Khôi phục lại giao diện UI gốc ban đầu (Rollback UI)
+- **Yêu cầu từ người dùng:** Giao diện mod gặp lỗi hiển thị và trải nghiệm, yêu cầu quay trở lại toàn bộ giao diện gốc ban đầu của PokéSurvivor.
+- **Thực thi hoàn tác:**
+  - Hoàn tác toàn bộ các file giao diện về trạng thái chuẩn ổn định (commit `6906a14`):
+    - `css/style.css`: Phục hồi CSS gốc chuẩn đẹp của game PokéSurvivor.
+    - `dev.html` & `index.html`: Phục hồi cấu trúc HTML gốc.
+    - `js/ui/menu.js`, `js/ui/ui.js`, `js/ui/icons.js`, `js/ui/settings-ui.js`, `js/ui/support-ui.js`: Phục hồi logic menu, icon và giao diện ban đầu.
+    - `js/core/db.js`: Khôi phục database logic gốc ổn định.
+    - Xóa các file đồ họa tạm đã tạo trong đợt thử nghiệm UI mod (`fonts/`, `ui/floor.png`). Giữ nguyên thư mục ảnh `Reference/`.
+- **Bảo toàn gói tiếng Việt:**
+  - Giữ nguyên 100% từ điển tiếng Việt hoàn chỉnh trong `js/data/lang-vi.js` và `js/lang/vi.js`.
+  - Chạy kiểm thử tự động `tests/i18n.test.cjs`: **20/20 tests passed**.
+- **Đóng gói sản phẩm:**
+  - Chạy `node tools/build.js` thành công, nén mã hóa `js/app.min.js?v=338b0a77e1` và cập nhật `index.html`.

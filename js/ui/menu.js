@@ -9,49 +9,14 @@ G.MenuUI = (() => {
   let dexF = DEX0();
   const SORTS = [['num', 'Nº'], ['name', 'Nombre'], ['rar', 'Rareza'], ['new', 'Recién conseguidos'], ['used', 'Más usados']];
 
-  let talkDict = {};
-  function setTalk(key) {
-    const say = $('talk-say');
-    if (!say) return;
-    if (talkDict[key]) say.textContent = talkDict[key];
-    else if (talkDict.solo) say.textContent = talkDict.solo;
-  }
-
   function init() {
-    const ICON = {
-      solo: 'ball',
-      multiplayer: 'friends',
-      play: 'ball',
-      dex: 'book',
-      upgrades: 'up',
-      shop: 'shop',
-      bag: 'bag',
-      gacha: 'ball4',
-      goals: 'medal3',
-      friends: 'friends',
-      rank: 'trophy',
-      settings: 'gear',
-      logout: 'user'
-    };
+    const ICON = { play: 'ball', dex: 'book', upgrades: 'up', shop: 'shop', bag: 'bag', gacha: 'ball4', goals: 'medal3', friends: 'friends', rank: 'trophy', settings: 'gear' };
     document.querySelectorAll('#scr-menu [data-go]').forEach(b => {
-      const ico = ICON[b.dataset.go];
-      if (ico && !b.querySelector('.mi-ico')) {
-        b.insertAdjacentHTML('afterbegin', `<span class="mi-ico">${G.Icons.html(ico, 24)}</span>`);
-      }
-      b.dataset.sfx = (b.dataset.go === 'solo' || b.dataset.go === 'play') ? 'confirm' : 'click';
+      b.insertAdjacentHTML('afterbegin', `<span class="mi-ico">${G.Icons.html(ICON[b.dataset.go], 26)}</span>`);
+      b.dataset.sfx = b.dataset.go === 'play' ? 'confirm' : 'click';
       b.onclick = () => {
         const go = b.dataset.go;
-        if (go === 'solo' || go === 'play') {
-          if (G.Social.room) {
-            if (confirm(G.T('Nhóm đang chờ trong phòng. Rời phòng để chơi solo?'))) {
-              G.Social.leave();
-              G.Flow.play();
-            }
-          } else {
-            G.Flow.play();
-          }
-        }
-        else if (go === 'multiplayer') { if (G.Social.room) G.LobbyUI.open(); else G.FriendsUI.open(); }
+        if (go === 'play') { if (G.Social.room) G.LobbyUI.open(); else G.Flow.play(); }
         else if (go === 'dex') openDex();
         else if (go === 'upgrades') openUpgrades();
         else if (go === 'shop') G.ShopUI.open();
@@ -61,71 +26,15 @@ G.MenuUI = (() => {
         else if (go === 'friends') G.FriendsUI.open();
         else if (go === 'rank') G.RankingUI.open();
         else if (go === 'settings') G.SettingsUI.open();
-        else if (go === 'logout') {
-          if (G.DB.guest && !confirm('Eres invitado: se perderá todo el progreso. ¿Salir?')) return;
-          G.Audio.music(null);
-          G.DB.logout().then(() => G.Flow.toLogin());
-        }
-      };
-
-      b.onpointerenter = () => {
-        document.querySelectorAll('#main-cursor-list .cursor-item').forEach(el => el.classList.remove('on'));
-        b.classList.add('on');
-        setTalk(b.dataset.talk || b.dataset.go);
       };
     });
-
-    const partnerStage = $('menu-partner');
-    if (partnerStage) {
-      partnerStage.parentElement.onclick = () => openDex();
-      partnerStage.parentElement.onpointerenter = () => setTalk('partner');
-    }
-
-    const newsBtn = $('btn-news') || $('menu-btn-news');
-    if (newsBtn) {
-      newsBtn.onclick = () => G.NewsUI && G.NewsUI.open();
-      newsBtn.onpointerenter = () => setTalk('news');
-    }
-
-    // Điều hướng bằng bàn phím (ArrowUp / ArrowDown / Enter)
-    window.addEventListener('keydown', e => {
-      if (!G.UI.isOpen('scr-menu')) return;
-      const items = [...document.querySelectorAll('#main-cursor-list .cursor-item')];
-      if (!items.length) return;
-      const idx = items.findIndex(el => el.classList.contains('on'));
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        const next = items[(idx + 1) % items.length];
-        items.forEach(el => el.classList.remove('on'));
-        next.classList.add('on');
-        next.focus({ preventScroll: true });
-        setTalk(next.dataset.talk || next.dataset.go);
-        G.Audio.sfx('click');
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        const prev = items[(idx - 1 + items.length) % items.length];
-        items.forEach(el => el.classList.remove('on'));
-        prev.classList.add('on');
-        prev.focus({ preventScroll: true });
-        setTalk(prev.dataset.talk || prev.dataset.go);
-        G.Audio.sfx('click');
-      } else if (e.key === 'Enter') {
-        if (idx >= 0 && items[idx]) {
-          e.preventDefault();
-          items[idx].click();
-        }
-      }
-    });
-
     document.querySelectorAll('[data-back]').forEach(b => { b.onclick = open; });
     G.Social.on(() => { if (G.UI.isOpen('scr-menu')) socialLine(); });
-    if ($('btn-logout')) {
-      $('btn-logout').onclick = () => {
-        if (G.DB.guest && !confirm('Eres invitado: se perderá todo el progreso. ¿Salir?')) return;
-        G.Audio.music(null);
-        G.DB.logout().then(() => G.Flow.toLogin());
-      };
-    }
+    $('btn-logout').onclick = () => {
+      if (G.DB.guest && !confirm('Eres invitado: se perderá todo el progreso. ¿Salir?')) return;
+      G.Audio.music(null);
+      G.DB.logout().then(() => G.Flow.toLogin());
+    };
   }
 
   // ---------------- menú principal ----------------
@@ -137,90 +46,43 @@ G.MenuUI = (() => {
     G.UI.chrome(true);
     G.UI.show('scr-menu');
     bagLine();
-
-    // Sprite bạn đồng hành chính
     G.UI.sprite($('menu-partner'), mon.dex, { lively: true, scale: 4, hero: true, shiny });
     $('menu-partner').style.setProperty('--stage-c', shiny ? '#9ae6ff' : G.U.TYPE_COLOR[mon.types[0]]);
     $('menu-partner').classList.toggle('shiny', shiny);
     $('menu-partner-name').innerHTML = mon.name + (shiny ? ' ' + G.Icons.html('shiny', 24) : '');
-    if ($('menu-partner-no')) {
-      $('menu-partner-no').textContent = `Partner · No.${String(mon.dex).padStart(3, '0')} ⌄`;
-    }
-    if ($('menu-partner-types')) {
-      $('menu-partner-types').innerHTML = G.UI.typeChips(mon.types);
-    }
-
-    // Avatar và tên trong khung thoại bạn đồng hành
-    if ($('talk-avatar')) {
-      G.UI.sprite($('talk-avatar'), mon.dex, { lively: true, scale: 2, hero: true, shiny });
-    }
-    if ($('talk-portrait')) {
-      $('talk-portrait').style.setProperty('--portrait', G.U.TYPE_COLOR[mon.types[0]]);
-    }
-    if ($('talk-who')) {
-      $('talk-who').textContent = mon.name;
-    }
-
-    // Normal / shiny selector
+    $('menu-partner-info').innerHTML = G.UI.typeChips(mon.types) + ' ' + G.UI.stars(mon.rarity);
+    // Normal / shiny a mano, aquí mismo (en el móvil no se encontraba en la ficha).
     const seg = $('menu-shiny');
-    if (seg) {
-      seg.classList.toggle('hidden', !G.DB.ownsShiny(mon.dex));
-      seg.lastChild.innerHTML = G.Icons.html('shiny', 12) + ' Shiny';
-      seg.querySelectorAll('button').forEach(b => {
-        b.classList.toggle('on', (b.dataset.v === '1') === shiny);
-        b.onclick = () => {
-          if ((b.dataset.v === '1') === shiny) return;
-          s.partnerShiny = b.dataset.v === '1';
-          G.DB.commit();
-          G.Audio.sfx('confirm');
-          open();
-        };
-      });
-    }
+    seg.classList.toggle('hidden', !G.DB.ownsShiny(mon.dex));
+    seg.lastChild.innerHTML = G.Icons.html('shiny', 12) + ' Shiny';
+    seg.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('on', (b.dataset.v === '1') === shiny);
+      b.onclick = () => {
+        if ((b.dataset.v === '1') === shiny) return;
+        s.partnerShiny = b.dataset.v === '1';
+        G.DB.commit();
+        G.Audio.sfx('confirm');
+        open();
+      };
+    });
 
     const owned = Object.keys(s.owned).filter(d => G.DEX_BY[d]).length;
     const shinies = Object.keys(s.shiny || {}).length;
-    if ($('menu-dex-count')) {
-      $('menu-dex-count').textContent = `${owned}/${G.DEX.length}` + (shinies ? ` · ${shinies}✨` : '');
-    }
+    $('menu-dex-count').textContent = `${owned} / ${G.DEX.length}` + (shinies ? ` · ${shinies} shiny` : '');
 
     const st = s.stats;
-    if ($('stat-runs')) $('stat-runs').textContent = st.runs;
-    if ($('stat-time')) $('stat-time').textContent = G.U.mmss(st.bestTime);
-    if ($('stat-level')) $('stat-level').textContent = st.bestLevel;
-    if ($('stat-kills')) $('stat-kills').textContent = st.totalKills.toLocaleString(G.I18n.locale);
-
-    // Cập nhật câu thoại tương tác
-    const room = G.Social.room;
-    const roomTxt = room ? `${room.members.length}/${G.Social.MAX_PLAYERS}` : '';
-    const pend = G.Progress.pending ? G.Progress.pending() : 0;
-    const frOnline = G.Social.friends ? G.Social.friends.filter(f => f.status !== 'offline').length : 0;
-
-    talkDict = {
-      solo: G.T('Cùng nhau vào hầm ngục nào! Sẵn sàng bất cứ lúc nào.'),
-      lobby: room ? G.I18n.f('Nhóm của chúng ta đang chờ trong phòng ({x}). Để đi solo, ta phải rời phòng trước.', roomTxt) : G.T('Chơi mạng: lập đội tối đa 4 huấn luyện viên cùng nhau sinh tồn!'),
-      collection: G.I18n.f('Pokémon: tất cả những người bạn chúng ta đã gặp, {x} trên {x}. Bạn có thể chọn bạn đồng hành mới ở đây.', owned, G.DEX.length),
-      gacha: G.T('Gacha: nơi ta kết bạn mới từ khắp các vùng đất! Cùng thử vận may nào!'),
-      upgrades: G.T('Nâng cấp: gia tăng sức mạnh chỉ số cho mỗi chuyến thám hiểm.'),
-      goals: pend > 0 ? G.I18n.f('Bạn có {x} phần thưởng nhiệm vụ đang chờ nhận!', pend) : G.T('Nhiệm vụ & Thành tựu: hoàn thành thử thách để nhận thêm phần thưởng.'),
-      ranking: G.T('Bảng xếp hạng: xem ai sinh tồn lâu nhất trong hầm ngục.'),
-      friends: frOnline > 0 ? G.I18n.f('Bạn bè: hiện có {x} bạn bè đang online!', frOnline) : G.T('Bạn bè: kết nối và mời bạn bè cùng chơi tối đa 4 người.'),
-      settings: G.T('Cài đặt: điều chỉnh âm thanh, đồ họa, điều khiển và tài khoản.'),
-      logout: G.T('Đăng xuất: tiến trình của bạn đã được lưu an toàn.'),
-      news: G.T('Tin mới: xem các thông tin cập nhật và phiên bản mới nhất.'),
-      partner: G.T('Là tớ đó! Nhấn để xem và đổi bạn đồng hành khác.')
-    };
-
-    const currentOn = document.querySelector('#main-cursor-list .cursor-item.on');
-    setTalk(currentOn ? (currentOn.dataset.talk || currentOn.dataset.go) : 'solo');
+    $('menu-stats').innerHTML =
+      `Runs <b style="color:#fff">${st.runs}</b> · Mejor tiempo <b style="color:#fff">${G.U.mmss(st.bestTime)}</b><br>` +
+      `Mejor nivel <b style="color:#fff">${st.bestLevel}</b> · Derrotados <b style="color:#fff">${st.totalKills.toLocaleString(G.I18n.locale)}</b>` +
+      (G.DB.guest ? '<br><span style="color:#ffb0b8">Modo invitado: no se guarda</span>' : '');
 
     socialLine();
+    // Premios de misiones por recoger.
     G.Progress.checkAch();
-    if (pend > 0 && $('menu-goals-badge')) {
-      $('menu-goals-badge').textContent = `(${pend})`;
-      $('menu-goals-badge').classList.add('gold');
-    }
-
+    const pend = G.Progress.pending();
+    $('menu-goals-sub').textContent = pend ? pend + (pend === 1 ? ' premio por recoger' : ' premios por recoger') : 'Misiones, logros y perfil';
+    $('menu-goals-sub').classList.toggle('gold', pend > 0);
+    // Con cuenta en la nube: amigos en línea, invitaciones y (una vez) el apodo.
     if (G.DB.online && !G.Social.started) {
       G.Social.start().then(r => {
         if (r === 'need-nick' && !G.NickUI.skipped && G.UI.isOpen('scr-menu')) G.NickUI.open();
@@ -234,24 +96,20 @@ G.MenuUI = (() => {
   function bagLine() {
     const s = G.DB.save, sum = o => Object.values(o || {}).reduce((a, b) => a + (+b || 0), 0);
     const items = sum(s.bag), tms = sum(s.tms);
-    const bagSub = $('menu-bag-sub');
-    if (bagSub) bagSub.textContent = items || tms ? G.I18n.f('Objetos: {x} · MT: {x}', items, tms) : G.T('Vacía');
+    $('menu-bag-sub').textContent = items || tms ? G.I18n.f('Objetos: {x} · MT: {x}', items, tms) : G.T('Vacía');
   }
 
   /** Texto bajo "Amigos" y "Jugar": quién está en línea, solicitudes, sala. */
   function socialLine() {
     const room = G.Social.room;
-    const badge = $('room-badge');
-    if (badge) {
-      badge.classList.toggle('hidden', !room);
-      if (room) badge.textContent = `Room ${room.members.length}/${G.Social.MAX_PLAYERS}`;
-    }
-    const fr = G.Social.friends || [];
+    const play = document.querySelector('#scr-menu [data-go=play] small');
+    if (play) play.textContent = room ? 'Volver a tu sala (' + room.members.length + '/' + G.Social.MAX_PLAYERS + ')' : 'Entra en la mazmorra';
+    const fr = G.Social.friends;
     const req = fr.filter(f => f.status === 'in').length;
-    if ($('menu-friends-badge')) {
-      $('menu-friends-badge').textContent = req ? `(${req})` : '';
-      $('menu-friends-badge').classList.toggle('gold', req > 0);
-    }
+    const parts = [];
+    if (req) parts.push(req + (req === 1 ? ' solicitud' : ' solicitudes'));
+    $('menu-friends-sub').textContent = parts.length ? parts.join(' · ') : 'Juega en grupo, hasta 4';
+    $('menu-friends-sub').classList.toggle('gold', req > 0);
   }
 
   // ---------------- colección ----------------

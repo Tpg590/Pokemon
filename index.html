@@ -81,7 +81,7 @@
 }
 </script>
 
-<link rel="stylesheet" href="css/style.css?v=af0ec3885e">
+<link rel="stylesheet" href="css/style.css?v=7ec35e9cc4">
 <script src="js/core/locales.js?v=398c4e5c1e"></script>
 <script src="js/noframe.js"></script>
 </head>
@@ -92,39 +92,39 @@
 <div id="rotate" class="hidden"><div class="box center"><div id="rotate-ico"></div><h2>Gira el móvil</h2><p class="sub">PokéSurvivor se juega en horizontal.</p></div></div>
 
 <!-- ====== Inicio: login / registro / invitado ====== -->
-<section id="scr-login" class="scr hidden scr-login">
-  <div class="login-col">
-    <div class="login-title">
-      <h1 class="field-title">PokéSurvivor</h1>
-      <p class="login-sub" style="letter-spacing:4px;color:var(--title);margin-top:6px;font-size:16px;">DOOFORAFT VN EDITION</p>
+<section id="scr-login" class="scr hidden">
+  <div class="box" style="width:min(420px,100%)">
+    <div class="logo">
+      <div class="t1">PokéSurvivor</div>
+      <div class="t2">Mundo Misterioso</div>
     </div>
-    <div class="box login-box" style="width:min(440px,100%)">
-      <p class="login-tag">Sinh tồn giữa bầy quái cùng bạn đồng hành Pokémon · Miễn phí, trên PC & Mobile</p>
-      <div class="tabs">
-        <div class="tab on" data-tab="login">Đăng nhập</div>
-        <div class="tab" data-tab="register">Tạo tài khoản</div>
-      </div>
-      <form id="login-form" autocomplete="off">
-        <label for="f-user">Tên người chơi</label>
-        <input id="f-user" class="field" maxlength="16" spellcheck="false">
-        <label for="f-pass">Mật khẩu</label>
-        <input id="f-pass" class="field" type="password" maxlength="64">
-        <p id="login-err" class="err"></p>
-        <p class="note"><a href="#" id="f-forgot">Quên mật khẩu?</a></p>
-        <p id="forgot-note" class="note hidden">Nếu đã liên kết Gmail, hãy bấm <b>Đăng nhập với Google</b> với Gmail đó: đó chính là tài khoản của bạn.</p>
-        <div class="row">
-          <button id="btn-auth" class="btn primary gold grow" type="submit">Đăng nhập</button>
-        </div>
-      </form>
-      <div class="row" style="margin-top:10px">
-        <button id="btn-google" class="btn google grow hidden" type="button">Đăng nhập với Google</button>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <button id="btn-guest" class="btn ghost grow" type="button">Chơi với tư cách khách</button>
-      </div>
-      <p class="note center" id="login-mode"></p>
-      <p class="note center"><a href="#" class="legal-link" data-legal>Điều khoản & Bản quyền</a></p>
+    <p class="login-tag">Sobrevive a las hordas con tu compañero Pokémon · gratis, en PC y móvil</p>
+    <p class="login-official">Web oficial: pokesurvivor.com · si alguien te pide pagar, no somos nosotros</p>
+    <div class="tabs">
+      <div class="tab on" data-tab="login">Entrar</div>
+      <div class="tab" data-tab="register">Crear cuenta</div>
     </div>
+    <form id="login-form" autocomplete="off">
+      <label for="f-user">Nombre</label>
+      <input id="f-user" class="field" maxlength="16" spellcheck="false">
+      <label for="f-pass">Contraseña</label>
+      <input id="f-pass" class="field" type="password" maxlength="64">
+      <p id="login-err" class="err"></p>
+      <p class="note"><a href="#" id="f-forgot">¿Olvidaste tu contraseña?</a></p>
+      <p id="forgot-note" class="note hidden">Si vinculaste tu Gmail, pulsa <b>Entrar con Google</b> con ese Gmail: es tu misma cuenta.
+        Si no lo vinculaste, no se puede recuperar: crea una cuenta nueva (y esta vez vincula tu Gmail desde el aviso que sale al entrar).</p>
+      <div class="row">
+        <button id="btn-auth" class="btn gold grow" type="submit">Entrar</button>
+      </div>
+    </form>
+    <div class="row" style="margin-top:10px">
+      <button id="btn-google" class="btn google grow hidden" type="button">Entrar con Google</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="btn-guest" class="btn ghost grow" type="button">Jugar como invitado</button>
+    </div>
+    <p class="note center" id="login-mode"></p>
+    <p class="note center"><a href="guia/">Guía</a> · <a href="pokedex/">Pokédex</a> · <a href="#" class="legal-link" data-legal>Aviso legal y privacidad</a></p>
   </div>
 </section>
 
@@ -168,129 +168,54 @@
 </section>
 
 <!-- ====== Menú principal ====== -->
-<section id="scr-menu" class="scr hidden scr-menu">
-  <header class="menu-title">
-    <h1 class="field-title">PokéSurvivor</h1>
-    <p>DOOFORAFT VN EDITION</p>
-  </header>
-
+<section id="scr-menu" class="scr hidden">
   <div class="menu-left">
-    <div class="win partner-win">
-      <div class="stage-wrap" style="position:relative">
-        <canvas id="menu-partner" class="stage" width="260" height="200"></canvas>
-      </div>
-      <div class="partner-info">
-        <h2 id="menu-partner-name"></h2>
-        <div class="no" id="menu-partner-no"></div>
-        <div class="types" id="menu-partner-types"></div>
-        <div class="seg hidden" id="menu-shiny"><button data-v="0">Normal</button><button data-v="1"></button></div>
-        <dl class="menu-stats">
-          <dt>Runs</dt><dd id="stat-runs">0</dd>
-          <dt>Best time</dt><dd id="stat-time">0:00</dd>
-          <dt>Best level</dt><dd id="stat-level">1</dd>
-          <dt>Defeated</dt><dd id="stat-kills">0</dd>
-        </dl>
-      </div>
+    <div class="logo">
+      <div class="t1">PokéSurvivor<span class="splash">Folagor, Sekiam, PokeAlex: ¿un hueco?</span></div>
+      <div class="t2">Mundo Misterioso</div>
     </div>
-
-    <button id="menu-btn-news" class="btn whats-new" data-talk="news">
-      <span class="new-dot"></span>
-      <span id="news-label">Tin mới · v31</span>
-    </button>
+    <div class="partner-card">
+      <canvas id="menu-partner" class="stage" width="260" height="200"></canvas>
+      <div class="nm" id="menu-partner-name"></div>
+      <div class="lv" id="menu-partner-info"></div>
+      <div class="seg hidden" id="menu-shiny"><button data-v="0">Normal</button><button data-v="1"></button></div>
+    </div>
   </div>
-
-  <nav class="win menu-win" aria-label="Menu">
-    <div class="cursor-list" id="main-cursor-list">
-      <button class="menu-item cursor-item on" data-go="solo" data-talk="solo">
-        <span class="mi-ico"></span>
-        <span class="mi-label">Solo</span>
-      </button>
-      <button class="menu-item cursor-item" data-go="multiplayer" data-talk="lobby">
-        <span class="mi-ico"></span>
-        <span class="mi-label">Multiplayer</span>
-        <small class="online hidden" id="room-badge">Room 1/4</small>
-      </button>
-      <button class="menu-item cursor-item" data-go="dex" data-talk="collection">
-        <span class="mi-ico"></span>
-        <span class="mi-label">Pokémon</span>
-        <small id="menu-dex-count">0/966</small>
-      </button>
-      <button class="menu-item cursor-item" data-go="gacha" data-talk="gacha">
-        <span class="mi-ico"></span>
-        <span class="mi-label">Gacha</span>
-      </button>
-      <button class="menu-item cursor-item" data-go="upgrades" data-talk="upgrades">
-        <span class="mi-ico"></span>
-        <span class="mi-label">Nâng cấp</span>
-      </button>
-      <button class="menu-item cursor-item" data-go="goals" data-talk="goals">
-        <span class="mi-ico"></span>
-        <span class="mi-label">Nhiệm vụ</span>
-        <small id="menu-goals-badge"></small>
-      </button>
-      <button class="menu-item cursor-item" data-go="rank" data-talk="ranking">
-        <span class="mi-ico"></span>
-        <span class="mi-label">Xếp hạng</span>
-      </button>
-      <button class="menu-item cursor-item" data-go="friends" data-talk="friends">
-        <span class="mi-ico"></span>
-        <span class="mi-label">Bạn bè</span>
-        <small id="menu-friends-badge"></small>
-      </button>
-      <hr>
-      <button class="menu-item cursor-item" data-go="settings" data-talk="settings">
-        <span class="mi-ico"></span>
-        <span class="mi-label">Cài đặt</span>
-      </button>
-      <button class="menu-item cursor-item dim" data-go="logout" data-talk="logout">
-        <span class="mi-ico"></span>
-        <span class="mi-label">Đăng xuất</span>
-      </button>
+  <div class="menu-right">
+    <div class="box">
+      <div class="menu-list">
+        <button class="menu-item play" data-go="play">Jugar<small>Entra en la mazmorra</small></button>
+        <button class="menu-item" data-go="dex">Pokémon<small id="menu-dex-count">Tu colección</small></button>
+        <button class="menu-item" data-go="upgrades">Mejoras<small>Haz más fuerte cada run</small></button>
+        <button class="menu-item" data-go="shop">Tienda Kecleon<small>Mentas, Cápsulas y MT</small></button>
+        <button class="menu-item" data-go="bag">Mochila<small id="menu-bag-sub">Vacía</small></button>
+        <button class="menu-item" data-go="gacha">Gacha<small>9 regiones · Pokémon y shinies</small></button>
+        <button class="menu-item" data-go="goals">Misiones<small id="menu-goals-sub">Misiones, logros y perfil</small></button>
+        <button class="menu-item" data-go="friends">Amigos<small id="menu-friends-sub">Juega en grupo, hasta 4</small></button>
+        <button class="menu-item" data-go="rank">Ranking<small>Quién aguanta más</small></button>
+        <button class="menu-item" data-go="settings">Ajustes<small>Sonido, gráficos, controles y cuenta</small></button>
+      </div>
     </div>
-  </nav>
-
-  <div class="win talk talk-box" id="menu-talk-box">
-    <div class="portrait" id="talk-portrait">
-      <canvas id="talk-avatar" width="84" height="84"></canvas>
+    <div class="box" style="padding:14px 18px">
+      <div id="menu-stats" style="font-size:14px;color:var(--muted)"></div>
     </div>
-    <div>
-      <div class="who" id="talk-who">Pokémon</div>
-      <p class="say" id="talk-say" aria-live="polite">Cùng nhau vào hầm ngục nào! Sẵn sàng bất cứ lúc nào.</p>
-    </div>
-    <span class="more"></span>
-  </div>
-
-  <div class="key-hints">
-    <span><kbd>Enter</kbd> Chọn</span>
-    <span><kbd>↑</kbd> <kbd>↓</kbd> Di chuyển</span>
   </div>
 </section>
 
 <div id="topbar" class="topbar hidden">
-  <div class="online-count">
-    <span class="online-dot"></span>
-    <span id="online-num">987</span> online
-  </div>
-  <a href="https://discord.gg/pokemon" target="_blank" class="discord-btn" title="Discord" rel="noreferrer">
-    <svg viewBox="0 0 24 24" width="28" height="28" fill="#fff"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
-  </a>
-  <div class="win tb-card">
-    <div class="tb-cell" id="coins-cell" title="PokéCoins"><span class="coin"></span><span id="coins">0</span></div>
-    <div class="tb-cell" id="tickets-pill" title="Tickets"></div>
-    <div class="tb-cell" id="gems-cell" title="Kim Cương"><span id="gems-ico"></span><span id="gems">3</span></div>
-    <div class="tb-cell room-cell hidden" id="room-cell">Room 1/4</div>
-    <div class="tb-cell user-cell" id="user-pill"></div>
-    <button id="btn-settings" class="tb-cell gear-cell" title="Cài đặt"></button>
-  </div>
+  <div class="pill"><span class="coin"></span><span id="coins">0</span></div>
+  <div class="pill" id="tickets-pill" title="Tickets del gacha"></div>
+  <div class="pill" id="user-pill"></div>
+  <button id="btn-save" class="btn small gold save-btn hidden" title="Guardar la partida en la nube"></button>
+  <button id="btn-news" class="btn small ghost news-btn" title="Novedades"></button>
   <button id="btn-support" class="btn small gold hidden" title="Apoyar el proyecto"></button>
+  <button id="btn-sound" class="btn small ghost" title="Sonido"></button>
   <button id="btn-full" class="btn small ghost hidden" title="Pantalla completa"></button>
-  <button id="btn-news" class="btn small ghost news-btn hidden" title="Novedades"></button>
-  <button id="btn-save" class="btn small gold save-btn hidden" title="Lưu game"></button>
-  <button id="btn-sound" class="btn small ghost hidden" title="Âm thanh"></button>
-  <button id="btn-logout" class="btn small ghost hidden">Thoát</button>
+  <button id="btn-settings" class="btn small ghost" title="Ajustes"></button>
+  <button id="btn-logout" class="btn small ghost">Salir</button>
 </div>
 <div id="sound-panel" class="box sound-panel hidden"></div>
-<div id="credits-line" class="credits-line hidden">PokéSurvivor: Dooforaft VN Edition · Sprites: SpriteCollab (CC BY-NC 4.0) · Pokémon © Nintendo/Creatures/GAME FREAK · <a href="#" class="legal-link" data-legal>Aviso legal</a></div>
+<div id="credits-line" class="credits-line hidden">Proyecto de fan sin ánimo de lucro · Sprites: SpriteCollab (CC BY-NC 4.0) · Pokémon © Nintendo/Creatures/GAME FREAK · <a href="#" class="legal-link" data-legal>Aviso legal</a></div>
 
 <!-- ====== Novedades (cambios del juego) ====== -->
 <section id="scr-news" class="scr dim hidden">
@@ -678,6 +603,6 @@
 </section>
 
 <!-- datos generados -->
-<script defer src="js/app.min.js?v=0caee839cf"></script>
+<script defer src="js/app.min.js?v=338b0a77e1"></script>
 </body>
 </html>

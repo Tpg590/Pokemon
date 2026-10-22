@@ -35,10 +35,6 @@ G.Icons = (() => {
     shop: { pal: { g: '#5fe08a', w: '#f4f8ff', b: '#b07a4a', y: '#ffd23f' }, rows: [
       '............', 'kkkkkkkkkkkk', 'kgwgwgwgwgwk', 'kgwgwgwgwgwk', 'kkkkkkkkkkkk', '.kbbbbbbbbk.',
       '.kbkkkbbbbk.', '.kbkwkbyybk.', '.kbkwkbyybk.', '.kbkwkbbbbk.', '.kbkwkbbbbk.', 'kkkkkkkkkkkk'] },
-    gem: { pal: { b: '#4fd8ff', d: '#1c88cf', w: '#e6faff' }, rows: [
-      '....kkkk....', '..kkwwwwkk..', '.kwwbbbbddk.', 'kwwbbbbbbddk',
-      'kbbbbbbbbddk', 'kbbbbbbbbddk', '.kbbbbbbddk.', '..kbbbbddk..',
-      '...kbbddk...', '....kbddk....', '.....kk.....', '............'] },
     gear: { pal: { g: '#c9d6ff', d: '#7f93c9' }, rows: [
       '....kkkk....', '.kk.kggk.kk.', '.kgkkggkkgk.', '..kggggggk..', 'kkggkkkkggkk', 'kgggk..kgddk',
       'kgggk..kgddk', 'kkggkkkkddkk', '..kggddddk..', '.kgkkddkkdk.', '.kk.kddk.kk.', '....kkkk....'] },
