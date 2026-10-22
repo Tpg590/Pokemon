@@ -16,15 +16,19 @@ G.SettingsUI = (() => {
     if (G.Settings.touch) document.querySelector('#set-tabs [data-t="a11y"]').classList.add('hidden');
     // Al conectar o quitar un mando con Controles abierto, se ve al momento.
     for (const ev of ['gamepadconnected', 'gamepaddisconnected']) addEventListener(ev, () => { if (isOpen() && tab === 'ctl') render(); });
-    $('set-close').onclick = close;
-    $('btn-settings').innerHTML = G.Icons.html('gear', 20);
-    $('btn-settings').onclick = () => open();
-    $('btn-pause-settings').onclick = () => open('sound');
+    const sc = $('set-close'); if (sc) sc.onclick = close;
+    const bs = $('btn-settings');
+    if (bs) {
+      bs.innerHTML = G.Icons.html('gear', 20);
+      bs.onclick = () => open();
+    }
+    const bps = $('btn-pause-settings'); if (bps) bps.onclick = () => open('sound');
     // Pantalla completa (si el navegador la permite; en iPhone, cómo conseguirla).
-    if (canFull() || iosTip()) {
-      $('btn-full').classList.remove('hidden');
-      $('btn-full').innerHTML = G.Icons.html('full', 20);
-      $('btn-full').onclick = toggleFull;
+    const bf = $('btn-full');
+    if (bf && (canFull() || iosTip())) {
+      bf.classList.remove('hidden');
+      bf.innerHTML = G.Icons.html('full', 20);
+      bf.onclick = toggleFull;
     }
   }
 

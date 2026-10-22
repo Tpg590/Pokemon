@@ -104,3 +104,14 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
 - **Đóng gói & Kiểm thử:**
   - `tests/i18n.test.cjs`: **20/20 tests passed**.
   - `node tools/build.js`: Biên dịch và mã hóa thành công ra `js/app.min.js?v=293bc58e48` và `index.html`.
+
+## ⏱️ [2026-10-23 03:46:00] — Khắc phục lỗi màn hình Loading bị đơ (`TypeError: Cannot read properties of null reading classList`)
+- **Nguyên nhân cốt lõi:**
+  - Trong quá trình tinh giản `#topbar`, các nút ẩn hệ thống như `btn-support`, `btn-full`, `btn-news` bị thiếu trong DOM.
+  - Khi game khởi động (`G.Flow.boot()`), các module `G.SupportUI.init()` và `G.SettingsUI.init()` truy cập vào `$('btn-support').classList` và `$('btn-full').classList` dẫn đến ngoại lệ `TypeError: null.classList`, làm gián đoạn chuỗi khởi tạo khiến lệnh ẩn màn hình `#boot` không được gọi.
+- **Giải pháp xử lý triệt để:**
+  1. Thêm bộ kiểm tra an toàn `if (!b) return;` trong `js/ui/support-ui.js` và `js/ui/settings-ui.js` để đảm bảo code không bao giờ crash kể cả khi phần tử giao diện tùy chọn bị thiếu.
+  2. Bổ sung đầy đủ các nút hệ thống (`btn-support`, `btn-full`, `btn-news`) vào `#topbar` trong `dev.html`.
+  3. Đổi ID nút tin tức trong màn hình chính thành `menu-btn-news` để tránh xung đột với nút tin tức hệ thống.
+  4. Đóng gói lại toàn bộ ứng dụng bằng `node tools/build.js` (`app.min.js?v=0caee839cf`) và đẩy lên nhánh `main`.
+
