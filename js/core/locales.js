@@ -12,10 +12,12 @@ window.PS_LOCALES = (() => {
     ['es', 'Español', 'es-ES'], ['en', 'English', 'en-GB'],
     ['fr', 'Français', 'fr-FR'], ['it', 'Italiano', 'it-IT'],
     ['pt-BR', 'Português (Brasil)', 'pt-BR'],
-    ['zh-Hans', '简体中文', 'zh-CN'], ['zh-Hant', '繁體中文', 'zh-TW']
+    ['zh-Hans', '简体中文', 'zh-CN'], ['zh-Hant', '繁體中文', 'zh-TW'],
+    ['vi', 'Tiếng Việt', 'vi-VN']
   ];
   function normalize(value) {
     const s = String(value || '').toLowerCase().replace(/_/g, '-');
+    if (/^vi(?:-|$)/.test(s)) return 'vi';
     if (/^zh(?:-|$)/.test(s)) {
       if (s.includes('-hans')) return 'zh-Hans';
       if (s.includes('-hant') || /^zh-(tw|hk|mo)(-|$)/.test(s)) return 'zh-Hant';
