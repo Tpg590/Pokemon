@@ -29,11 +29,17 @@ G.SupportUI = (() => {
     const momoHtml = F.momo ? `
       <div class="sup-qr-card">
         <div class="sup-qr-title">${qrTitle}</div>
-        <img class="sup-qr-img" src="${F.momo.qr}" alt="MoMo VietQR - ${F.momo.name}">
+        <a href="${F.momo.qr}" target="_blank" rel="noopener" title="${isVi ? 'Bấm để mở ảnh gốc / phóng to' : 'Click to view full size'}">
+          <img class="sup-qr-img" src="${F.momo.qr}" alt="MoMo VietQR - ${F.momo.name}">
+        </a>
         <div class="sup-qr-name">${F.momo.name}</div>
         <div class="sup-qr-sub">${qrSub}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:5px;cursor:pointer">
+          <a href="${F.momo.qr}" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none">${isVi ? '🔍 Bấm để phóng to mã QR' : '🔍 Click to enlarge QR'}</a>
+        </div>
       </div>
     ` : '';
+
 
     $('sup-body').innerHTML = `
       <div class="sup-grid">

@@ -897,9 +897,9 @@ a.btn { text-decoration: none; display: inline-block; color: var(--ink); }
 .sup-grid { display: flex; flex-direction: row; gap: 18px; align-items: flex-start; margin-top: 10px; }
 .sup-info { flex: 1 1 0; min-width: 0; }
 .sup-qr-card {
-  flex: 0 0 210px;
+  flex: 0 0 220px;
   background: rgba(18, 22, 38, 0.7);
-  border: 2px solid rgba(226, 0, 116, 0.4);
+  border: 2px solid rgba(226, 0, 116, 0.45);
   border-radius: 12px;
   padding: 12px 10px;
   text-align: center;
@@ -912,13 +912,19 @@ a.btn { text-decoration: none; display: inline-block; color: var(--ink); }
   margin-bottom: 8px;
 }
 .sup-qr-img {
-  width: 170px;
+  width: 195px;
   max-width: 100%;
   border-radius: 8px;
   display: block;
   margin: 0 auto;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: transform .18s ease;
 }
+.sup-qr-img:hover {
+  transform: scale(1.04);
+}
+
 .sup-qr-name {
   font-weight: 700;
   color: var(--gold);

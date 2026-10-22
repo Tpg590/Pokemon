@@ -26,8 +26,12 @@ G.NewsUI = (() => {
   function open() {
     // Historical notes without a complete translation use the existing English
     // version, never a sentence assembled from partially translated fragments.
-    const text = pair => G.I18n.lang === 'es' ? pair[0]
-      : G.I18n.lang === 'en' || !G.I18n.has(pair[0]) ? pair[1] : G.T(pair[0]);
+    const text = pair => {
+      if (G.I18n.lang === 'vi' && pair[2]) return pair[2];
+      if (G.I18n.lang === 'es') return pair[0];
+      if (G.I18n.lang !== 'en' && G.I18n.has(pair[0])) return G.T(pair[0]);
+      return pair[1] || pair[0];
+    };
     // Cada texto ya va en su idioma: translate="no" para que no lo toque i18n.
     const PARTS = [['new', ['Nuevo', 'New']], ['chg', ['Cambios', 'Changes']], ['fix', ['Arreglos', 'Fixes']]];
     $('news-body').innerHTML = G.CHANGELOG.map(v =>

@@ -6,7 +6,33 @@
  * Cada línea en español y en inglés.
  */
 G.CHANGELOG = [
+  { d: '2026-10-23', title: [
+    'Multijugador mejorado, enciclopedia de movimientos y donaciones MoMo',
+    'Enhanced Multiplayer, Moves Encyclopedia & MoMo Support',
+    'Nâng cấp Chơi nhiều người (Co-op), Tra cứu Chiêu thức & Tiếp sức MoMo'
+  ], new: [
+    ['Multijugador: botón directo en el menú principal con salas públicas, creación de salas y sala de espera con avatares de 4 jugadores.',
+     'Multiplayer: direct button on the main menu with public room list, room creation, and a lobby showing icons of all 4 players.',
+     'Chơi nhiều người (Co-op): Nút Multiplayer trực tiếp ở menu chính, danh sách phòng công khai, tạo phòng dễ dàng và phòng chờ hiển thị nhân vật của 4 người chơi.'],
+    ['Cambio de Pokémon en la sala: ahora puedes cambiar tu compañero directamente en la sala de espera sin salir al menú.',
+     'Change partner in lobby: you can now change your partner Pokémon directly inside the room lobby without leaving to the main menu.',
+     'Đổi Pokémon trong phòng: Có thể đổi Pokémon đồng hành ngay trong phòng chờ tổ đội mà không cần thoát ra menu chính.'],
+    ['Inspección de movimientos: en la Pokédex y la bolsa de MTs puedes pulsar cualquier ataque para ver su descripción y Pokémon compatibles.',
+     'Move inspection: in Pokédex and Bag TMs, you can now tap any move to view its description and compatible Pokémon.',
+     'Tra cứu Chiêu thức: Trong Pokédex và Túi đồ (MT), bấm vào chiêu thức để xem mô tả chi tiết và danh sách Pokémon tương thích.'],
+    ['Apoyo al proyecto: integración de código QR MoMo / VietQR (Napas 247) para donaciones y soporte voluntario.',
+     'Support the project: integrated MoMo / VietQR (Napas 247) QR code for voluntary support.',
+     'Tiếp sức dự án: Tích hợp mã QR MoMo và VietQR (Napas 247) trong nút Support để bạn bè có thể tiếp cơm tiếp gạo cho tác giả.']
+  ], fix: [
+    ['Teclado móvil: solucionado el fallo al escribir apodos con métodos de entrada o teclados virtuales en teléfonos.',
+     'Mobile keyboard: fixed crash when typing nicknames with virtual keyboards or mobile IME.',
+     'Bàn phím điện thoại: Khắc phục lỗi crash khi nhập tên bằng bàn phím ảo hoặc bộ gõ tiếng Việt trên điện thoại.'],
+    ['Tienda Kecleon: corregido el formato del contador de tiempo para la rotación diaria de objetos.',
+     'Kecleon Shop: fixed timer countdown format for daily item restock.',
+     'Cửa hàng Kecleon: Sửa lỗi hiển thị đồng hồ đếm ngược thời gian làm mới hàng ngày.']
+  ]},
   { d: '2026-10-22', title: ['Cooperativo sin salas que se cierran solas', 'Co-op without rooms closing on their own'], fix: [
+
     ['Cooperativo: a los invitados ya no les sale «La sala se ha cerrado» a mitad de partida (a veces a los pocos minutos o al entrar en una grieta) mientras los demás seguían jugando. Pasaba cuando su conexión con el servidor de las salas se cortaba un momento; ahora la partida sigue y la sala se recupera sola.',
      'Co-op: guests no longer get "The room has been closed" in the middle of a run (sometimes after a few minutes or when entering a rift) while the others kept playing. It happened when their connection to the rooms server dropped for a moment; now the run goes on and the room recovers on its own.'],
     ['Cooperativo: si se corta un momento la conexión con el anfitrión (un bache de la wifi o de los datos), el invitado ya no pierde la partida: se queda en pausa hasta 45 segundos mientras se vuelve a conectar y sigue jugando.',
