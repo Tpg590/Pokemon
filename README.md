@@ -1,5 +1,7 @@
 # PokéSurvivor (Community Fork / Custom Deployment)
 
+[Tiếng Việt](#-tiếng-việt) · [Español / Original](#-versión-en-español)
+
 > [!IMPORTANT]
 > **Attribution & Credits:**
 > This repository is a fork and custom deployment based on **PokéSurvivor**, an open-source game created and owned by **Jonathan Piera Torregrosa ([JPTER78](https://github.com/JPTER78))**.
@@ -11,6 +13,44 @@
 > All core engine development, game design, and original chiptune music are created by **JPTER78**. This repository is maintained for personal study, server latency optimization, and non-commercial community play.
 
 ---
+
+## 🇻🇳 Tiếng Việt
+
+Tựa game thể loại **Bullet-heaven / Roguelite sinh tồn** lấy chủ đề Pokémon với phong cách đồ họa pixel art từ *Pokémon Mystery Dungeon*, bao gồm **966 Pokémon từ cả 9 Thế hệ (Gen 1 đến Gen 9)**, hệ thống Shiny, quay Gacha theo từng vùng và âm nhạc chiptune độc quyền.
+
+Dự án được xây dựng hoàn toàn bằng **HTML + CSS + JavaScript thuần** trên **Canvas 2D**, không cần cài đặt thư viện phụ thuộc phức tạp và có thể chơi ngoại tuyến (offline) hoặc chơi nhiều người trực tuyến (online co-op).
+
+### 🎮 Cách chơi & Phím điều khiển
+
+Mở file `index.html` trên trình duyệt (hoặc truy cập qua link web deploy). Bạn có thể đăng nhập tài khoản để lưu dữ liệu lên Cloud hoặc chơi ngay với tư cách Khách (Guest).
+
+| Phím | Thao tác |
+|---|---|
+| `W` `A` `S` `D` hoặc các phím mũi tên | Di chuyển nhân vật |
+| `1` `2` `3` `4` | Chọn chiêu thức tấn công đang kích hoạt |
+| `Q` / `E` | Đổi nhanh chiêu thức tiếp theo / trước đó |
+| `Esc` / `P` | Tạm dừng (Pause) |
+
+- **Trên điện thoại / máy tính bảng (xoay ngang màn hình):** Chạm và kéo ngón tay bất kỳ đâu trên màn hình để di chuyển (cần điều khiển ảo sẽ xuất hiện tại điểm chạm), bấm vào biểu tượng kỹ năng bên dưới để đổi chiêu và bấm góc trên bên phải để tạm dừng.
+
+### 🌟 Các tính năng nổi bật
+
+- **Tự động tấn công & Liên kết chiêu (Fusion):** Pokémon sẽ tự động thi triển chiêu thức đang chọn. Khi hạ gục các Pokémon Huyền thoại (Legendary), bạn có thể dung hợp các chiêu thức lại với nhau để phóng ra đồng thời từ một ô kỹ năng duy nhất (tối đa liên kết 4 chiêu).
+- **Tương tác bản đồ:** Phá hủy đá, rương gỗ và bụi cỏ cao; lợi dụng tường và cây cối để chắn đạn của kẻ địch; địa hình nước làm giảm tốc độ, dung nham gây sát thương bỏng cho cả ta và địch. Trên map còn xuất hiện Đài tế ban sức mạnh, Suối hồi máu, Rương báu khóa và các Vết nứt không gian (Rift) dẫn tới đấu trường Boss Huyền Thoại.
+- **Hệ thống khắc hệ & Thời tiết:** Bảng khắc hệ chuẩn Pokémon (Nước khắc Lửa,...). Các hiệu ứng thời tiết (Nắng gắt, Mưa rào, Bão cát, Tuyết rơi, Sương mù) thay đổi ngẫu nhiên giúp tăng sức mạnh cho hệ tương ứng và giảm sức mạnh các hệ khác.
+- **Quay Gacha & Thẻ bài nâng cấp:** Dùng Vé Gacha nhận được khi chơi để quay ra các Pokémon mới từ Gen 1 đến Gen 9 trong cỗ máy slot pixel art.
+- **Tỉ lệ Shiny cực hiếm:** Mỗi quái vật trên màn hình có tỉ lệ `1/4096` xuất hiện dạng Shiny (Phát sáng lấp lánh). Khi xuất hiện sẽ có mũi tên chỉ đường, nếu hạ gục được nó bạn sẽ mở khóa và sở hữu vĩnh viễn dạng Shiny của Pokémon đó! Trong Gacha, tỉ lệ ra Shiny là `1%` (1/100).
+- **Chơi cùng bạn bè (Co-op Multiplayer tối đa 4 người):** Kết nối P2P trực tiếp qua WebRTC, có phòng chờ và mời bạn bè qua mã phòng. Bản fork này đã được tối ưu máy chủ Firebase đặt tại Singapore (ping siêu thấp ~30ms) và tăng tần số mạng lên **30 Hz** giúp trải nghiệm mượt mà không bị giật lag.
+
+### 📜 Bản quyền & Miễn trừ trách nhiệm
+
+- **Mã nguồn:** Thuộc bản quyền của **Jonathan Piera Torregrosa ([JPTER78](https://github.com/JPTER78))** theo giấy phép [PolyForm Noncommercial 1.0.0](LICENSE-NONCOMMERCIAL.md). Nghiêm cấm mọi hành vi thương mại hóa, bán game, bán vật phẩm hoặc gắn quảng cáo.
+- **Hình ảnh Sprites:** Lấy từ dự án cộng đồng [SpriteCollab](https://github.com/PMDCollab/SpriteCollab) theo giấy phép CC BY-NC 4.0 (danh sách tác giả xem tại [`CREDITS.md`](CREDITS.md)).
+- **Thương hiệu Pokémon:** Pokémon và toàn bộ tên nhân vật liên quan là thương hiệu và tài sản thuộc sở hữu của Nintendo, Game Freak, Creatures Inc. và The Pokémon Company. Đây là dự án fan-game hoàn toàn phi lợi nhuận.
+
+---
+
+## 🇪🇸 Versión en Español
 
 Bullet-heaven con Pokémon al estilo de Survivor.io y Megabonk, con sprites de
 *Pokémon Mundo Misterioso*, capa roguelike, **966 Pokémon de las 9 generaciones**,
