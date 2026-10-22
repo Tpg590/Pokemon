@@ -179,3 +179,21 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
 - **Đóng gói sản phẩm:**
   - `tests/i18n.test.cjs`: **20/20 tests passed**.
   - `node tools/build.js`: Biên dịch ra `app.min.js?v=14cd57e21c` và đồng bộ `index.html`.
+
+## ⏱️ [2026-10-23 04:54:00] — Đồng bộ căn chỉnh Icon Mega & Thêm nút Bỏ qua (Skip) khi Gacha
+- **Căn chỉnh hoàn hảo Icon Mega & Icon Pokéball (`css/style.css` & `js/ui/menu.js`):**
+  - Đồng bộ kích thước icon Mega thành 12x12px chuẩn (`G.Icons.html('mega', 12)`) giống icon bóng độ hiếm.
+  - Tái cấu trúc `.cell-rarity-row` thành Flexbox căn giữa hoàn toàn (`display: flex; align-items: center; justify-content: center; gap: 4px; line-height: 1; height: 14px;`).
+  - Thiết lập `.cell-rarity-row .rarity-ball` và `.cell-rarity-row .badge-mega` thành `display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; margin: 0; padding: 0;`.
+  - Triệt tiêu hoàn toàn độ lệch dọc và khoảng cách bất đối xứng, hai icon giờ nằm thẳng hàng tuyệt đối trên thẻ Pokédex.
+- **Tính năng Bỏ qua hoạt ảnh Gacha (Gacha Skip Button) (`dev.html`, `js/ui/gacha-ui.js`, `js/ui/slots.js`, `css/style.css`):**
+  - Thêm nút `[ ⏭️ Bỏ qua / Skip ]` (`#pull-skip`) tại góc trên màn hình Gacha với thiết kế kính mờ bo tròn nổi bật.
+  - Khi bấm nút Bỏ qua:
+    - Lập tức ngắt hoạt ảnh máy xèng (`G.Slots.stop()`), ẩn ngay canvas máy quay.
+    - Dừng toàn bộ các khoảng chờ trễ (`wait`) của quá trình lật thẻ.
+    - Hiển thị ngay lập tức toàn bộ thẻ Pokémon quay được lên màn hình không cần chờ đợi.
+    - Hiện ngay nút Tiếp tục (`#pull-close`) để người chơi thu thập và tiếp tục trải nghiệm nhanh chóng.
+  - Hỗ trợ đa ngôn ngữ đầy đủ (Tiếng Việt: "Bỏ qua ⏭️", Tiếng Anh: "Skip ⏭️", cùng các ngôn ngữ ES, FR, IT, PT, ZH).
+- **Đóng gói sản phẩm:**
+  - `tests/i18n.test.cjs`: **20/20 tests passed**.
+  - `node tools/build.js`: Biên dịch ra `app.min.js?v=f9bf112831` và đồng bộ `index.html`.

@@ -48,28 +48,35 @@ G.Slots = (() => {
 
     const ten = results.length === 10;
     for (let i = 0; i < results.length; i++) {
+      if (!st) break;
       const r = results[i];
       if (ten) st.led = 'TIRADA ' + (i + 1) + '/10';
       // Palanca.
       G.Audio.sfx('ball');
-      await tween(v => { st.lever = v; }, 0, 1, ten ? 0.12 : 0.22);
+      await tween(v => { if (st) st.lever = v; }, 0, 1, ten ? 0.12 : 0.22);
+      if (!st) break;
       for (const rl of st.reels) { rl.spin = true; rl.speed = 520; }
-      await tween(v => { st.lever = v; }, 1, 0, ten ? 0.1 : 0.2);
+      await tween(v => { if (st) st.lever = v; }, 1, 0, ten ? 0.1 : 0.2);
+      if (!st) break;
       st.win = null;
       await wait(ten ? 0.18 : 0.6);
+      if (!st) break;
       const big = r.rarity >= 4 || r.shiny;
       for (let k = 0; k < 3; k++) {
+        if (!st) break;
         if (k === 2 && big) {
           // Suspense: el último rodillo frena despacio y las luces parpadean.
           st.frenzy = 1;
           st.led = r.shiny ? '¡¿SHINY?!' : r.rarity === 5 ? '¡¿LEGENDARIO?!' : '¡¿ÉPICO?!';
           st.ledCol = colOf(r);
-          await tween(v => { st.reels[2].speed = v; }, 520, 120, ten ? 0.5 : 1.1);
+          await tween(v => { if (st) st.reels[2].speed = v; }, 520, 120, ten ? 0.5 : 1.1);
         }
+        if (!st) break;
         stopReel(st.reels[k], symOf(r));
         G.Audio.sfx('shake');
         await wait(ten ? 0.08 : 0.32);
       }
+      if (!st) break;
       st.frenzy = 0;
       // Premio.
       st.win = { col: colOf(r), t: 0 };
@@ -82,7 +89,7 @@ G.Slots = (() => {
       st.tray.push({ sym: symOf(r), y: 104, vy: 0, done: false });
       await wait(ten ? (big ? 0.7 : 0.28) : 1.0);
     }
-    await wait(0.4);
+    if (st) await wait(0.4);
     stopAll();
   }
 

@@ -265,7 +265,7 @@ G.MenuUI = (() => {
     const useShiny = sh && p.dex === s.partner && s.partnerShiny;
     cell.appendChild(G.UI.spriteCanvas(p.dex, 92, 80, { scale: 2, silhouette: !own, shadow: own, shiny: useShiny }));
     const isMega = G.Mega && G.Mega.isCapable(p.dex);
-    const megaIconHtml = isMega ? `<span class="badge-mega" title="${G.Mega.getStoneName(p.dex)}">${G.Icons.html('mega', 11)}</span>` : '';
+    const megaIconHtml = isMega ? `<span class="badge-mega" title="${G.Mega.getStoneName(p.dex)}">${G.Icons.html('mega', 12)}</span>` : '';
     cell.insertAdjacentHTML('beforeend', `<b>${own ? p.name : '???'}</b><div class="cell-rarity-row">${G.UI.stars(p.rarity, 9)}${megaIconHtml}</div>`);
     cell.onclick = () => {
       dexSel = p.dex;

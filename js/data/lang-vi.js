@@ -2862,5 +2862,7 @@ G.I18n.add({
   "Escribe un mensaje…": "Nhập tin nhắn…",
   "Enviar mensaje": "Gửi tin nhắn",
   "Mensaje enviado.": "Đã gửi tin nhắn.",
-  "No se pueden enviar mensajes vacíos.": "Không thể gửi tin nhắn trống."
+  "No se pueden enviar mensajes vacíos.": "Không thể gửi tin nhắn trống.",
+  "Saltar": "Bỏ qua",
+  "Saltar ⏭️": "Bỏ qua ⏭️"
 }, "vi");

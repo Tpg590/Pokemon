@@ -946,5 +946,6 @@ G.I18n.add({
   // ---------------- Tienda Kecleon, naturalezas y habilidades (20-10-2026) ----------------
   "Objetos: {x} · MT: {x}": "Items: {x} · TMs: {x}",
   // ---------------- Cooperativo: mirar a un compañero estando caído (21-10-2026) ----------------
-  "Ver a un compañero": "Watch a teammate", "Viendo a {x}": "Watching {x}", "cambiar": "switch"
+  "Ver a un compañero": "Watch a teammate", "Viendo a {x}": "Watching {x}", "cambiar": "switch",
+  "Saltar": "Skip", "Saltar ⏭️": "Skip ⏭️"
 });

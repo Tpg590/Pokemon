@@ -5,12 +5,23 @@ G.GachaUI = (() => {
   const $ = G.UI.$;
   let busy = false;
   let gen = 1;
+  let skipped = false;
+
+  function doSkip() {
+    if (!busy || skipped) return;
+    skipped = true;
+    const btn = $('pull-skip');
+    if (btn) btn.classList.add('hidden');
+    G.Slots.stop();
+  }
 
   function init() {
     $('pull-1').onclick = () => pull(1);
     $('pull-10').onclick = () => pull(10, 't1');
     $('pull-10b').onclick = () => pull(10, 't10');
     $('pull-close').onclick = close;
+    const skipBtn = $('pull-skip');
+    if (skipBtn) skipBtn.onclick = doSkip;
 
     const tabs = $('gacha-gens');
     G.Gacha.BANNERS.forEach(b => {
@@ -76,7 +87,14 @@ G.GachaUI = (() => {
     G.UI.refreshCoins();
   }
 
-  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const wait = ms => new Promise(r => {
+    if (!ms || skipped) { r(); return; }
+    const end = performance.now() + ms;
+    (function chk() {
+      if (performance.now() >= end || skipped) r();
+      else setTimeout(chk, 16);
+    })();
+  });
 
   async function pull(n, use = 't1') {
     if (busy) return;
@@ -85,17 +103,20 @@ G.GachaUI = (() => {
     G.Progress.checkAch();
     G.DB.commit(true);
     busy = true;
+    skipped = false;
 
     const best = Math.max(...res.map(r => r.rarity));
     const fx = $('pull-fx'), slot = $('slot'), out = $('pull-results');
     out.innerHTML = '';
     $('pull-close').classList.add('hidden');
+    const skipBtn = $('pull-skip');
+    if (skipBtn) skipBtn.classList.remove('hidden');
     slot.style.display = '';
     fx.classList.remove('hidden');
 
     // La tragaperras (ui/slots.js) y luego las cartas.
     await G.Slots.play(slot, res);
-    G.Audio.sfx('burst', { rarity: best });
+    if (!skipped) G.Audio.sfx('burst', { rarity: best });
     slot.style.display = 'none';
 
     for (const r of res) {
@@ -113,15 +134,22 @@ G.GachaUI = (() => {
       const who = ab ? `<div class="pmon" translate="no">${G.Mons.name(G.Mons.natureOf(r.dex).n)} · <span class="${ab.slot === 2 ? 'gold' : ''}">${G.Mons.abilityName(ab.id)}</span></div>` : '';
       c.insertAdjacentHTML('beforeend', `<b>${r.shiny ? G.Icons.html('shiny', 12) + ' ' : ''}${mon.name}</b>${who}<div class="tag">${tag}</div>`);
       out.appendChild(c);
-      G.Audio.sfx('reveal', { rarity: r.rarity });
-      await wait(n === 10 ? 150 : 0);
+      if (!skipped) {
+        G.Audio.sfx('reveal', { rarity: r.rarity });
+        await wait(n === 10 ? 150 : 0);
+      }
     }
+    if (skipBtn) skipBtn.classList.add('hidden');
     $('pull-close').classList.remove('hidden');
     busy = false;
   }
 
   function close() {
+    const skipBtn = $('pull-skip');
+    if (skipBtn) skipBtn.classList.add('hidden');
     $('pull-fx').classList.add('hidden');
+    G.Slots.stop();
+    busy = false;
     refresh();
   }
 
