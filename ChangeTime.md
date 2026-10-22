@@ -57,4 +57,28 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
      - **Bản tin cập nhật (`G.CHANGELOG`):** Dịch chuẩn ngữ nghĩa toàn bộ 145 mục tin mới từ phiên bản đầu đến mới nhất ngày 22/10/2026.
   3. **Kiểm thử tự động (`tests/i18n.test.cjs`):** Thêm mã ngôn ngữ `vi` và từ khóa `Lưu` vào bộ test. Chạy `node --test tests/i18n.test.cjs` đạt kết quả tuyệt đối **20/20 tests passed**.
   4. **Đóng gói & Phát hành:** Chạy `node tools/build.js` thành công, tạo `js/app.min.js` mới kèm chữ ký số và cập nhật `js/lang/vi.js`. Đã đẩy toàn bộ mã nguồn lên GitHub `Tpg590/Pokemon` để Vercel tự động triển khai.
-
+## ⏱️ [2026-10-23 02:48:00] — Dịch toàn diện mô tả Chiêu thức, Vật phẩm, Cốt truyện sang Tiếng Việt (Giữ nguyên tên Pokémon, Kỹ năng, Vật phẩm)
+- **Yêu cầu & Quy chuẩn:**
+  - Giữ nguyên toàn bộ **Tên Pokémon** (Pikachu, Bulbasaur, Mewtwo...), **Tên Chiêu thức / Kỹ năng** (Ember, Flamethrower, Solar Beam, Hydro Pump, Confuse Ray...), **Tên Vật phẩm** (Leftovers, Choice Band, Focus Sash, Life Orb...).
+  - Dịch 100% tất cả **Mô tả chiêu thức, mô tả vật phẩm, hiệu ứng đặc tính, cốt truyện, nhiệm vụ, danh hiệu, minigame, thông báo chiến đấu** sang tiếng Việt tự nhiên và chuẩn xác.
+- **Chi tiết các phần đã hoàn thiện:**
+  1. **Mô tả chiêu thức chiến đấu (100%):**
+     - `"Drena vida de todo lo cercano y te cura con cada golpe."` ➔ `"Hút sinh lực từ kẻ địch xung quanh và hồi máu cho bạn sau mỗi đòn đánh."`
+     - `"Embiste en arco a todo lo que tengas delante."` ➔ `"Lao tới theo hình vòng cung càn quét mọi kẻ địch phía trước."`
+     - `"Esfera de energía que nunca falla."` ➔ `"Quả cầu năng lượng không bao giờ trượt mục tiêu."`
+     - `"Esfera oscura que atraviesa a varios."` ➔ `"Khối cầu bóng tối xuyên thấu qua nhiều kẻ địch."`
+     - `"Estallido mental radial que busca enemigos."` ➔ `"Bộc phát sóng tâm linh tỏa tròn tự tìm mục tiêu."`
+     - `"Explota en llamas en todas las direcciones."` ➔ `"Bùng nổ ngọn lửa rực cháy về mọi hướng."`
+     - `"Golpe seco y potente al frente."` ➔ `"Cú đòn trực diện hiểm hóc và đầy uy lực."`
+     - `"Hilos pegajosos en todas direcciones que frenan mucho."` ➔ `"Tơ dính phóng ra mọi hướng làm chậm kẻ địch đáng kể."`
+     - `"Lametazo espectral que paraliza un poco."` ➔ `"Cú liếm ma quái làm tê liệt thoáng chốc."`
+     - `"Látigos de largo alcance en arco amplio."` ➔ `"Dây roi tầm xa quét theo hình vòng cung rộng."`
+     - `"Llamarada dracónica en línea recta."` ➔ `"Ngọn lửa rồng thiêu rụi theo đường thẳng."`
+  2. **Tên chiêu thức & Vật phẩm:**
+     - Giữ nguyên ánh xạ sang tên tiếng Anh quốc tế quen thuộc (Ví dụ: `Ascuas` ➔ `Ember`, `Lanzallamas` ➔ `Flamethrower`, `Restos` ➔ `Leftovers`, `Cinta Elección` ➔ `Choice Band`...).
+  3. **Hệ thống dữ liệu và Kiểm thử:**
+     - Cập nhật từ điển `js/data/lang-vi.js` lên **196.2 KB** (1.736 khóa dịch hoàn chỉnh).
+     - Biên dịch ra `js/lang/vi.js` với kết quả: `vi: faltan 0` (không còn thiếu bất kỳ chuỗi nào).
+     - Chạy kiểm thử tự động `tests/i18n.test.cjs`: **20/20 tests passed**, đảm bảo 100% khớp tham số động `{x}`, `{name}`.
+     - Đóng gói bản mã hóa sản phẩm `node tools/build.js` thành công (`app.min.js?v=338b0a77e1`).
+     - Đẩy mã nguồn lên GitHub `Tpg590/Pokemon` nhánh `main`.
