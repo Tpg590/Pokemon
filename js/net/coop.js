@@ -24,9 +24,8 @@
 G.Coop = (() => {
   const ANIMS = ['Idle', 'Walk', 'Attack', 'Shoot', 'Charge', 'Hurt', 'Faint'];
   const COLORS = ['#ffcb3d', '#5fc8ff', '#7ee07a', '#ff8ad8'];
-  // Mensajes por segundo: 15 por la conexión directa y 3 por el relé de la
-  // Realtime Database (apagado: 1 $ el GB).
-  const RATE_FAST = 1 / 15, RATE_SLOW = 1 / 3;
+  // Mensajes por segundo: 30 por la conexión directa (para mayor fluidez) y 5 por el relé
+  const RATE_FAST = 1 / 30, RATE_SLOW = 1 / 5;
   const rateFor = u => (G.Net.slow(u) ? RATE_SLOW : RATE_FAST);
   const NEAR = 950;                     // radio de enemigos que se mandan a cada uno
 
