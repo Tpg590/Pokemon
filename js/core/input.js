@@ -9,16 +9,23 @@ G.Input = (() => {
     left: ['keya', 'arrowleft'], right: ['keyd', 'arrowright']
   };
 
-  function code(e) { return (e.code || e.key).toLowerCase(); }
+  function code(e) {
+    const k = (e && (e.code || e.key)) || '';
+    return typeof k === 'string' ? k.toLowerCase() : '';
+  }
 
   addEventListener('keydown', e => {
     const c = code(e);
+    if (!c) return;
     if (!down.has(c)) pressed.add(c);
     down.add(c);
     // Evita que el navegador haga scroll con flechas/espacio durante el juego.
     if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'space', 'tab'].includes(c)) e.preventDefault();
   });
-  addEventListener('keyup', e => down.delete(code(e)));
+  addEventListener('keyup', e => {
+    const c = code(e);
+    if (c) down.delete(c);
+  });
   addEventListener('blur', () => { down.clear(); });
   let movedAt = 0;               // última vez que se movió el ratón (apuntado a mano)
   addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; movedAt = performance.now(); });

@@ -182,7 +182,7 @@
       for (const r of list) {
         const row = document.createElement('div');
         row.className = 'public-room-row';
-        const bestTimeStr = G.U ? G.U.formatTime(r.bestTime || 0) : Math.floor((r.bestTime || 0) / 60) + 'm';
+        const bestTimeStr = (G.U && G.U.mmss) ? G.U.mmss(r.bestTime || 0) : (Math.floor((r.bestTime || 0) / 60) + 'm');
         const bestPoke = G.DEX_BY[r.bestDex] || G.DEX_BY[r.dex] || G.DEX_BY[25];
         row.innerHTML = `
           <div class="room-host-info">

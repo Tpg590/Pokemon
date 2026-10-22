@@ -4,6 +4,22 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
 
 ---
 
+## ⏱️ [2026-10-23 06:25:00] — Khắc phục lỗi toLowerCase(), Bách khoa Chiêu thức & MT đa ngôn ngữ, Tích hợp Pokédex và Online Presence
+- **input.js:** Xử lý triệt để lỗi crash `Cannot read properties of undefined (reading 'toLowerCase')` khi gõ tiếng Việt / phím ảo trên mobile khi `e.code` hoặc `e.key` rỗng.
+- **moves-ui.js & dev.html:**
+  - Chuyển toàn bộ chuỗi gốc sang chuẩn Spanish base và thêm đầy đủ bộ dịch tiếng Anh (`lang-en.js`) và tiếng Việt (`lang-vi.js`). Khi chọn tiếng Anh thì hiển thị chuẩn tiếng Anh, chọn tiếng Việt hiển thị tiếng Việt.
+  - Sửa lỗi màn hình trắng trống trơn, hiển thị đầy đủ danh sách chiêu thức theo 18 hệ, nấc nâng cấp cấp 1-5, tiến hóa chiêu, vật phẩm phụ trợ yêu cầu.
+  - Mục Đĩa TM hiển thị đầy đủ danh sách tất cả các đĩa TM, mô tả chiêu, chỉ số, số lượng loài học được và lưới đầy đủ toàn bộ Pokemon có thể học (kèm nhãn Đã sở hữu / Chưa sở hữu).
+- **Pokédex (menu.js):**
+  - Tích hợp tính năng bấm vào biểu tượng bất kỳ chiêu thức nào của Pokémon (hoặc chiêu xuất phát) để xem ngay popup chi tiết: tên chiêu, hệ, phân loại Vật lý / Đặc biệt, sát thương gốc, hồi chiêu và mô tả công dụng.
+  - Thêm nút tắt xem thẳng chiêu đó trong Bách khoa toàn thư Chiêu thức.
+- **Túi đồ (shop-ui.js):**
+  - Hiển thị mô tả công dụng của từng đĩa TM trực tiếp trong túi và thêm nút xem danh sách Pokemon học được.
+- **Multiplayer & Bạn bè (social.js, social-ui.js, database.rules.json):**
+  - Sửa lỗi crash `G.U.formatTime is not a function` bằng `G.U.mmss`.
+  - Cập nhật rule Realtime Database mở quyền đọc `presence` và `public_rooms` (`.read: true`) tránh nghẽn quyền đọc khi token auth đang sync.
+  - Bổ sung cơ chế ghi nhận trạng thái online tức thì, heartbeat định kỳ và bộ nhớ đệm `presenceMap` đảm bảo danh sách bạn bè hiển thị trạng thái Trực tuyến/Ngoại tuyến chuẩn xác.
+
 ## ⏱️ [2026-10-22 23:04:00] — Khởi tạo cấu hình mạng & máy chủ
 - **db.js:** Cập nhật danh sách whitelist `HOSTS` sang nhận diện động `location.hostname` để hỗ trợ Vercel và các custom domain.
 - **coop.js:** Nâng cấp tần số gửi gói tin co-op từ 15 Hz (`1/15`) lên **30 Hz (`1/30`)** nhằm tăng gấp đôi độ mượt chuyển động, triệt tiêu hiện tượng quái và người chơi bị giật lag khi kết nối P2P.

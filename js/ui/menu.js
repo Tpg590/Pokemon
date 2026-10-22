@@ -392,9 +392,10 @@ G.MenuUI = (() => {
         <p class="sub center" style="margin:6px 0 0">Pega mejor con ataques <b class="gold">${G.Stats.sideOf(q) === 'special' ? 'especiales' : 'físicos'}</b></p>
         ${activeMega ? `<p class="sub center gold" style="margin:6px 0">${activeMega.desc}</p>${megaStoneAction}` : monExtras(dex)}
         ${dispTypes.length === 1 ? `<p class="sub center" style="margin:2px 0 0">Monotipo: +20 % de daño con sus ataques de tipo ${G.U.TYPE_NAME[dispTypes[0]]}</p>` : ''}
-        <p style="font-size:14px;margin:10px 0 4px">Empieza con <b class="gold">${G.T(G.Moves.BY_ID[G.startMoveOf(dex)].name, 'move')}</b></p>
-        <p class="move-icons" title="Movimientos que puede aprender">
-          ${G.Moves.poolFor(p).map(id => `<span title="${G.T(G.Moves.BY_ID[id].name, 'move')}">${G.Icons.html('move:' + id, 16)}</span>`).join('')}</p>
+        <p style="font-size:14px;margin:10px 0 4px">${G.T('Empieza con')} <b class="gold dex-start-move-btn" data-move-id="${G.startMoveOf(dex)}" style="cursor:pointer;text-decoration:underline" title="${G.T('Pulsa para ver detalles')}">${G.T(G.Moves.BY_ID[G.startMoveOf(dex)].name, 'move')}</b></p>
+        <p class="move-icons" title="${G.T('Movimientos que puede aprender')}">
+          ${G.Moves.poolFor(p).map(id => `<span class="dex-move-chip" data-move-id="${id}" style="cursor:pointer;display:inline-block;padding:2px" title="${G.U.esc(G.T(G.Moves.BY_ID[id].name, 'move'))}">${G.Icons.html('move:' + id, 18)}</span>`).join('')}</p>
+        <div id="dex-move-preview" class="dex-move-preview-box hidden" style="margin:6px 0 10px;padding:8px 10px;background:rgba(5,10,26,0.65);border:1px solid rgba(244,248,255,0.2);border-radius:8px"></div>
         ${usingThis
           ? '<button class="btn grow" disabled style="width:100%">Es tu compañero</button>'
           : `<button id="dex-pick" class="btn gold" data-sfx="confirm" style="width:100%">Elegir de compañero${viewShiny ? ' (shiny)' : ''}</button>`}
@@ -440,6 +441,45 @@ G.MenuUI = (() => {
       G.UI.toast(p.name + (s.partnerShiny ? ' shiny' : '') + ' es ahora tu compañero');
       renderGrid(true); showDetail(dex);
     };
+
+    function renderMovePreview(mId) {
+      const prevBox = $('dex-move-preview');
+      if (!prevBox) return;
+      const m = G.Moves.BY_ID[mId];
+      if (!m) { prevBox.classList.add('hidden'); return; }
+      prevBox.classList.remove('hidden');
+      const trName = G.T(m.name, 'move');
+      const trDesc = G.T(m.desc || '');
+      const cat = m.stat === 'patk' || m.stat === 'satk' || m.kind === 'buff' ? G.T('🛡️ Buff')
+        : (G.Moves.isSpecial && G.Moves.isSpecial(m.id) ? G.T('🔮 Ataque Especial') : G.T('⚔️ Ataque Físico'));
+      const stats = [];
+      if (m.dmg) stats.push(`💥 ${G.T('Daño:')} <b class="gold">${m.dmg}</b>`);
+      if (m.cd) stats.push(`⏱️ ${G.T('Recarga:')} <b class="gold">${m.cd}s</b>`);
+      if (m.count && m.count > 1) stats.push(`🎯 ${G.T('Cantidad:')} <b class="gold">${m.count}</b>`);
+      prevBox.innerHTML = `
+        <div class="row between" style="align-items:center;margin-bottom:4px">
+          <div class="row" style="gap:6px;align-items:center">
+            ${G.Icons.html('move:' + m.id, 18)}
+            <b style="color:#fff;font-size:14px">${G.U.esc(trName)}</b>
+            ${G.UI.typeChips([m.type])}
+          </div>
+          <span style="font-size:11px;color:var(--muted)">${cat}</span>
+        </div>
+        <p style="font-size:12px;color:#c0cce0;margin:4px 0 6px;line-height:1.4">${G.U.esc(trDesc)}</p>
+        ${stats.length ? `<div style="font-size:12px;color:var(--muted);margin-bottom:6px">${stats.join(' · ')}</div>` : ''}
+        <button class="btn small ghost" id="dex-view-encyclopedia" style="width:100%;font-size:11px;padding:4px 8px">${G.Icons.html('book', 12)} ${G.T('Ver en Enciclopedia de Movimientos')} ➔</button>
+      `;
+      const encBtn = prevBox.querySelector('#dex-view-encyclopedia');
+      if (encBtn) encBtn.onclick = () => G.MovesUI.open(m.id, 'types');
+    }
+
+    box.querySelectorAll('.dex-move-chip, .dex-start-move-btn').forEach(btn => {
+      btn.onclick = () => {
+        const id = btn.dataset.moveId;
+        renderMovePreview(id);
+      };
+    });
+
     if (own && !activeMega) wireExtras(dex, box);
   }
 

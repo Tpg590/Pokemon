@@ -143,16 +143,27 @@ G.Social = (() => {
     if (known) listenInvites();
   }
 
+  let presTimer = null;
   function setupPresence() {
     if (!fb || !fb.rtdb || !uid) return;
     rtOn();
     const myPresRef = fb.rtdb.ref('presence/' + uid);
+    const writePres = () => {
+      myPresRef.onDisconnect().remove().catch(e => console.warn('[Presence] onDisconnect err:', e));
+      myPresRef.set({ online: true, name: (me && me.name) || '', at: ts() })
+        .catch(e => console.warn('[Presence] set error (kiểm tra rules RTDB):', e));
+    };
+    writePres();
     fb.rtdb.ref('.info/connected').on('value', snap => {
-      if (snap.val() === true) {
-        myPresRef.onDisconnect().remove().catch(() => {});
-        myPresRef.set({ online: true, name: (me && me.name) || '', at: ts() }).catch(() => {});
-      }
+      if (snap.val() === true) writePres();
     });
+    if (!presTimer) {
+      presTimer = setInterval(() => {
+        if (started && uid && fb && fb.rtdb) {
+          myPresRef.update({ online: true, at: ts() }).catch(() => {});
+        }
+      }, 25000);
+    }
   }
 
   /** Carga la lista de amigos (y la sigue escuchando) la primera vez que hace falta. */
@@ -228,6 +239,7 @@ G.Social = (() => {
   // ---------------- amigos ----------------
 
   const trackedPresence = new Set();
+  const presenceMap = new Map();
 
   function listenFriends(ready) {
     unFriends = fb.fs.collection('friendships').where('users', 'array-contains', uid).onSnapshot(snap => {
@@ -236,10 +248,11 @@ G.Social = (() => {
         const f = d.data();
         const other = f.users[0] === uid ? f.users[1] : f.users[0];
         const prev = friends.get(other) || {};
+        const isOnline = presenceMap.has(other) ? presenceMap.get(other) : (prev.online || false);
         next.set(other, Object.assign({
           uid: other, pid: d.id, name: (f.names && f.names[other]) || '???',
           status: f.status === 'ok' ? 'ok' : f.to === uid ? 'in' : 'out',
-          online: prev.online || false, play: false, room: '', seen: 0
+          online: isOnline, play: false, room: '', seen: 0
         }, pres.get(other) || {}));
 
         if (f.status === 'ok' && !trackedPresence.has(other)) {
@@ -258,12 +271,17 @@ G.Social = (() => {
 
   function trackPresence(other) {
     if (!fb || !fb.rtdb) return;
+    rtOn();
     fb.rtdb.ref('presence/' + other).on('value', s => {
+      const isOnline = s.exists() && !!(s.val() && s.val().online === true);
+      presenceMap.set(other, isOnline);
       const f = friends.get(other);
       if (f) {
-        f.online = s.exists() && s.val() && s.val().online === true;
+        f.online = isOnline;
         emit('friends');
       }
+    }, err => {
+      console.warn('[Presence] listen error for ' + other + ' (kiểm tra rules RTDB):', err);
     });
   }
 
@@ -338,13 +356,14 @@ G.Social = (() => {
       const s = G.DB.save;
       const st = s.stats || {};
       const fav = (s.profile && s.profile.favs && s.profile.favs[0] && s.profile.favs[0].dex) || s.partner;
+      const myM = room.members.find(x => x.uid === uid);
       try {
         await ref.set({
           roomId: room.id,
           host: uid,
           hostName: (me && me.name) || 'Host',
-          dex: s.partner,
-          shiny: !!s.partnerShiny,
+          dex: (myM && myM.dex) || s.partner,
+          shiny: (myM ? !!myM.shiny : !!s.partnerShiny),
           bestTime: st.bestTime || 0,
           bestLevel: st.bestLevel || 1,
           bestDex: fav,
@@ -387,7 +406,7 @@ G.Social = (() => {
       const list = Object.keys(val).map(k => val[k]).filter(r => r && r.roomId && r.memberCount < MAX_PLAYERS);
       callback(list);
     };
-    ref.on('value', onVal);
+    ref.on('value', onVal, err => console.warn('[Social] listenPublicRooms err (kiểm tra rules RTDB):', err));
     return () => {
       ref.off('value', onVal);
       browsing = false;

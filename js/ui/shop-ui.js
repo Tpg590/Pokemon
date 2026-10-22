@@ -507,6 +507,11 @@ G.ShopUI = (() => {
     if (go) go.onclick = () => G.MenuUI.openDex();
     const shop = box.querySelector('[data-go-shop]');
     if (shop) shop.onclick = () => open();
+    const moves = box.querySelector('[data-go-moves]');
+    if (moves) moves.onclick = () => G.MovesUI.open();
+    box.querySelectorAll('[data-view-tm]').forEach(b => {
+      b.onclick = () => G.MovesUI.open(b.dataset.viewTm, 'tms');
+    });
   }
 
   /** Lo que dice el Kecleon morado en el bocadillo (se va solo a los 6 s). */
@@ -651,17 +656,29 @@ G.ShopUI = (() => {
       return `<p class="sub center" style="margin:24px 0">${G.T('Tu Mochila está vacía.')}<br><br>
             <button class="btn gold" data-go-shop>${G.Icons.html('shop', 16)} ${G.T('Ir a la Tienda Kecleon')}</button></p>`;
     }
-    let h = `<p class="sub" style="margin:10px 0">${G.T('Para usarlo, abre la colección, elige un Pokémon y pulsa Menta, Cápsula o Enseñar MT en su ficha.')}
-      <button class="btn small" data-go-dex>${G.Icons.html('book', 14)} ${G.T('Ir a la colección')}</button></p><div class="upg">`;
+    let h = `<p class="sub" style="margin:10px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span>${G.T('Para usarlo, abre la colección, elige un Pokémon y pulsa Menta, Cápsula o Enseñar MT en su ficha.')}</span>
+      <span class="row" style="gap:6px">
+        <button class="btn small" data-go-dex>${G.Icons.html('book', 14)} ${G.T('Ir a la colección')}</button>
+        <button class="btn small ghost" data-go-moves>${G.Icons.html('tm', 14)} ${G.T('Movimientos & MT')}</button>
+      </span>
+    </p><div class="upg">`;
     for (const id of items) {
       const it = G.Shop.ITEMS[id];
       h += row(G.Icons.html(it.icon, 32), G.T(it.name), G.T(it.desc), `<b class="gold">×${G.Shop.count(id)}</b>`);
     }
     for (const id of tms) {
+      const m = G.Moves.BY_ID[id];
       // Cuántos de tus Pokémon la pueden aprender.
       const n = Object.keys(s.owned).filter(d => G.DEX_BY[d] && G.Mons.canLearn(+d, id)).length;
-      h += row(G.Icons.html('move:' + id, 32), `${G.T('MT')} ${moveName(id)}`,
-        n ? G.I18n.f('La pueden aprender {x} de tus Pokémon', n) : G.T('Ninguno de tus Pokémon la puede aprender'), `<b class="gold">×${s.tms[id]}</b>`);
+      const desc = m ? G.T(m.desc) : '';
+      const learnText = n ? G.I18n.f('La pueden aprender {x} de tus Pokémon', n) : G.T('Ninguno de tus Pokémon la puede aprender');
+      const descHtml = `${desc ? `<div style="color:#d8e2f0">${desc}</div>` : ''}<div class="gold" style="margin-top:2px">${learnText}</div>`;
+      const rightHtml = `<div class="row" style="gap:6px;align-items:center">
+        <b class="gold" style="font-size:15px">×${s.tms[id]}</b>
+        <button class="btn small ghost" data-view-tm="${id}" title="${G.T('Ver todos los Pokémon que la aprenden')}">${G.Icons.html('book', 14)} ${G.T('Ver')}</button>
+      </div>`;
+      h += row(G.Icons.html('move:' + id, 32), `${G.T('MT')} ${moveName(id)}`, descHtml, rightHtml);
     }
     return h + '</div>';
   }

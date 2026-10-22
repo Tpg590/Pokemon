@@ -1,21 +1,13 @@
 /* ============ moves-ui.js — tra cứu chiêu thức theo hệ & đĩa TM ============ */
 G.MovesUI = (() => {
-  const $ = G.UI.$;
-  const esc = G.U.esc;
+  const $ = id => G.UI.$(id);
+  const esc = s => (G.U && G.U.esc ? G.U.esc(s) : String(s || ''));
 
   const TYPES = [
     'all', 'normal', 'fire', 'water', 'grass', 'electric', 'ice',
     'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug',
     'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'
   ];
-
-  const TYPE_NAMES = {
-    all: 'Tất cả', normal: 'Normal', fire: 'Fuego', water: 'Agua', grass: 'Planta',
-    electric: 'Eléctrico', ice: 'Hielo', fighting: 'Lucha', poison: 'Veneno',
-    ground: 'Tierra', flying: 'Volador', psychic: 'Psíquico', bug: 'Bicho',
-    rock: 'Roca', ghost: 'Fantasma', dragon: 'Dragón', dark: 'Siniestro',
-    steel: 'Acero', fairy: 'Hada'
-  };
 
   const LADDERS = {
     projectile: [
@@ -198,8 +190,8 @@ G.MovesUI = (() => {
           tabs.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
           t.classList.add('on');
           curTab = t.dataset.tab;
-          $('moves-tab-types').classList.toggle('hidden', curTab !== 'types');
-          $('moves-tab-tms').classList.toggle('hidden', curTab !== 'tms');
+          if ($('moves-tab-types')) $('moves-tab-types').classList.toggle('hidden', curTab !== 'types');
+          if ($('moves-tab-tms')) $('moves-tab-tms').classList.toggle('hidden', curTab !== 'tms');
           if (curTab === 'types') renderTypesTab();
           else renderTMsTab();
         };
@@ -208,24 +200,53 @@ G.MovesUI = (() => {
 
     if ($('moves-search')) {
       $('moves-search').oninput = e => {
-        qMoves = e.target.value.toLowerCase().trim();
+        qMoves = (e.target.value || '').toLowerCase().trim();
         renderMovesList();
       };
     }
     if ($('tms-search')) {
       $('tms-search').oninput = e => {
-        qTMs = e.target.value.toLowerCase().trim();
+        qTMs = (e.target.value || '').toLowerCase().trim();
         renderTMsList();
       };
     }
   }
 
-  function open() {
+  function open(targetId, tab) {
     G.UI.chrome(true);
     G.UI.show('scr-moves', true);
+
+    if (tab) {
+      curTab = tab;
+    } else if (targetId && G.TM_MOVES && G.TM_MOVES[targetId]) {
+      curTab = 'tms';
+    }
+
+    if (targetId) {
+      if (curTab === 'tms') {
+        selTMId = targetId;
+      } else {
+        selMoveId = targetId;
+        const m = (G.Moves.ALL || []).find(x => x.id === targetId);
+        if (m && m.type) curType = m.type;
+      }
+    }
+
+    const tabs = $('moves-main-tabs');
+    if (tabs) {
+      tabs.querySelectorAll('.tab').forEach(t => {
+        t.classList.toggle('on', t.dataset.tab === curTab);
+      });
+    }
+    if ($('moves-tab-types')) $('moves-tab-types').classList.toggle('hidden', curTab !== 'types');
+    if ($('moves-tab-tms')) $('moves-tab-tms').classList.toggle('hidden', curTab !== 'tms');
+
     renderTypesBar();
-    renderTypesTab();
-    renderTMsTab();
+    if (curTab === 'types') {
+      renderTypesTab();
+    } else {
+      renderTMsTab();
+    }
   }
 
   function close() {
@@ -233,7 +254,7 @@ G.MovesUI = (() => {
     G.MenuUI.open();
   }
 
-  // ---------------- Tab 1: Kỹ Năng Theo Hệ ----------------
+  // ---------------- Tab 1: Movimientos por Tipo ----------------
 
   function renderTypesBar() {
     const box = $('moves-type-chips');
@@ -242,7 +263,7 @@ G.MovesUI = (() => {
     for (const t of TYPES) {
       const b = document.createElement('button');
       b.className = 'type-chip-btn' + (t === curType ? ' on' : '');
-      const name = G.T(TYPE_NAMES[t] || t);
+      const name = t === 'all' ? G.T('Todos') : G.T(G.U.TYPE_NAME[t] || t);
       if (t === 'all') {
         b.innerHTML = `<span>🌈 ${name}</span>`;
       } else {
@@ -271,17 +292,19 @@ G.MovesUI = (() => {
 
     const all = G.Moves.ALL || [];
     const filtered = all.filter(m => {
+      if (!m) return false;
       if (curType !== 'all' && m.type !== curType) return false;
       if (qMoves) {
-        const trName = G.T(m.name).toLowerCase();
-        const trDesc = G.T(m.desc).toLowerCase();
-        return m.name.toLowerCase().includes(qMoves) || trName.includes(qMoves) || trDesc.includes(qMoves);
+        const rawName = (m.name || m.id || '').toLowerCase();
+        const trName = String(G.T(m.name || '')).toLowerCase();
+        const trDesc = String(G.T(m.desc || '')).toLowerCase();
+        return rawName.includes(qMoves) || trName.includes(qMoves) || trDesc.includes(qMoves) || (m.id || '').includes(qMoves);
       }
       return true;
     });
 
     if (!filtered.length) {
-      box.innerHTML = '<p class="sub center" style="padding:20px">Không tìm thấy chiêu thức nào.</p>';
+      box.innerHTML = `<p class="sub center" style="padding:20px">${G.T('No se encontró ningún movimiento.')}</p>`;
       return;
     }
 
@@ -292,10 +315,10 @@ G.MovesUI = (() => {
     for (const m of filtered) {
       const item = document.createElement('div');
       item.className = 'move-row-item' + (m.id === selMoveId ? ' on' : '');
-      const trName = G.T(m.name);
+      const trName = G.T(m.name || m.id, 'move');
       const isEvo = !!(G.Moves.EVO && G.Moves.EVO[m.id]);
-      const cat = m.stat === 'patk' || m.stat === 'satk' || m.kind === 'buff' ? '🛡️ Buff'
-        : (G.Moves.isSpecial && G.Moves.isSpecial(m.id) ? '🔮 Sp.' : '⚔️ Phys.');
+      const cat = m.stat === 'patk' || m.stat === 'satk' || m.kind === 'buff' ? G.T('🛡️ Buff')
+        : (G.Moves.isSpecial && G.Moves.isSpecial(m.id) ? G.T('🔮 Esp.') : G.T('⚔️ Fís.'));
 
       item.innerHTML = `
         <div class="row" style="gap:6px;align-items:center">
@@ -304,7 +327,7 @@ G.MovesUI = (() => {
         </div>
         <div class="row between" style="font-size:12px;color:var(--muted);margin-top:4px">
           <span>${cat}</span>
-          ${isEvo ? '<span class="evo-badge">⚡ Có tiến hóa</span>' : ''}
+          ${isEvo ? `<span class="evo-badge">${G.T('⚡ Evoluciona')}</span>` : ''}
         </div>
       `;
       item.onclick = () => {
@@ -323,36 +346,36 @@ G.MovesUI = (() => {
     if (!box) return;
     const m = (G.Moves.ALL || []).find(x => x.id === id);
     if (!m) {
-      box.innerHTML = '<p class="sub center" style="padding:30px">Hãy chọn một chiêu thức để xem chi tiết.</p>';
+      box.innerHTML = `<p class="sub center" style="padding:30px">${G.T('Selecciona un movimiento para ver sus detalles.')}</p>`;
       return;
     }
 
-    const trName = G.T(m.name);
-    const trDesc = G.T(m.desc);
+    const trName = G.T(m.name || m.id, 'move');
+    const trDesc = G.T(m.desc || '');
     const evo = G.Moves.EVO ? G.Moves.EVO[m.id] : null;
     const ladder = LADDERS[m.kind] || [];
     const evoText = EVO_TEXTS[m.kind] || '';
 
     // Stats line
     const statsHtml = [];
-    if (m.dmg) statsHtml.push(`<span>💥 Sát thương gốc: <b class="gold">${m.dmg}</b></span>`);
-    if (m.cd) statsHtml.push(`<span>⏱️ Hồi chiêu: <b class="gold">${m.cd}s</b></span>`);
-    if (m.count && m.count > 1) statsHtml.push(`<span>🎯 Số tia/đòn: <b class="gold">${m.count}</b></span>`);
-    if (m.burn) statsHtml.push(`<span style="color:#ff7675">🔥 Gây bỏng</span>`);
-    if (m.poison) statsHtml.push(`<span style="color:#a29bfe">☠️ Gây độc</span>`);
-    if (m.slow) statsHtml.push(`<span style="color:#74b9ff">❄️ Làm chậm</span>`);
+    if (m.dmg) statsHtml.push(`<span>💥 ${G.T('Daño base:')} <b class="gold">${m.dmg}</b></span>`);
+    if (m.cd) statsHtml.push(`<span>⏱️ ${G.T('Recarga:')} <b class="gold">${m.cd}s</b></span>`);
+    if (m.count && m.count > 1) statsHtml.push(`<span>🎯 ${G.T('Cantidad:')} <b class="gold">${m.count}</b></span>`);
+    if (m.burn) statsHtml.push(`<span style="color:#ff7675">🔥 ${G.T('Quema')}</span>`);
+    if (m.poison) statsHtml.push(`<span style="color:#a29bfe">☠️ ${G.T('Envenena')}</span>`);
+    if (m.slow) statsHtml.push(`<span style="color:#74b9ff">❄️ ${G.T('Ralentiza')}</span>`);
 
     // Ladder steps
     let ladderHtml = '';
     if (ladder.length) {
       ladderHtml = ladder.map((step, idx) => `
         <div class="lvl-step">
-          <span class="lvl-num">Cấp ${idx + 2}</span>
+          <span class="lvl-num">${G.I18n.f('Nivel {x}', idx + 2)}</span>
           <span class="lvl-desc">${esc(G.T(step))}</span>
         </div>
       `).join('');
     } else {
-      ladderHtml = '<div class="sub">Tăng hiệu lực với mỗi cấp độ trong trận.</div>';
+      ladderHtml = `<div class="sub">${G.T('Aumenta su potencia en cada nivel durante la partida.')}</div>`;
     }
 
     // Evolution block
@@ -363,16 +386,16 @@ G.MovesUI = (() => {
       evoBlock = `
         <div class="evo-box-card">
           <div class="evo-header">
-            <span class="evo-tag">TIẾN HÓA CHIÊU TRONG TRẬN</span>
+            <span class="evo-tag">${G.T('EVOLUCIÓN EN PARTIDA')}</span>
             <span class="evo-arrow">➔</span>
-            <b class="evo-to-name gold">${esc(G.T(evoName))}</b>
+            <b class="evo-to-name gold">${esc(G.T(evoName, 'move'))}</b>
           </div>
           <div class="evo-req">
-            <span>Yêu cầu món đồ phụ trợ:</span>
+            <span>${G.T('Objeto pasivo requerido:')}</span>
             <b class="evo-req-item">📦 ${esc(G.T(reqName || reqStat))}</b>
           </div>
           <div class="evo-boost">
-            <span>Hiệu ứng nhận được:</span>
+            <span>${G.T('Efecto recibido:')}</span>
             <div class="evo-boost-text">✨ ${esc(G.T(evoText))}</div>
           </div>
         </div>
@@ -380,39 +403,42 @@ G.MovesUI = (() => {
     } else {
       evoBlock = `
         <div class="evo-box-card none">
-          <span class="sub">Chiêu thức này là chiêu cơ bản / không có dạng tiến hóa bậc 2 trong trận.</span>
+          <span class="sub">${G.T('Este movimiento no tiene evolución secundaria en partida.')}</span>
         </div>
       `;
     }
 
+    const catBadge = m.stat === 'patk' || m.stat === 'satk' || m.kind === 'buff' ? G.T('🛡️ Buff')
+      : (G.Moves.isSpecial && G.Moves.isSpecial(m.id) ? G.T('🔮 Ataque Especial') : G.T('⚔️ Ataque Físico'));
+
     box.innerHTML = `
       <div class="move-detail-card">
-        <div class="row between" style="align-items:center">
+        <div class="row between" style="align-items:center;flex-wrap:wrap;gap:8px">
           <div class="row" style="gap:8px;align-items:center">
             ${G.UI.typeChips([m.type])}
             <h3 class="m-title" style="margin:0">${esc(trName)}</h3>
           </div>
-          <span class="m-kind-badge">${esc(m.kind)}</span>
+          <span class="m-kind-badge">${esc(catBadge)}</span>
         </div>
         <p class="m-desc">${esc(trDesc)}</p>
-        <div class="m-stats-row">${statsHtml.join(' · ')}</div>
+        ${statsHtml.length ? `<div class="m-stats-row">${statsHtml.join(' · ')}</div>` : ''}
         
-        <h4 class="sec-title">📈 Nâng cấp cấp độ trong trận (Cấp 1 ➔ 5)</h4>
+        <h4 class="sec-title">📈 ${G.T('Mejoras de nivel en partida (Nivel 1 ➔ 5)')}</h4>
         <div class="lvl-steps-list">
           <div class="lvl-step">
-            <span class="lvl-num">Cấp 1</span>
-            <span class="lvl-desc">Học chiêu với các chỉ số cơ bản</span>
+            <span class="lvl-num">${G.T('Nivel 1')}</span>
+            <span class="lvl-desc">${G.T('Aprende el movimiento con estadísticas base')}</span>
           </div>
           ${ladderHtml}
         </div>
 
-        <h4 class="sec-title" style="margin-top:14px">⚡ Tiến hóa chiêu thức (Skill Evolution)</h4>
+        <h4 class="sec-title" style="margin-top:14px">⚡ ${G.T('Evolución de movimiento (Skill Evolution)')}</h4>
         ${evoBlock}
       </div>
     `;
   }
 
-  // ---------------- Tab 2: Đĩa TM & Pokémon Học Được ----------------
+  // ---------------- Tab 2: Discos MT & Pokémon que la aprenden ----------------
 
   function renderTMsTab() {
     renderTMsList();
@@ -429,18 +455,21 @@ G.MovesUI = (() => {
       const m = (G.Moves.ALL || []).find(x => x.id === id);
       if (!m) return false;
       if (qTMs) {
-        const trName = G.T(m.name).toLowerCase();
-        return m.name.toLowerCase().includes(qTMs) || trName.includes(qTMs) || id.includes(qTMs);
+        const rawName = (m.name || id).toLowerCase();
+        const trName = String(G.T(m.name || id, 'move')).toLowerCase();
+        return rawName.includes(qTMs) || trName.includes(qTMs) || id.includes(qTMs);
       }
       return true;
     }).sort((a, b) => {
       const ma = (G.Moves.ALL || []).find(x => x.id === a);
       const mb = (G.Moves.ALL || []).find(x => x.id === b);
-      return (ma ? ma.name : a).localeCompare(mb ? mb.name : b);
+      const na = G.T(ma ? ma.name : a, 'move');
+      const nb = G.T(mb ? mb.name : b, 'move');
+      return na.localeCompare(nb);
     });
 
     if (!filtered.length) {
-      box.innerHTML = '<p class="sub center" style="padding:20px">Không tìm thấy đĩa TM nào.</p>';
+      box.innerHTML = `<p class="sub center" style="padding:20px">${G.T('No se encontró ninguna MT.')}</p>`;
       return;
     }
 
@@ -452,7 +481,7 @@ G.MovesUI = (() => {
       const m = (G.Moves.ALL || []).find(x => x.id === id);
       if (!m) continue;
       const count = (G.TM_MOVES[id] || []).length;
-      const trName = G.T(m.name);
+      const trName = G.T(m.name || id, 'move');
       const item = document.createElement('div');
       item.className = 'move-row-item' + (id === selTMId ? ' on' : '');
       item.innerHTML = `
@@ -463,7 +492,7 @@ G.MovesUI = (() => {
           ${G.UI.typeChips([m.type])}
         </div>
         <div class="row between" style="font-size:12px;color:var(--muted);margin-top:4px">
-          <span>👥 Học được: <b style="color:#fff">${count}</b> loài</span>
+          <span>👥 ${G.I18n.f('Lo aprenden: {x} especies', count)}</span>
         </div>
       `;
       item.onclick = () => {
@@ -482,29 +511,37 @@ G.MovesUI = (() => {
     if (!box) return;
     const m = (G.Moves.ALL || []).find(x => x.id === id);
     if (!m) {
-      box.innerHTML = '<p class="sub center" style="padding:30px">Hãy chọn một đĩa TM để xem danh sách Pokémon học được.</p>';
+      box.innerHTML = `<p class="sub center" style="padding:30px">${G.T('Selecciona una MT para ver los Pokémon que la aprenden.')}</p>`;
       return;
     }
 
-    const trName = G.T(m.name);
-    const trDesc = G.T(m.desc);
+    const trName = G.T(m.name || id, 'move');
+    const trDesc = G.T(m.desc || '');
     const pokes = G.TM_MOVES[id] || [];
     const s = G.DB.save || {};
     const ownedMap = s.owned || {};
+    const ownedCount = pokes.filter(dex => !!ownedMap[dex]).length;
+
+    // Stats line
+    const statsHtml = [];
+    if (m.dmg) statsHtml.push(`<span>💥 ${G.T('Daño base:')} <b class="gold">${m.dmg}</b></span>`);
+    if (m.cd) statsHtml.push(`<span>⏱️ ${G.T('Recarga:')} <b class="gold">${m.cd}s</b></span>`);
+    if (m.count && m.count > 1) statsHtml.push(`<span>🎯 ${G.T('Cantidad:')} <b class="gold">${m.count}</b></span>`);
 
     box.innerHTML = `
       <div class="tm-detail-card">
-        <div class="row between" style="align-items:center">
+        <div class="row between" style="align-items:center;flex-wrap:wrap;gap:8px">
           <div class="row" style="gap:8px;align-items:center">
             ${G.Icons.html('tm', 26)}
             <h3 class="m-title" style="margin:0">${esc(trName)}</h3>
             ${G.UI.typeChips([m.type])}
           </div>
-          <span class="m-count-badge">Tổng cộng ${pokes.length} Pokémon</span>
+          <span class="m-count-badge">${G.I18n.f('{x} Pokémon en total', pokes.length)} (${G.I18n.f('{x} conseguidos', ownedCount)})</span>
         </div>
         <p class="m-desc">${esc(trDesc)}</p>
+        ${statsHtml.length ? `<div class="m-stats-row" style="margin-bottom:12px">${statsHtml.join(' · ')}</div>` : ''}
 
-        <h4 class="sec-title" style="margin:12px 0 8px">📋 Danh sách Pokémon có thể học chiêu này qua TM:</h4>
+        <h4 class="sec-title" style="margin:12px 0 8px">📋 ${G.T('Pokémon que pueden aprender este movimiento por MT:')}</h4>
         <div class="tm-poke-grid" id="tm-poke-grid"></div>
       </div>
     `;
@@ -522,7 +559,7 @@ G.MovesUI = (() => {
           <div class="tp-sprite"></div>
           <b class="tp-name">${esc(mon.name)}</b>
           <div class="tp-types">${G.UI.typeChips(mon.types)}</div>
-          ${isOwned ? '<span class="tp-tag">Đã sở hữu</span>' : ''}
+          ${isOwned ? `<span class="tp-tag">${G.T('Conseguido')}</span>` : ''}
         `;
         const sBox = cell.querySelector('.tp-sprite');
         if (sBox) sBox.appendChild(G.UI.spriteCanvas(dex, 44, 44, { lively: true }));
