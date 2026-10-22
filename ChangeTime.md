@@ -160,3 +160,22 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
 - **Đóng gói sản phẩm:**
   - `tests/i18n.test.cjs`: **20/20 tests passed**.
   - `node tools/build.js`: Biên dịch ra `app.min.js?v=d7b8ad3834` và đồng bộ `index.html`.
+
+## ⏱️ [2026-10-23 04:41:00] — Triển khai Đồng hồ đếm ngược & Nút đổi mới Tiệm Kecleon (Kecleon Shop Reroll)
+- **Đồng hồ đếm ngược thời gian làm mới cửa hàng (`nextRefreshMs()`):**
+  - Tích hợp hàm tính thời gian thực tế còn lại cho đến 00:00:00 ngày tiếp theo (theo múi giờ Europe/Madrid đồng bộ với hệ thống lịch ngày của game).
+  - Hiển thị huy hiệu đếm ngược sắc nét `⏱️ Làm mới sau: HH:mm:ss` ngay cạnh tiêu đề "MT hôm nay" trong tiệm Kecleon.
+  - Tự động chạy `setInterval` cập nhật mỗi giây khi tiệm mở, tự động dừng khi đóng tiệm và tự động làm mới hàng hóa khi đồng hồ về 0.
+- **Nút đổi mới danh sách MT hôm nay (Shop Reroll Button):**
+  - Thêm nút `[ 🎴 Đổi mới <Giá> 🪙 ]` tại góc phải hàng tiêu đề MT hôm nay.
+  - **Bậc thang giá chuẩn theo yêu cầu:**
+    - Lần 1: **1.000 vàng (1k)**
+    - Lần 2: **2.000 vàng (2k)**
+    - Lần 3: **2.000 vàng (2k)**
+    - Lần 4: **5.000 vàng (5k)**
+    - Lần 5 trở đi: **10.000 vàng (10k)**
+  - **Cơ chế reset hàng ngày:** Khi qua ngày mới (`checkNewDay()`), số lần đã đổi mới tự động reset về 0 và mức giá reroll quay trở lại mốc ban đầu 1.000 vàng.
+  - Khi người chơi bấm đổi mới: Trừ vàng tương ứng, tạo hạt giống seed mới cho 8 MT, kích hoạt animation Kecleon nhảy mừng, hiệu ứng âm thanh và thông báo toast.
+- **Đóng gói sản phẩm:**
+  - `tests/i18n.test.cjs`: **20/20 tests passed**.
+  - `node tools/build.js`: Biên dịch ra `app.min.js?v=14cd57e21c` và đồng bộ `index.html`.

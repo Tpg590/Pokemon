@@ -1033,3 +1033,36 @@ html:lang(zh) .btn, html:lang(zh) .chip { letter-spacing: 0; }
   margin: 6px 0;
   width: 100%;
 }
+
+/* ============ Kecleon Shop Refresh & Timer ============ */
+.shop-tm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 0 6px;
+}
+.shop-tm-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.shop-countdown-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: rgba(255, 210, 63, 0.12);
+  border: 1px solid rgba(255, 210, 63, 0.35);
+  color: #ffd23f;
+  font-size: 13px;
+  font-weight: 500;
+}
+.shop-countdown-pill b {
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+}

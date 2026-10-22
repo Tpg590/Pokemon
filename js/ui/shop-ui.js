@@ -445,8 +445,43 @@ G.ShopUI = (() => {
 
   // ---------------- abrir ----------------
 
+  // ---------------- countdown timer & reroll ----------------
+
+  let timerInterval = 0;
+
+  function formatCountdown(ms) {
+    if (ms <= 0) return '00:00:00';
+    const totalSec = Math.floor(ms / 1000);
+    const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+    const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+    const s = String(totalSec % 60).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
+
+  function startCountdown() {
+    stopCountdown();
+    timerInterval = setInterval(() => {
+      if (!G.UI.isOpen('scr-shop')) { stopCountdown(); return; }
+      const el = $('shop-timer-val');
+      const ms = G.Shop.nextRefreshMs();
+      if (el) el.textContent = formatCountdown(ms);
+      if (ms <= 1000) {
+        G.Shop.checkNewDay();
+        render();
+      }
+    }, 1000);
+  }
+
+  function stopCountdown() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = 0;
+    }
+  }
+
   function open() {
     G.UI.show('scr-shop', true);
+    startCountdown();
     const sg = $('shop-sign');
     sg.classList.remove('lit', 'show', 'shown');
     $('shop-bubble').classList.add('hide');
@@ -540,6 +575,26 @@ G.ShopUI = (() => {
         flyToBag(icon, from, key);
       };
     });
+
+    const rerollBtn = $('shop-reroll-btn');
+    if (rerollBtn) {
+      rerollBtn.onclick = () => {
+        const res = G.Shop.reroll();
+        if (!res.ok) {
+          if (res.error) G.UI.toast(res.error);
+          G.Audio.sfx('error');
+          return;
+        }
+        G.Audio.sfx('reveal', { rarity: 4 });
+        G.UI.refreshCoins();
+        Scene.cheer('tm');
+        say(G.U.pick(['¡Aquí tienes nuevo género!', '¡Mira qué MT acaban de llegar!']));
+        render();
+        const isVi = G.I18n && G.I18n.lang === 'vi';
+        G.UI.toast(isVi ? 'Đã đổi mới danh sách MT hôm nay!' : 'Refreshed today\'s TM list!');
+      };
+    }
+
     // Pasar por algo de la tienda: el Kecleon más cercano va a señalarlo.
     box.querySelectorAll('.upg-item').forEach(it => {
       it.addEventListener('pointerenter', () => { const r = it.getBoundingClientRect(); Scene.point(r.left + r.width / 2); });
@@ -554,8 +609,28 @@ G.ShopUI = (() => {
       const it = G.Shop.ITEMS[id];
       h += row(G.Icons.html(it.icon, 32), G.T(it.name) + mine(G.Shop.count(id)), G.T(it.desc), buyBtn(id, it.price));
     }
-    h += `</div><h3 style="margin:14px 0 6px">${G.T('MT de hoy')}</h3>
-      <p class="sub" style="margin:0 0 8px">${G.T('Cada día hay otras 8. Una MT enseña su ataque a un Pokémon que lo aprenda en los juegos, para siempre (se gasta al usarla).')}</p><div class="upg">`;
+
+    const rerollPrice = G.Shop.getRerollPrice();
+    const canReroll = s.coins >= rerollPrice;
+    const isVi = G.I18n && G.I18n.lang === 'vi';
+    const refreshNotice = isVi ? 'Làm mới sau' : (G.I18n.lang === 'es' ? 'Se renuevan en' : 'Refreshes in');
+    const rerollBtnText = isVi ? 'Đổi mới' : (G.I18n.lang === 'es' ? 'Renovar' : 'Refresh');
+
+    h += `</div>
+      <div class="shop-tm-header">
+        <div class="shop-tm-title-row">
+          <h3 style="margin:0">${G.T('MT de hoy')}</h3>
+          <span class="shop-countdown-pill" title="${refreshNotice}">
+            ⏱️ ${refreshNotice}: <b id="shop-timer-val">${formatCountdown(G.Shop.nextRefreshMs())}</b>
+          </span>
+        </div>
+        <button id="shop-reroll-btn" class="btn small gold" style="display:inline-flex;align-items:center;gap:6px;" ${canReroll ? '' : 'disabled'}>
+          ${G.Icons.html('cards', 14)} <span>${rerollBtnText}</span> ${coin(rerollPrice)}
+        </button>
+      </div>
+      <p class="sub" style="margin:0 0 8px">${G.T('Cada día hay otras 8. Una MT enseña su ataque a un Pokémon que lo aprenda en los juegos, para siempre (se gasta al usarla).')}</p>
+      <div class="upg">`;
+
     for (const id of G.Shop.dailyTms()) {
       const m = G.Moves.BY_ID[id];
       const fits = partner && G.Mons.canLearn(partner, id);

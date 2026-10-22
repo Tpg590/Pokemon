@@ -41,6 +41,67 @@ G.Shop = (() => {
     return true;
   }
 
+  // ---------------- Reroll & Ngày mới ----------------
+
+  function checkNewDay() {
+    const s = save();
+    if (!s) return;
+    const curDay = today();
+    if (s.shopDay !== curDay) {
+      s.shopDay = curDay;
+      s.shopRerolls = 0;
+      s.shopRerollIndex = 0;
+      G.DB.commit();
+    }
+  }
+
+  function getRerolls() {
+    checkNewDay();
+    const s = save();
+    return (s && s.shopRerolls) || 0;
+  }
+
+  function getRerollPrice() {
+    const count = getRerolls();
+    if (count === 0) return 1000;
+    if (count === 1 || count === 2) return 2000;
+    if (count === 3) return 5000;
+    return 10000;
+  }
+
+  function reroll() {
+    checkNewDay();
+    const s = save();
+    if (!s) return { ok: false };
+    const price = getRerollPrice();
+    if (s.coins < price) {
+      const isVi = G.I18n && G.I18n.lang === 'vi';
+      return { ok: false, error: isVi ? 'Bạn không có đủ Pokémonedas.' : 'No tienes Pokémonedas suficientes.' };
+    }
+    s.coins -= price;
+    s.shopRerolls = (s.shopRerolls || 0) + 1;
+    s.shopRerollIndex = (s.shopRerollIndex || 0) + 1;
+    s.shopDay = today();
+    G.DB.commit();
+    return { ok: true, tms: dailyTms() };
+  }
+
+  function nextRefreshMs() {
+    try {
+      const now = new Date();
+      const madridStr = now.toLocaleString('en-US', { timeZone: 'Europe/Madrid' });
+      const madridNow = new Date(madridStr);
+      const madridMidnight = new Date(madridNow);
+      madridMidnight.setHours(24, 0, 0, 0);
+      return Math.max(0, madridMidnight.getTime() - madridNow.getTime());
+    } catch (e) {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      return Math.max(0, midnight.getTime() - now.getTime());
+    }
+  }
+
   // ---------------- MT del día ----------------
 
   /** Fecha de hoy en España (todos ven la misma tienda el mismo día). */
@@ -56,13 +117,17 @@ G.Shop = (() => {
   }
   /** Las 8 MT a la venta hoy. */
   function dailyTms() {
-    const all = Object.keys(G.TM_MOVES).sort(), r = rng('kecleon:' + today());
+    checkNewDay();
+    const s = save();
+    const rIdx = (s && s.shopRerollIndex) || 0;
+    const seed = 'kecleon:' + today() + ':' + rIdx;
+    const all = Object.keys(G.TM_MOVES).sort(), r = rng(seed);
     for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
     const list = all.slice(0, DAILY);
-    const s = save(), dex = s && s.partner;
+    const dex = s && s.partner;
     if (dex && !list.some(id => G.Mons.canLearn(dex, id))) {
       const mine = G.Mons.learnable(dex).sort();
-      if (mine.length) list[DAILY - 1] = mine[Math.floor(rng('kecleon:' + today() + ':' + dex)() * mine.length)];
+      if (mine.length) list[DAILY - 1] = mine[Math.floor(rng(seed + ':' + dex)() * mine.length)];
     }
     return list;
   }
@@ -86,5 +151,5 @@ G.Shop = (() => {
     return { ok: true };
   }
 
-  return { ITEMS, ORDER, count, take, tmCount, takeTm, dailyTms, tmPrice, buy, today };
+  return { ITEMS, ORDER, count, take, tmCount, takeTm, dailyTms, tmPrice, buy, today, reroll, getRerollPrice, getRerolls, nextRefreshMs, checkNewDay };
 })();
