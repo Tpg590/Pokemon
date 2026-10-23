@@ -259,20 +259,6 @@ G.RunUI = (() => {
       return `<tr><td>${G.Icons.html('move:' + m.id, 18)} ${G.T(m.name, 'move')} <small>Nv.${m.lvl}</small></td><td>${cat}</td>
         <td class="num">${m.cat ? n(m.dealt || 0) : '—'}</td><td class="num">${m.cat ? n((m.dealt || 0) / secs) + '/s' : '—'}</td></tr>`;
     }).join('');
-    const mon = pl.mon, fis = 1 - G.Stats.taken(mon, 'physical'), esp = 1 - G.Stats.taken(mon, 'special');
-    const guard = v => (v >= 0 ? '−' : '+') + Math.round(Math.abs(v) * 100) + ' %';
-    const st = [
-      ['Vida', n(pl.hp) + ' / ' + n(pl.maxHp)],
-      ['Ataque', k2(pl.atkFor({ cat: 'physical' }))],
-      ['At. Esp.', k2(pl.atkFor({ cat: 'special' }))],
-      ['Defensa', mon.df + ' <small>' + guard(fis) + ' físico</small>'],
-      ['Def. Esp.', mon.sd + ' <small>' + guard(esp) + ' especial</small>'],
-      ['Velocidad', n(pl.spd)],
-      ['Crítico', pct(pl.critChance || 0)],
-      ['Reducción de daño', pct(pl.reduction)],
-      ['Recarga', pl.cdMul < 0.995 ? '−' + pct(1 - pl.cdMul) : '0 %'],
-      ['Regeneración', pl.regen.toFixed(1).replace('.', ',') + ' /s']
-    ].map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('');
     const it = pl.item && G.Items.BY[pl.item];
     const cards = Object.entries(pl.statsTaken || {}).map(([id, c]) => {
       const s = G.LevelUp.STATS.find(x => x.id === id);
@@ -280,7 +266,6 @@ G.RunUI = (() => {
     }).join('');
     return `<h3>Tus ataques</h3>
       <table class="sum-moves"><tr><th></th><th></th><th class="num">Daño</th><th class="num">Por segundo</th></tr>${moves}</table>
-      <h3>Tus estadísticas</h3><div class="sum-stats">${st}</div>
       <h3>Objeto y cartas</h3>
       <p class="sub">${it ? G.Icons.html(pl.item, 18) + ' <b>' + it.name + '</b>: ' + it.desc : 'Sin objeto.'}</p>
       <div class="chips">${cards || '<span class="sub">Aún no has cogido cartas de mejora.</span>'}</div>`;

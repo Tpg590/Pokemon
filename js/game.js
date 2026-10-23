@@ -235,6 +235,7 @@ G.Game = (() => {
     resume() {
       G.RunUI.closeLevelUp();
       if (state === 'levelup') { state = holdBy.length ? 'held' : 'playing'; afterLevelUp(); }
+      if (pl) pl.invuln = Math.max(pl.invuln || 0, 1.0);
     },
     /** ¿Estás eligiendo algo que para la partida (objeto o vínculo)? */
     choosing() { return state === 'choice'; },
@@ -262,7 +263,10 @@ G.Game = (() => {
         if (!mine && others.length) G.Spawner.say('Pausa: ' + others.join(', ') + ' ' + (others.length > 1 ? 'están eligiendo…' : 'está eligiendo…'), 999, true);
         else if (!others.length) G.Spawner.say(awayBy ? awayText() : '', awayBy ? 999 : 0, true);   // sólo tú: sin aviso viejo
       } else {
-        if (state === 'held' && !awayBy) state = 'playing';
+        if (state === 'held' && !awayBy) {
+          state = 'playing';
+          if (pl) pl.invuln = Math.max(pl.invuln || 0, 1.0);
+        }
         G.Spawner.say(awayBy ? awayText() : '', awayBy ? 999 : 0, true);
       }
     },
@@ -273,7 +277,10 @@ G.Game = (() => {
         if (state === 'playing') state = 'held';
         G.Spawner.say(awayText(), 999, true);
       } else if (!holdBy.length) {
-        if (state === 'held') state = 'playing';
+        if (state === 'held') {
+          state = 'playing';
+          if (pl) pl.invuln = Math.max(pl.invuln || 0, 1.0);
+        }
         G.Spawner.say('', 0, true);
       }
     }
@@ -400,6 +407,7 @@ G.Game = (() => {
       G.Audio.sfx('confirm');
       card.apply(pl);
       state = 'playing';
+      if (pl) pl.invuln = Math.max(pl.invuln || 0, 1.0);
     });
   }
 

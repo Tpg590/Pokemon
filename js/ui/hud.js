@@ -58,10 +58,56 @@ G.HUD = (() => {
     ctx.textAlign = 'center';
     ctx.fillText(Math.ceil(pl.hp) + ' / ' + Math.round(pl.maxHp), px + 48 + 84, py + 26);
 
-    // buffs activos
+    // ---------- tabla de estadísticas (debajo de la vida) ----------
+    const stBoxX = px, stBoxY = py + 33, stBoxW = 264, stBoxH = 50;
+    ctx.fillStyle = 'rgba(18, 16, 16, 0.88)';
+    ctx.fillRect(stBoxX, stBoxY, stBoxW, stBoxH);
+    ctx.strokeStyle = '#3a322c';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(stBoxX + 0.5, stBoxY + 0.5, stBoxW - 1, stBoxH - 1);
+
+    function drawStatItem(x, y, label, val, mul, isMod) {
+      ctx.textAlign = 'left';
+      ctx.font = F(700, 10);
+      ctx.fillStyle = '#8fa3c4';
+      ctx.fillText(label, x, y);
+      let curX = x + ctx.measureText(label).width + 4;
+      if (val != null) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(val, curX, y);
+        curX += ctx.measureText(val).width + 3;
+      }
+      if (mul != null) {
+        ctx.fillStyle = isMod ? '#ffcb3d' : '#cccccc';
+        ctx.fillText(mul, curX, y);
+      }
+    }
+
+    const c1 = stBoxX + 6, c2 = stBoxX + 94, c3 = stBoxX + 180;
+    const y1 = stBoxY + 14, y2 = stBoxY + 29, y3 = stBoxY + 44;
+
+    const atkBase = Math.round(pl.baseAtk < 5 ? pl.baseAtk * 100 : pl.baseAtk);
+    const atkMulVal = pl.baseAtk ? pl.atk / pl.baseAtk : pl.atkMul;
+    drawStatItem(c1, y1, 'ATK', atkBase, '*' + atkMulVal.toFixed(2), Math.abs(atkMulVal - 1) > 0.01);
+
+    const spdMulVal = pl.baseSpd ? pl.spd / pl.baseSpd : pl.spdMul;
+    drawStatItem(c2, y1, 'SPE', Math.round(pl.spd), '*' + spdMulVal.toFixed(2), Math.abs(spdMulVal - 1) > 0.01);
+
+    const hpMulVal = pl.mon && pl.mon.hp ? pl.maxHp / pl.mon.hp : 1;
+    drawStatItem(c3, y1, 'HP', Math.round(pl.maxHp), '*' + hpMulVal.toFixed(2), Math.abs(hpMulVal - 1) > 0.01);
+
+    drawStatItem(c1, y2, 'CD', null, '*' + pl.cdMul.toFixed(2), Math.abs(pl.cdMul - 1) > 0.01);
+    drawStatItem(c2, y2, 'DEF', '+' + Math.round(pl.reduction * 100) + '%', null, pl.reduction > 0);
+    drawStatItem(c3, y2, 'REGEN', '+' + pl.regen.toFixed(1) + '/s', null, pl.regen > 0);
+
+    const magMulVal = pl.magnet / 78;
+    drawStatItem(c1, y3, 'MAGNET', null, '*' + magMulVal.toFixed(2), Math.abs(magMulVal - 1) > 0.01);
+    drawStatItem(c2, y3, 'XP', null, '*' + pl.xpMul.toFixed(2), Math.abs(pl.xpMul - 1) > 0.01);
+
+    // buffs activos (debajo de la tabla de estadísticas)
     const COL = { atk: '#ff6b4d', patk: '#ff6b4d', satk: '#c47bff', spd: '#7fe0ff', def: '#b0b8c8', regen: '#5fe08a' };
     const LBL = { atk: 'ATK', patk: 'ATK', satk: 'AT.E', spd: 'VEL', def: 'DEF', regen: 'REG' };
-    let bx = px;
+    let bx = px, buffY = stBoxY + stBoxH + 4;
     ctx.textAlign = 'left';
     for (const k in pl.buffs) {
       const b = pl.buffs[k];
@@ -69,10 +115,10 @@ G.HUD = (() => {
       ctx.font = F(800, 9);
       const txt = LBL[k] + ' ×' + b.n;
       const tw = ctx.measureText(txt).width + 12;
-      roundRect(ctx, bx, py + 34, tw, 15, 7);
+      roundRect(ctx, bx, buffY, tw, 15, 7);
       ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fill();
       ctx.fillStyle = COL[k];
-      ctx.fillText(txt, bx + 6, py + 45);
+      ctx.fillText(txt, bx + 6, buffY + 11);
       bx += tw + 5;
     }
 
@@ -92,7 +138,8 @@ G.HUD = (() => {
       ctx.textAlign = 'left';
       const txt = wx.name.toUpperCase() + ' · ' + Math.ceil(wx.left) + 's';
       const tw = ctx.measureText(txt).width + 40;
-      const x0 = w - tw - 16 - sa.right - (touch ? 56 : 0), y0 = 14 + sa.top;
+      const rightMargin = (touch ? 56 : 0) + 48;
+      const x0 = w - tw - 16 - sa.right - rightMargin, y0 = 14 + sa.top;
       roundRect(ctx, x0, y0, tw, 26, 9);
       ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fill();
       G.Icons.draw(ctx, wx.icon, x0 + 6, y0 + 3, 20);
@@ -139,14 +186,14 @@ G.HUD = (() => {
       ctx.font = F(800, 9);
       ctx.textAlign = 'left';
       const tw = ctx.measureText(txt).width + 12;
-      roundRect(ctx, bx, py + 34, tw, 15, 7);
+      roundRect(ctx, bx, buffY, tw, 15, 7);
       ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fill();
       ctx.fillStyle = pw.def.color;
-      ctx.fillText(txt, bx + 6, py + 45);
+      ctx.fillText(txt, bx + 6, buffY + 11);
       bx += tw + 5;
     }
 
-    if (G.Coop.active) drawCoop(ctx, w, h, pl, px, py + (bx > px ? 56 : 40));
+    if (G.Coop.active) drawCoop(ctx, w, h, pl, px, buffY + (bx > px ? 20 : 0));
 
     // Grieta: flecha grande que late en el borde si no se ve, y si se ve, una
     // flecha que bota encima; en la arena, cuenta atrás.
@@ -362,6 +409,68 @@ G.HUD = (() => {
         ctx.fillStyle = '#ffd23f';
         ctx.fillText(G.Items.BY[pl.item].name, ix + S / 2, iy - 6);
       }
+    }
+
+    // ---------- botón de auto aim (esquina derecha) ----------
+    {
+      const sa = G.Touch.safeArea();
+      const pp = touch ? G.Touch.spot('pause') : null;
+      const pauseX = pp ? G.U.clamp(pp[0] * w - 20, 4, w - 44) : w - 52 - Math.min(44, sa.right);
+      const pauseY = pp ? G.U.clamp(pp[1] * h - 20, 10, h - 44) : 12 + Math.min(20, sa.top);
+      const bs = 40;
+      const abx = touch ? pauseX - 48 : w - 52 - Math.min(44, sa.right);
+      const aby = pauseY;
+      const isManual = !!G.Settings.get('aimManual');
+      const autoOn = !isManual;
+
+      roundRect(ctx, abx, aby, bs, bs, 10);
+      ctx.fillStyle = autoOn ? 'rgba(10,26,20,.85)' : 'rgba(28,14,14,.85)';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = autoOn ? '#5fe08a' : '#ff5f6d';
+      ctx.stroke();
+
+      // Icono: retícula / mira (crosshair)
+      const cx = abx + bs / 2, cy = aby + 15, cr = 7;
+      ctx.save();
+      ctx.strokeStyle = autoOn ? '#5fe08a' : '#ff5f6d';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Líneas de la mira
+      ctx.beginPath();
+      ctx.moveTo(cx - cr - 3, cy); ctx.lineTo(cx - cr + 1, cy);
+      ctx.moveTo(cx + cr - 1, cy); ctx.lineTo(cx + cr + 3, cy);
+      ctx.moveTo(cx, cy - cr - 3); ctx.lineTo(cx, cy - cr + 1);
+      ctx.moveTo(cx, cy + cr - 1); ctx.lineTo(cx, cy + cr + 3);
+      ctx.stroke();
+
+      // Punto central
+      ctx.fillStyle = autoOn ? '#5fe08a' : '#ff5f6d';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Texto de estado
+      ctx.font = F(800, 9);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = autoOn ? '#5fe08a' : '#ff5f6d';
+      ctx.fillText(autoOn ? 'AUTO' : 'MANUAL', cx, aby + 33);
+      ctx.restore();
+
+      G.Touch.addButton(abx, aby, bs, bs, () => {
+        const cur = !!G.Settings.get('aimManual');
+        G.Settings.set('aimManual', !cur);
+        G.Audio.sfx('click');
+        const nowAuto = cur;
+        const isVi = G.I18n && G.I18n.lang === 'vi';
+        const msg = nowAuto
+          ? (isVi ? 'Tự ngắm: BẬT' : 'Auto Aim: ON')
+          : (isVi ? 'Tự ngắm: TẮT (Thủ công)' : 'Auto Aim: OFF (Manual)');
+        G.UI.toast(msg, 1200);
+      }, 6);
     }
 
     // ---------- botón de pausa (táctil) ----------

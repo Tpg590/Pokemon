@@ -148,7 +148,12 @@ G.Rift = (() => {
     if (th && th.weather) G.Weather.force(th.weather, ARENA_TIME + 15);
     // Todos al sur de la arena, en fila; el legendario aparece al norte.
     const ps = G.Game.everyone();
-    ps.forEach((p, i) => { p.x = arena.x + (i - (ps.length - 1) / 2) * 34; p.y = arena.y + ts * 3; });
+    ps.forEach((p, i) => {
+      p.x = arena.x + (i - (ps.length - 1) / 2) * 34;
+      p.y = arena.y + ts * 3;
+      p.invuln = Math.max(p.invuln || 0, 1.0);
+    });
+    if (pl) pl.invuln = Math.max(pl.invuln || 0, 1.0);
     G.Camera.x = pl.x; G.Camera.y = pl.y;
     G.Game.flash(cfg.isMega ? '#ff4b72' : '#c9a6ff', 0.9);
     G.Audio.sfx('rift');
@@ -277,8 +282,12 @@ G.Rift = (() => {
     G.Projectiles.clear();
     G.Combat.clearFields();
     G.Hazards.clear();
-    for (const p of G.Game.everyone()) { p.x = a.back.x; p.y = a.back.y; }
+    for (const p of G.Game.everyone()) {
+      p.x = a.back.x; p.y = a.back.y;
+      p.invuln = Math.max(p.invuln || 0, 1.0);
+    }
     pl.x = a.back.x; pl.y = a.back.y;
+    pl.invuln = Math.max(pl.invuln || 0, 1.0);
     if (pl.dead) pl.revive(0.3);
     G.Camera.x = pl.x; G.Camera.y = pl.y;
     G.Game.flash('#c9a6ff', 0.8);

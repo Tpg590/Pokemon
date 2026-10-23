@@ -474,11 +474,10 @@ G.Player = class Player {
    * se ha movido después (en PC). Soltar el stick sin tocar el ratón = solo.
    */
   handAim() {
-    // En el móvil (táctil) no hay apuntado a mano: siempre apunta solo.
-    if (this.remote || G.Settings.touch || !G.Settings.get('aimManual')) return null;
+    if (this.remote || !G.Settings.get('aimManual')) return null;
     const st = G.Pad.aim();
     if (st) return Math.atan2(st[1], st[0]);
-    if (G.Touch.active || !G.Input.mouseMovedAt || G.Input.mouseMovedAt < G.Pad.aimAt) return null;
+    if (G.Settings.touch || G.Touch.active || !G.Input.mouseMovedAt || G.Input.mouseMovedAt < G.Pad.aimAt) return null;
     const w = G.Input.mouseWorld();
     const dx = w.x - this.x, dy = w.y - (this.y - G.LIFT * 0.5);
     return Math.hypot(dx, dy) < 4 ? null : Math.atan2(dy, dx);
