@@ -5,6 +5,9 @@ window.G = window.G || {};
 G.LIFT = 18;
 
 G.U = {
+  esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  },
   clamp(v, a, b) { return v < a ? a : v > b ? b : v; },
   /*
    * Lo que llega de OTROS jugadores (ranking, perfiles, reportes) se limpia

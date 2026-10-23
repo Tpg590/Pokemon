@@ -4,6 +4,14 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
 
 ---
 
+## ⏱️ [2026-10-23 17:46:00] — Khắc phục lỗi Pokédex không hiển thị chi tiết và không chọn được bạn đồng hành
+- **util.js:** Bổ sung phương thức `G.U.esc(s)` mã hóa ký tự HTML an toàn (`&`, `<`, `>`, `"`, `'`), khắc phục triệt để lỗi crash `TypeError: G.U.esc is not a function`.
+- **menu.js:**
+  - Khai báo helper `esc` nội bộ an toàn và bọc kiểm tra dữ liệu chiêu thức (`G.startMoveOf`, `G.Moves.poolFor`).
+  - Phục hồi toàn vẹn giao diện chi tiết Pokémon bên phải (`#dex-detail`), bao gồm thông số, hệ, chỉ số, bản xem trước chiêu và nút chọn làm bạn đồng hành (`Elegir de compañero`).
+  - Đồng bộ ngay lập tức Pokémon đồng hành mới sang phòng chơi nhóm (`G.Social.refreshMember`) khi người chơi chọn trong Pokédex.
+- **Build & Bundle:** Chạy lại `tools/build.js` cập nhật `index.html`, `js/app.min.js` và `version.json`.
+
 ## ⏱️ [2026-10-23 06:25:00] — Khắc phục lỗi toLowerCase(), Bách khoa Chiêu thức & MT đa ngôn ngữ, Tích hợp Pokédex và Online Presence
 - **input.js:** Xử lý triệt để lỗi crash `Cannot read properties of undefined (reading 'toLowerCase')` khi gõ tiếng Việt / phím ảo trên mobile khi `e.code` hoặc `e.key` rỗng.
 - **moves-ui.js & dev.html:**

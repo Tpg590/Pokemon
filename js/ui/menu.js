@@ -1,6 +1,7 @@
 /* ============ menu.js — menú principal, colección y mejoras ============ */
 G.MenuUI = (() => {
   const $ = G.UI.$;
+  const esc = s => (G.U && G.U.esc ? G.U.esc(s) : String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])));
   const GEN_NAMES = ['Kanto', 'Johto', 'Hoenn', 'Sinnoh', 'Teselia', 'Kalos', 'Alola', 'Galar', 'Paldea'];
   let dexGen = 1, dexSel = null;
   // Filtros de la colección (se combinan): tengo / me faltan, rarezas (varias),
@@ -392,9 +393,13 @@ G.MenuUI = (() => {
         <p class="sub center" style="margin:6px 0 0">Pega mejor con ataques <b class="gold">${G.Stats.sideOf(q) === 'special' ? 'especiales' : 'físicos'}</b></p>
         ${activeMega ? `<p class="sub center gold" style="margin:6px 0">${activeMega.desc}</p>${megaStoneAction}` : monExtras(dex)}
         ${dispTypes.length === 1 ? `<p class="sub center" style="margin:2px 0 0">Monotipo: +20 % de daño con sus ataques de tipo ${G.U.TYPE_NAME[dispTypes[0]]}</p>` : ''}
-        <p style="font-size:14px;margin:10px 0 4px">${G.T('Empieza con')} <b class="gold dex-start-move-btn" data-move-id="${G.startMoveOf(dex)}" style="cursor:pointer;text-decoration:underline" title="${G.T('Pulsa para ver detalles')}">${G.T(G.Moves.BY_ID[G.startMoveOf(dex)].name, 'move')}</b></p>
+        <p style="font-size:14px;margin:10px 0 4px">${G.T('Empieza con')} <b class="gold dex-start-move-btn" data-move-id="${(G.startMoveOf && G.startMoveOf(dex)) || ''}" style="cursor:pointer;text-decoration:underline" title="${G.T('Pulsa para ver detalles')}">${esc(G.startMoveOf && G.Moves.BY_ID[G.startMoveOf(dex)] ? G.T(G.Moves.BY_ID[G.startMoveOf(dex)].name, 'move') : '---')}</b></p>
         <p class="move-icons" title="${G.T('Movimientos que puede aprender')}">
-          ${G.Moves.poolFor(p).map(id => `<span class="dex-move-chip" data-move-id="${id}" style="cursor:pointer;display:inline-block;padding:2px" title="${G.U.esc(G.T(G.Moves.BY_ID[id].name, 'move'))}">${G.Icons.html('move:' + id, 18)}</span>`).join('')}</p>
+          ${(G.Moves && G.Moves.poolFor ? G.Moves.poolFor(p) : []).map(id => {
+            const m = G.Moves.BY_ID[id];
+            if (!m) return '';
+            return `<span class="dex-move-chip" data-move-id="${id}" style="cursor:pointer;display:inline-block;padding:2px" title="${esc(G.T(m.name, 'move'))}">${G.Icons.html('move:' + id, 18)}</span>`;
+          }).join('')}</p>
         <div id="dex-move-preview" class="dex-move-preview-box hidden" style="margin:6px 0 10px;padding:8px 10px;background:rgba(5,10,26,0.65);border:1px solid rgba(244,248,255,0.2);border-radius:8px"></div>
         ${usingThis
           ? '<button class="btn grow" disabled style="width:100%">Es tu compañero</button>'
@@ -437,6 +442,9 @@ G.MenuUI = (() => {
       s.partner = dex;
       s.partnerShiny = hasSh && viewShiny;
       G.DB.commit();
+      if (G.Social && G.Social.refreshMember) {
+        G.Social.refreshMember(s.partner, s.partnerShiny);
+      }
       G.UI.toast(p.name + (s.partnerShiny ? ' shiny' : '') + ' es ahora tu compañero');
       renderGrid(true); showDetail(dex);
     };
@@ -444,7 +452,7 @@ G.MenuUI = (() => {
     function renderMovePreview(mId) {
       const prevBox = $('dex-move-preview');
       if (!prevBox) return;
-      const m = G.Moves.BY_ID[mId];
+      const m = G.Moves && G.Moves.BY_ID ? G.Moves.BY_ID[mId] : null;
       if (!m) { prevBox.classList.add('hidden'); return; }
       prevBox.classList.remove('hidden');
       const trName = G.T(m.name, 'move');
@@ -459,12 +467,12 @@ G.MenuUI = (() => {
         <div class="row between" style="align-items:center;margin-bottom:4px">
           <div class="row" style="gap:6px;align-items:center">
             ${G.Icons.html('move:' + m.id, 18)}
-            <b style="color:#fff;font-size:14px">${G.U.esc(trName)}</b>
+            <b style="color:#fff;font-size:14px">${esc(trName)}</b>
             ${G.UI.typeChips([m.type])}
           </div>
           <span style="font-size:11px;color:var(--muted)">${cat}</span>
         </div>
-        <p style="font-size:12px;color:#c0cce0;margin:4px 0 6px;line-height:1.4">${G.U.esc(trDesc)}</p>
+        <p style="font-size:12px;color:#c0cce0;margin:4px 0 6px;line-height:1.4">${esc(trDesc)}</p>
         ${stats.length ? `<div style="font-size:12px;color:var(--muted);margin-bottom:6px">${stats.join(' · ')}</div>` : ''}
         <button class="btn small ghost" id="dex-view-encyclopedia" style="width:100%;font-size:11px;padding:4px 8px">${G.Icons.html('book', 12)} ${G.T('Ver en Enciclopedia de Movimientos')} ➔</button>
       `;
