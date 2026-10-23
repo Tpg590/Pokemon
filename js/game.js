@@ -778,29 +778,63 @@ G.Game = (() => {
   }
 
   /*
-   * Apuntar a mano: una mira donde está el ratón (y el cursor en cruz), o
-   * delante de tu Pokémon si apuntas con el stick derecho.
+   * Apuntar a mano: indicador direccional (flecha amarilla y arco) alrededor del Pokémon.
    */
   function drawAimMark() {
-    const on = state === 'playing' && pl && pl.manualAim && !G.Judgment.cinematic;
-    const cur = on && !G.Pad.aim() ? 'crosshair' : '';
+    const isManual = !!G.Settings.get('aimManual');
+    const on = state === 'playing' && pl && !pl.dead && !G.Judgment.cinematic && isManual;
+    const cur = on && !G.Pad.aim() && !(G.Touch && G.Touch.aimStick) ? 'crosshair' : '';
     if (cv.style.cursor !== cur) cv.style.cursor = cur;
     if (!on) return;
-    let x, y;
-    if (G.Pad.aim()) {
-      const k = G.Camera.scale;
-      x = (pl.x - G.Camera.left() + Math.cos(pl.aim) * 90) * k;
-      y = (pl.y - G.LIFT * 0.5 - G.Camera.top() + Math.sin(pl.aim) * 90) * k;
-    } else ({ x, y } = G.Input.mouse());
+
+    const k = G.Camera.scale;
+    const px = (pl.x - G.Camera.left()) * k;
+    const py = (pl.y - (pl.bodyH ? pl.bodyH * 0.35 : 10) - G.Camera.top()) * k;
+    const ang = pl.aim;
+
+    const r = Math.max(26, 26 * k);
+
     ctx.save();
+
+    // 1. Cung tròn mờ định hướng quanh nhân vật
+    const arcSpan = 0.82; // ~47 độ mỗi bên
+    ctx.beginPath();
+    ctx.arc(px, py, r, ang - arcSpan, ang + arcSpan);
+    ctx.strokeStyle = 'rgba(220, 245, 230, 0.45)';
+    ctx.lineWidth = Math.max(2.5, 2.5 * k);
     ctx.lineCap = 'round';
-    for (const [col, lw] of [['rgba(0,0,0,.65)', 4], ['#ffe9a8', 1.6]]) {
-      ctx.strokeStyle = col; ctx.lineWidth = lw;
-      ctx.beginPath(); ctx.arc(x, y, 9, 0, 6.2832); ctx.stroke();
-      ctx.beginPath();
-      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { ctx.moveTo(x + dx * 5, y + dy * 5); ctx.lineTo(x + dx * 14, y + dy * 14); }
-      ctx.stroke();
-    }
+    ctx.stroke();
+
+    // 2. Mũi tên tam giác vàng viền đen chỉ hướng tấn công (chuẩn pokesurvivor.doofcraft.com)
+    const cos = Math.cos(ang), sin = Math.sin(ang);
+    const nx = -sin, ny = cos;
+
+    const tipDist = r + Math.max(9, 9 * k);
+    const baseDist = r - Math.max(3, 3 * k);
+    const baseHalfW = Math.max(6.5, 6.5 * k);
+
+    const tipX = px + cos * tipDist;
+    const tipY = py + sin * tipDist;
+
+    const b1x = px + cos * baseDist + nx * baseHalfW;
+    const b1y = py + sin * baseDist + ny * baseHalfW;
+
+    const b2x = px + cos * baseDist - nx * baseHalfW;
+    const b2y = py + sin * baseDist - ny * baseHalfW;
+
+    ctx.beginPath();
+    ctx.moveTo(tipX, tipY);
+    ctx.lineTo(b1x, b1y);
+    ctx.lineTo(b2x, b2y);
+    ctx.closePath();
+
+    ctx.fillStyle = '#ffd23f';
+    ctx.fill();
+    ctx.strokeStyle = '#1e272e';
+    ctx.lineWidth = Math.max(1.8, 1.8 * k);
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
     ctx.restore();
   }
 

@@ -28,8 +28,12 @@ G.Input = (() => {
   });
   addEventListener('blur', () => { down.clear(); });
   let movedAt = 0;               // última vez que se movió el ratón (apuntado a mano)
+  if (typeof matchMedia === 'function' && !matchMedia('(hover: none) and (pointer: coarse)').matches) {
+    movedAt = 1;
+  }
   addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; movedAt = performance.now(); });
-  addEventListener('mousedown', () => mdown = true);
+  addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { mx = e.clientX; my = e.clientY; movedAt = performance.now(); } });
+  addEventListener('mousedown', e => { mdown = true; mx = e.clientX; my = e.clientY; movedAt = performance.now(); });
   addEventListener('mouseup', () => mdown = false);
 
   return {

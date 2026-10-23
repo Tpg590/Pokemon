@@ -479,7 +479,8 @@ G.Player = class Player {
     if (st) return Math.atan2(st[1], st[0]);
     const touchAim = G.Touch && G.Touch.aimVector ? G.Touch.aimVector() : null;
     if (touchAim) return Math.atan2(touchAim[1], touchAim[0]);
-    if (G.Settings.touch || G.Touch.active || !G.Input.mouseMovedAt || G.Input.mouseMovedAt < G.Pad.aimAt) return null;
+    if (G.Pad.aimAt && G.Input.mouseMovedAt && G.Input.mouseMovedAt < G.Pad.aimAt) return null;
+    if (!G.Input.mouseMovedAt && (G.Settings.touch || G.Touch.active)) return null;
     const w = G.Input.mouseWorld();
     const dx = w.x - this.x, dy = w.y - (this.y - G.LIFT * 0.5);
     return Math.hypot(dx, dy) < 4 ? null : Math.atan2(dy, dx);

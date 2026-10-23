@@ -4,6 +4,18 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
 
 ---
 
+## ⏱️ [2026-10-23 19:20:00] — Sửa lỗi ngắm thủ công trên PC & Thay thế tâm ngắm bằng mũi tên định hướng quanh nhân vật
+- **Khắc phục triệt để lỗi ngắm chuột thủ công trên PC (`player.js`, `input.js`):**
+  - Xóa bỏ điều kiện `G.Settings.touch || G.Touch.active` trong `handAim()`: trước đó nếu màn hình PC có cảm ứng (hoặc chạm thử nghiệm) thì `handAim()` tự động trả về `null` khiến chuột hoàn toàn mất tác dụng ngắm bắn.
+  - Cập nhật `input.js`: lắng nghe đầy đủ `mousemove`, `pointermove (mouse)` và `mousedown`, khởi tạo sẵn trạng thái con trỏ chuột trên các thiết bị PC / Desktop. Khi di chuyển hoặc trỏ chuột đến đâu, nhân vật và kỹ năng sẽ hướng chính xác theo con trỏ chuột.
+- **Thay thế tâm súng bằng Mũi tên định hướng quanh nhân vật (`game.js`):**
+  - Xóa bỏ biểu tượng tâm tròn chữ thập (crosshair dot ngắm như súng bắn) ở xa.
+  - Tái tạo chuẩn giao diện như `pokesurvivor.doofcraft.com` (áp dụng cho cả PC và Mobile khi bật ngắm thủ công):
+    - Vẽ một cung tròn mờ trang nhã (`rgba(220, 245, 230, 0.45)`) ngay sát quanh người Pokémon theo hướng đang ngắm.
+    - Vẽ mũi tên tam giác màu vàng (`#ffd23f`) có viền đen sắc nét (`#1e272e`) gắn trực tiếp trên vòng cung, chỉ thẳng theo hướng tấn công 360 độ của nhân vật.
+    - Hoạt động mượt mà đồng bộ theo chuyển động chuột (PC), cần gạt joystick ngắm (Mobile) và tay cầm gamepad.
+- **Build & Bundle:** Chạy lại `tools/build.js` cập nhật `index.html`, `js/app.min.js` và `version.json`. Kiểm tra 20/20 test i18n đều vượt qua.
+
 ## ⏱️ [2026-10-23 18:45:00] — Quyền Kick cho Chủ phòng, Sửa lỗi thông báo sẵn sàng, Bản dịch Tổ đội & Cơ chế Twin-Stick ngắm thủ công trên Mobile
 - **Quyền Kick thành viên tổ đội (`social.js`, `social-ui.js`, `style.css`):**
   - Bổ sung nút đuổi (`.kick-member-btn` icon ✖ màu đỏ) trên thẻ người chơi thành viên dành riêng cho chủ phòng (Host).
