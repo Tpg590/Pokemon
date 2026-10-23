@@ -4,6 +4,25 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
 
 ---
 
+## ⏱️ [2026-10-23 18:45:00] — Quyền Kick cho Chủ phòng, Sửa lỗi thông báo sẵn sàng, Bản dịch Tổ đội & Cơ chế Twin-Stick ngắm thủ công trên Mobile
+- **Quyền Kick thành viên tổ đội (`social.js`, `social-ui.js`, `style.css`):**
+  - Bổ sung nút đuổi (`.kick-member-btn` icon ✖ màu đỏ) trên thẻ người chơi thành viên dành riêng cho chủ phòng (Host).
+  - Tích hợp hàm `G.Social.kickMember(uid)`: ghi nhận cấm tham gia `rooms/<id>/kicked/<uid> = true` và xóa thẻ thành viên khỏi danh sách phòng.
+  - Xử lý listener realtime tự động đẩy thành viên bị kick ra sảnh chờ Multiplayer, hiển thị thông báo "Bạn đã bị chủ phòng mời ra khỏi phòng", đồng thời chặn gia nhập lại phòng đó.
+- **Sửa triệt để lỗi thông báo Ready bị kẹt "Tất cả người chơi đã sẵn sàng" (`social-ui.js`):**
+  - Khắc phục lỗi `$('lobby-waiting-names')` bị ghi đè `innerHTML` dẫn tới các lần render tiếp theo trả về `null` và kẹt cứng trạng thái `✅ All players are ready!`.
+  - Cập nhật logic: chỉ hiển thị thông báo tất cả sẵn sàng khi phòng có người chơi và `notReady.length === 0`. Khi còn người chưa sẵn sàng, hiển thị chính xác tên người chơi đang chờ (`Esperando a: ...` ➔ `Đang chờ: ...`).
+- **Việt hóa 100% giao diện Tổ đội & Chọn Pokémon (`dev.html`, `social-ui.js`, `lang-vi.js`, `lang-en.js`, `lang-updates.js`):**
+  - Chuyển toàn bộ chuỗi HTML và JS về chuẩn base Tây Ban Nha để hệ thống i18n tự động dịch chuẩn xác theo ngôn ngữ lựa chọn.
+  - Dịch hoàn chỉnh: `Sala` (Tổ đội), `Pública` (Công khai), `Los jugadores que busquen una sala abierta...` (Người chơi tìm phòng mở có thể tham gia mà không cần lời mời), `Esperando a:` (Đang chờ:), `Listo` / `No listo` (Sẵn sàng / Chưa sẵn sàng), `👑 Anfitrión · Tú` (👑 Chủ phòng · Bạn), `✋ Miembro` (✋ Thành viên), `Libre` (Trống), `Conectado` (Đã kết nối), `Cambiar de Pokémon` (Đổi Pokémon), `Empezar partida` (Bắt đầu trận), `Invitar amigos` (Mời bạn bè), `En esta sala` (Trong phòng), `Dentro` (Đã vào).
+- **Hệ thống điều khiển Twin-Stick (Ngắm thủ công) trên Mobile (`touch.js`, `player.js`, `hud.js`):**
+  - Tái tạo chuẩn xác tính năng như `pokesurvivor.doofcraft.com`: khi bật chế độ Thủ công (tắt Auto Aim) trên thiết bị cảm ứng, màn hình tự động phân chia làm 2 khu vực chạm linh hoạt:
+    - Nửa bên trái: Cần điều khiển di chuyển (nút vàng `#ffd23f`).
+    - Nửa bên phải: Cần điều khiển ngắm bắn và hướng tấn công 360 độ (nút đỏ `#ff6b6b`).
+  - Kết nối `G.Touch.aimVector()` trực tiếp vào `player.handAim()`: khi vuốt ngón tay bên phải, nhân vật sẽ nhắm đánh chính xác theo hướng cần gạt ảo; khi thả tay sẽ tự động ngắm theo mục tiêu gần nhất.
+  - Cập nhật dòng hướng dẫn phía dưới HUD: `Trái: di chuyển · Phải: hướng đánh · Chạm chiêu để đổi`.
+- **Build & Bundle:** Chạy lại `tools/build.js` cập nhật `index.html`, `js/app.min.js`, các file gói ngôn ngữ `js/lang/*.js` và `version.json`. Toàn bộ 20 test i18n đều đạt chuẩn 100%.
+
 ## ⏱️ [2026-10-23 18:02:00] — Sửa bản dịch độ hiếm "Rara" từ "Kỳ quặc" thành "Hiếm" (Tiếng Việt)
 - **lang-vi.js & build_vietnamese_dict.py:** Sửa bản dịch `"Rara"` từ `"Kỳ quặc"` thành `"Hiếm"`. Trong tiếng Tây Ban Nha, "Rara" vừa là tính cách Quirky vừa là độ hiếm Rare (3 sao), do trùng từ nên trước đó bị dịch nhầm thành "Kỳ quặc" ở bộ lọc độ hiếm Pokédex và Gacha. Bản tính Quirky vẫn được bảo đảm dịch chuẩn qua key `"Quirky"`.
 - **Build & Bundle:** Chạy lại `tools/build.js` cập nhật `js/lang/vi.js`, `index.html` và `version.json`.

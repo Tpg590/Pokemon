@@ -347,10 +347,10 @@
     function close() { G.UI.hide('scr-lobby'); }
 
     function connText(m, room) {
-      if (m.uid === room.host) return 'Connected';
-      if (!room.isHost) return m.uid === G.Social.uid ? 'Connected' : 'Connected';
+      if (m.uid === room.host) return G.I18n.t('Conectado');
+      if (!room.isHost) return G.I18n.t('Conectado');
       const mode = G.Net.mode(m.uid);
-      return mode === 'direct' ? 'Connected' : mode === 'relay' ? 'Connected (server)' : mode === 'failed' ? 'Connection failed' : 'Connecting…';
+      return mode === 'direct' ? G.I18n.t('Conectado') : mode === 'relay' ? G.I18n.t('Conectado (servidor)') : mode === 'failed' ? G.I18n.t('Error de conexión') : G.I18n.t('Conectando…');
     }
 
     function render() {
@@ -361,8 +361,8 @@
 
       if ($('lobby-sub')) {
         $('lobby-sub').textContent = room.isHost
-          ? "You're the host. Invite your friends (up to 3) and start when you're ready."
-          : "You're in the room of " + ((ms.find(m => m.uid === room.host) || {}).name || 'Host') + ". Get ready and wait for the host to start.";
+          ? G.I18n.t("Eres el anfitrión. Invita a tus amigos (hasta 3) y empieza cuando estéis listos.")
+          : G.I18n.f("Estás en la sala de {x}. Prepárate y espera a que el anfitrión empiece.", ((ms.find(m => m.uid === room.host) || {}).name || 'Host'));
       }
 
       // Render 4 Member Cards
@@ -380,18 +380,21 @@
           if (m) {
             c.style.setProperty('--pc', G.Coop.COLORS[i] || '#ffd23f');
             const mon = G.DEX_BY[m.dex] || G.DEX_BY[25];
-            const roleTxt = isHost ? (isMe ? '👑 Host · You' : '👑 Host') : (isMe ? '✋ Member · You' : '✋ Member');
+            const roleTxt = isHost
+              ? (isMe ? G.I18n.t('👑 Anfitrión · Tú') : G.I18n.t('👑 Anfitrión'))
+              : (isMe ? G.I18n.t('✋ Miembro · Tú') : G.I18n.t('✋ Miembro'));
             const readyCls = m.ready ? 'ready' : 'not-ready';
-            const readyTxt = m.ready ? 'Ready' : 'Not ready';
+            const readyTxt = m.ready ? G.I18n.t('Listo') : G.I18n.t('No listo');
 
             c.innerHTML = `
+              ${room.isHost && !isMe ? `<button class="kick-member-btn" title="${G.I18n.t('Expulsar')}">✖</button>` : ''}
               <div class="card-avatar"></div>
               <b class="card-name" translate="no">${esc(m.name)}</b>
               <small class="card-poke">${esc(mon.name)}</small>
               <span class="card-role">${roleTxt}</span>
               <span class="ready-badge ${readyCls}">${readyTxt}</span>
-              <span class="conn" data-u="${m.uid}">Connected</span>
-              ${isMe ? '<button class="change-mon-btn">Change Pokémon</button>' : ''}
+              <span class="conn" data-u="${m.uid}">${G.I18n.t('Conectado')}</span>
+              ${isMe ? `<button class="change-mon-btn">${G.I18n.t('Cambiar de Pokémon')}</button>` : ''}
             `;
             const avBox = c.querySelector('.card-avatar');
             if (avBox) avBox.appendChild(G.UI.spriteCanvas(m.dex, 100, 80, { scale: 2, lively: true, shiny: !!m.shiny }));
@@ -399,8 +402,20 @@
               const chBtn = c.querySelector('.change-mon-btn');
               if (chBtn) chBtn.onclick = () => G.PartnerPickerUI.open();
             }
+            if (room.isHost && !isMe) {
+              const kickBtn = c.querySelector('.kick-member-btn');
+              if (kickBtn) {
+                kickBtn.onclick = async (e) => {
+                  e.stopPropagation();
+                  const confirmed = confirm(G.I18n.f('¿Expulsar a {x} de la sala?', m.name));
+                  if (!confirmed) return;
+                  await G.Social.kickMember(m.uid);
+                  G.UI.toast(G.I18n.f('Has expulsado a {x}', m.name));
+                };
+              }
+            }
           } else {
-            c.innerHTML = '<span class="empty-txt">Free</span>';
+            c.innerHTML = `<span class="empty-txt">${G.I18n.t('Libre')}</span>`;
           }
           box.appendChild(c);
         }
@@ -411,7 +426,7 @@
         if (!m) return;
         const t = connText(m, room);
         el.textContent = t;
-        el.className = 'conn' + (t === 'Connecting…' ? ' wait' : '');
+        el.className = 'conn' + (t === G.I18n.t('Conectando…') ? ' wait' : '');
       });
 
       // Public toggle row
@@ -428,14 +443,14 @@
       // Waiting notice
       const notReady = ms.filter(m => !m.ready);
       const wBar = $('lobby-waiting');
-      const wNames = $('lobby-waiting-names');
-      if (wBar && wNames) {
-        if (notReady.length > 0) {
-          wBar.classList.remove('all-ready');
-          wBar.innerHTML = 'Waiting for: <span class="gold">' + notReady.map(m => esc(m.name)).join(', ') + '</span>';
-        } else {
+      if (wBar) {
+        if (ms.length >= 1 && notReady.length === 0) {
           wBar.classList.add('all-ready');
-          wBar.innerHTML = '<span class="all-ready-txt">✅ All players are ready!</span>';
+          wBar.innerHTML = '<span class="all-ready-txt">✅ ' + G.I18n.t('¡Todos los jugadores están listos!') + '</span>';
+        } else {
+          wBar.classList.remove('all-ready');
+          const names = notReady.length > 0 ? notReady.map(m => esc(m.name)).join(', ') : '...';
+          wBar.innerHTML = G.I18n.t('Esperando a:') + ' <span class="gold">' + names + '</span>';
         }
       }
 
@@ -443,12 +458,13 @@
       const readyBtn = $('lobby-ready');
       if (readyBtn) {
         const isReady = !!(myMember && myMember.ready);
-        readyBtn.textContent = isReady ? 'Not ready' : "I'm ready";
+        readyBtn.textContent = isReady ? G.I18n.t('No listo') : G.I18n.t('Listo');
         readyBtn.classList.toggle('is-ready', isReady);
       }
 
       const startBtn = $('lobby-start');
       if (startBtn) {
+        startBtn.textContent = G.I18n.t('Empezar partida');
         startBtn.classList.toggle('hidden', !room.isHost);
         if (room.isHost) {
           const allReady = ms.length >= 1 && ms.every(m => m.ready);
@@ -465,20 +481,22 @@
         invList.innerHTML = '';
         const allFriends = G.Social.friends.filter(f => f.status === 'ok');
         if (!allFriends.length) {
-          invList.innerHTML = '<p class="sub" style="margin:4px 0">Chưa có bạn bè nào. Thêm bạn trong mục Bạn bè để rủ chơi cùng!</p>';
+          invList.innerHTML = '<p class="sub" style="margin:4px 0">' + G.I18n.t('No tienes amigos agregados aún.') + '</p>';
         } else {
           for (const f of allFriends) {
             const inThisRoom = ms.some(m => m.uid === f.uid);
             const isOnline = !!f.online;
+            const statusTxt = inThisRoom ? G.I18n.t('En esta sala') : (isOnline ? G.I18n.t('En línea') : G.I18n.t('Desconectado'));
+            const btnTxt = inThisRoom ? G.I18n.t('Dentro') : G.I18n.t('Invitar');
             const el = document.createElement('div');
             el.className = 'lobby-friend-row';
             el.innerHTML = `
               <i class="dot ${isOnline ? 'on' : 'off'}"></i>
               <b translate="no" class="f-name">${esc(f.name)}</b>
-              <span class="f-status">${inThisRoom ? 'In this room' : (isOnline ? 'Online' : 'Offline')}</span>
+              <span class="f-status">${statusTxt}</span>
               <span class="grow"></span>
               <button class="btn small invite-btn ${isOnline && !inThisRoom ? 'gold' : 'disabled'}" ${isOnline && !inThisRoom ? '' : 'disabled'}>
-                ${inThisRoom ? 'Joined' : 'Invite'}
+                ${btnTxt}
               </button>
             `;
             const b = el.querySelector('.invite-btn');

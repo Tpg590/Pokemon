@@ -477,6 +477,8 @@ G.Player = class Player {
     if (this.remote || !G.Settings.get('aimManual')) return null;
     const st = G.Pad.aim();
     if (st) return Math.atan2(st[1], st[0]);
+    const touchAim = G.Touch && G.Touch.aimVector ? G.Touch.aimVector() : null;
+    if (touchAim) return Math.atan2(touchAim[1], touchAim[0]);
     if (G.Settings.touch || G.Touch.active || !G.Input.mouseMovedAt || G.Input.mouseMovedAt < G.Pad.aimAt) return null;
     const w = G.Input.mouseWorld();
     const dx = w.x - this.x, dy = w.y - (this.y - G.LIFT * 0.5);

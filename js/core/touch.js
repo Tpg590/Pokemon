@@ -11,7 +11,7 @@
  * mismo sitio; sólo se coge tocando cerca de él.
  */
 G.Touch = (() => {
-  let cv = null, stick = null;
+  let cv = null, stick = null, aimStick = null;
   let active = G.Settings.touch;      // ¿se está usando táctil?
   let buttons = [];
 
@@ -76,7 +76,20 @@ G.Touch = (() => {
     if (touchy && !active) { active = true; document.body.classList.add('touch'); }
     const b = hit(e.clientX, e.clientY);
     if (b) { e.preventDefault(); press(b); return; }
-    if (!touchy || stick || !G.Game || G.Game.state !== 'playing') return;
+    if (!touchy || !G.Game || G.Game.state !== 'playing') return;
+
+    const isAimManual = !!G.Settings.get('aimManual');
+    const isRightHalf = isAimManual && (e.clientX >= (cv.clientWidth || window.innerWidth) * 0.5);
+
+    if (isRightHalf) {
+      if (aimStick) return;
+      e.preventDefault();
+      aimStick = { id: e.pointerId, ox: e.clientX, oy: e.clientY, x: e.clientX, y: e.clientY };
+      try { cv.setPointerCapture(e.pointerId); } catch (err) { /* nada */ }
+      return;
+    }
+
+    if (stick) return;
     if (fixed()) {
       // Fijo: sólo si el dedo cae cerca del joystick (si no, no hace nada).
       const b0 = stickBase();
@@ -91,15 +104,25 @@ G.Touch = (() => {
   }
 
   function move(e) {
-    if (!stick || e.pointerId !== stick.id) return;
-    stick.x = e.clientX; stick.y = e.clientY;
-    if (stick.fixed) return;
-    const dx = stick.x - stick.ox, dy = stick.y - stick.oy, d = Math.hypot(dx, dy), r = R();
-    if (d > r) { stick.ox = stick.x - dx / d * r; stick.oy = stick.y - dy / d * r; }
+    if (stick && e.pointerId === stick.id) {
+      stick.x = e.clientX; stick.y = e.clientY;
+      if (!stick.fixed) {
+        const dx = stick.x - stick.ox, dy = stick.y - stick.oy, d = Math.hypot(dx, dy), r = R();
+        if (d > r) { stick.ox = stick.x - dx / d * r; stick.oy = stick.y - dy / d * r; }
+      }
+    }
+    if (aimStick && e.pointerId === aimStick.id) {
+      aimStick.x = e.clientX; aimStick.y = e.clientY;
+      const dx = aimStick.x - aimStick.ox, dy = aimStick.y - aimStick.oy, d = Math.hypot(dx, dy), r = R();
+      if (d > r) { aimStick.ox = aimStick.x - dx / d * r; aimStick.oy = aimStick.y - dy / d * r; }
+    }
   }
 
-  function up(e) { if (stick && e.pointerId === stick.id) stick = null; }
-  function reset() { stick = null; }
+  function up(e) {
+    if (stick && e.pointerId === stick.id) stick = null;
+    if (aimStick && e.pointerId === aimStick.id) aimStick = null;
+  }
+  function reset() { stick = null; aimStick = null; }
 
   /** Dirección del joystick (con fuerza 0..1), o null si no se usa. */
   function vector() {
@@ -109,6 +132,14 @@ G.Touch = (() => {
     // A partir de medio radio ya va a toda velocidad.
     const k = Math.min(1, (d - 7) / (R() * 0.5 - 7));
     return [dx / d * k, dy / d * k];
+  }
+
+  /** Dirección de apuntado del stick derecho (vector [dx/d, dy/d]), o null si no se usa. */
+  function aimVector() {
+    if (!aimStick) return null;
+    const dx = aimStick.x - aimStick.ox, dy = aimStick.y - aimStick.oy, d = Math.hypot(dx, dy);
+    if (d < 7) return null;
+    return [dx / d, dy / d];
   }
 
   /** Márgenes del iPhone (barra de inicio abajo, muesca a los lados), en px. */
@@ -137,12 +168,16 @@ G.Touch = (() => {
   function draw(ctx) {
     // El fijo se ve siempre (más tenue sin tocarlo), para saber dónde está.
     const base = !stick && fixed() && active ? stickBase() : null;
-    if (!stick && !base) return;
-    const s = stick || { ox: base.x, oy: base.y, x: base.x, y: base.y };
-    drawStick(ctx, s, R(), base ? 0.55 : 1);
+    if (stick || base) {
+      const s = stick || { ox: base.x, oy: base.y, x: base.x, y: base.y };
+      drawStick(ctx, s, R(), base ? 0.55 : 1, '#ffd23f', '#a55f00');
+    }
+    if (aimStick) {
+      drawStick(ctx, aimStick, R(), 1, '#ff6b6b', '#c0392b');
+    }
   }
   /** Dibuja un joystick (también lo usa el editor de botones); k: opacidad. */
-  function drawStick(ctx, stick, r, k = 1) {
+  function drawStick(ctx, stick, r, k = 1, knobCol = '#ffd23f', knobStroke = '#a55f00') {
     const dx = stick.x - stick.ox, dy = stick.y - stick.oy, d = Math.hypot(dx, dy);
     const kx = stick.ox + (d > r ? dx / d * r : dx), ky = stick.oy + (d > r ? dy / d * r : dy);
     ctx.save();
@@ -152,12 +187,12 @@ G.Touch = (() => {
     ctx.lineWidth = 3; ctx.strokeStyle = '#f4f8ff';
     ctx.stroke();
     ctx.globalAlpha = 0.85 * k;
-    ctx.fillStyle = '#ffd23f';
+    ctx.fillStyle = knobCol;
     ctx.beginPath(); ctx.arc(kx, ky, r * 0.42, 0, 6.2832); ctx.fill();
-    ctx.lineWidth = 3; ctx.strokeStyle = '#a55f00'; ctx.stroke();
+    ctx.lineWidth = 3; ctx.strokeStyle = knobStroke; ctx.stroke();
     ctx.restore();
   }
 
-  return { init, vector, draw, drawStick, clearButtons, addButton, reset, safeArea, resetSafe, spot, stickBase, R, STICK_DEF,
-           get active() { return active; }, get stick() { return stick; } };
+  return { init, vector, aimVector, draw, drawStick, clearButtons, addButton, reset, safeArea, resetSafe, spot, stickBase, R, STICK_DEF,
+           get active() { return active; }, get stick() { return stick; }, get aimStick() { return aimStick; } };
 })();

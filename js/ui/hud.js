@@ -497,9 +497,13 @@ G.HUD = (() => {
     if (st.time < 14) {
       ctx.font = F(600, 10);
       ctx.textAlign = 'center';
+      const isManual = !!G.Settings.get('aimManual');
       ctx.fillStyle = 'rgba(180,200,230,.55)';
-      ctx.fillText(touch ? 'Arrastra el dedo para moverte  ·  toca un ataque para cambiarlo'
-                         : 'WASD moverse  ·  1-4 / Q / E o clic en un ataque para cambiarlo  ·  Esc pausa', w / 2, h - 4);
+      const touchHint = isManual
+        ? 'Izquierda: mover · Derecha: apuntar · Toca un ataque para cambiarlo'
+        : 'Arrastra el dedo para moverte · toca un ataque para cambiarlo';
+      ctx.fillText(touch ? touchHint
+                         : 'WASD moverse · 1-4 / Q / E o clic en un ataque para cambiarlo · Esc pausa', w / 2, h - 4);
     }
 
     ctx.restore();

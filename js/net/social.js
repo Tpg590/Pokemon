@@ -427,11 +427,13 @@ G.Social = (() => {
     if (room && room.id === id) return { ok: true };
     if (room) await leaveRoom();
     rtOn();
-    let open = null, host = null;
+    let open = null, host = null, kicked = false;
     try {
       open = (await fb.rtdb.ref('rooms/' + id + '/open').get()).val();
       host = (await fb.rtdb.ref('rooms/' + id + '/host').get()).val();
+      kicked = (await fb.rtdb.ref('rooms/' + id + '/kicked/' + uid).get()).val();
     } catch (e) { /* sala borrada */ }
+    if (kicked === true) { rtOff(); return { ok: false, error: 'Has sido expulsado de esta sala.' }; }
     if (!host) { rtOff(); return { ok: false, error: 'Esa sala ya no existe.' }; }
     if (open !== true) { rtOff(); return { ok: false, error: 'La partida de esa sala ya ha empezado.' }; }
     try { await fb.rtdb.ref('rooms/' + id + '/m/' + uid).set(memberInfo()); }
@@ -473,10 +475,22 @@ G.Social = (() => {
     href.on('value', s => { if (room && room.id === id && !s.val()) lostRoom(id); }, () => lostRoom(id));
     const oref = fb.rtdb.ref('rooms/' + id + '/open');
     oref.on('value', s => { if (room && room.id === id) { room.open = s.val() === true; emit('room'); } }, () => {});
+    const kref = fb.rtdb.ref('rooms/' + id + '/kicked/' + uid);
+    kref.on('value', s => {
+      if (s.val() === true && room && room.id === id) {
+        detachRoom();
+        room = null;
+        writeStatus();
+        rtOff();
+        G.UI.toast(G.I18n.t('Has sido expulsado de la sala'), 3500);
+        if (G.UI.isOpen('scr-lobby')) G.UI.show('scr-multiplayer', true);
+        emit('room');
+      }
+    });
     // Tras un corte el servidor ya ha hecho el onDisconnect: hay que volver a dejarlo puesto.
     const cref = fb.rtdb.ref('.info/connected');
     cref.on('value', s => { if (s.val() === true && room && room.id === id) watchRoomDisconnect(); });
-    roomRefs = [mref, href, oref, cref];
+    roomRefs = [mref, href, oref, kref, cref];
   }
 
   /** Si se cierra el navegador, la sala (anfitrión) o tu plaza (invitado) se borran solas. */
@@ -531,6 +545,13 @@ G.Social = (() => {
         }
       } else {
         if (!host) throw Error('sin anfitrión');
+        const kicked = (await within(base.child('kicked/' + uid).get(), 5000)).val();
+        if (kicked === true) {
+          closedRoom();
+          G.UI.toast(G.I18n.t('Has sido expulsado de la sala'), 3500);
+          if (G.UI.isOpen('scr-lobby')) G.UI.show('scr-multiplayer', true);
+          return;
+        }
         const mine = room.members.find(x => x.uid === uid);
         // Si no deja, los demás siguen jugando (la sala no admite a nadie hasta que acaben): a esperar.
         await within(base.child('m/' + uid).set(Object.assign(memberInfo(), mine && mine.at ? { at: mine.at } : {})), 5000)
@@ -570,6 +591,17 @@ G.Social = (() => {
   /** Anfitrión: quita a alguien de la sala (se cortó en partida y no volvió). */
   function dropMember(u) {
     if (room && room.isHost && u !== uid) fb.rtdb.ref('rooms/' + room.id + '/m/' + u).remove().catch(() => {});
+  }
+
+  /** Anfitrión: expulsa a un miembro de la sala. */
+  async function kickMember(targetUid) {
+    if (!room || !room.isHost || !targetUid || targetUid === uid) return;
+    try {
+      await fb.rtdb.ref('rooms/' + room.id + '/kicked/' + targetUid).set(true);
+      await fb.rtdb.ref('rooms/' + room.id + '/m/' + targetUid).remove();
+    } catch (e) {
+      console.warn('[Social] kickMember error:', e);
+    }
   }
 
   function closedRoom() {
@@ -755,7 +787,7 @@ G.Social = (() => {
 
   return {
     start, stop, claimNick, request, accept, remove, publishProfile, getProfile, profileData,
-    createRoom, joinRoom, leaveRoom, setOpen, refreshMember, dropMember, setPlaying, refreshPresence, ensureFriends,
+    createRoom, joinRoom, leaveRoom, setOpen, refreshMember, dropMember, kickMember, setPlaying, refreshPresence, ensureFriends,
     setRoomPublic, listenPublicRooms, toggleReady,
     invite, acceptInvite, declineInvite,
     on(fn) { listeners.add(fn); }, off(fn) { listeners.delete(fn); },

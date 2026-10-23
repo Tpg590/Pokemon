@@ -1363,6 +1363,34 @@ html:lang(zh) .btn, html:lang(zh) .chip { letter-spacing: 0; }
   border-color: #ffd23f;
   color: #ffd23f;
 }
+.kick-member-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 95, 109, 0.4);
+  background: rgba(35, 12, 16, 0.75);
+  color: #ff5f6d;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all .15s ease;
+  z-index: 2;
+}
+.kick-member-btn:hover {
+  background: #ff5f6d;
+  color: #fff;
+  border-color: #ff5f6d;
+  transform: scale(1.12);
+  box-shadow: 0 0 8px rgba(255, 95, 109, 0.6);
+}
 
 /* Public toggle row */
 .lobby-setting-row {
