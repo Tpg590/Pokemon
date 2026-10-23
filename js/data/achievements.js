@@ -10,11 +10,16 @@ G.AchDefs = (() => {
   const own = s => Object.keys(s.owned || {}).filter(d => G.DEX_BY[d]).length;
   const shinies = s => Object.keys(s.shiny || {}).length;
   const legends = s => Object.keys(s.legends || {}).length;
+  const megaStones = s => Object.keys(s.megas || {}).filter(k => !k.includes(':')).length;
+  const megaEvos = s => (s.stats && s.stats.megaEvos) || 0;
+  const megaWins = s => (s.stats && s.stats.megaWins) || 0;
+  const megaLvl = s => (s.stats && s.stats.megaMaxLevel) || 0;
   const st = k => s => (s.stats && s.stats[k]) || 0;
   const count = k => s => Object.keys(s[k] || {}).length;
 
   const CATS = [['coleccion', 'Colección'], ['supervivencia', 'Supervivencia'], ['combate', 'Combate'],
-                ['grietas', 'Grietas'], ['legendarios', 'Legendarios'], ['otros', 'Misiones y más']];
+                ['grietas', 'Grietas'], ['legendarios', 'Legendarios'], ['mega', 'Megaevolución'], ['otros', 'Misiones y más']];
+
 
   const LIST = [
     // ---------- colección ----------
@@ -66,6 +71,15 @@ G.AchDefs = (() => {
     { id: 'leg30', cat: 'legendarios', tier: 3, name: 'Domador de mitos', desc: 'Vence a 30 legendarios distintos.', value: legends, goal: 30, reward: { t10: 2 } },
     { id: 'legAll', cat: 'legendarios', tier: 3, name: 'Leyenda', desc: 'Vence a todos los legendarios.', value: legends, goal: 87, reward: { t10: 5 }, title: 'Leyenda' },
 
+    // ---------- mega ----------
+    { id: 'megaEvo1', cat: 'mega', tier: 1, name: 'Despertar Mega', desc: 'Evoluciona a la forma Mega en una partida.', value: megaEvos, goal: 1, reward: { t1: 3, coins: 300 }, title: 'Despertado' },
+    { id: 'megaEvo10', cat: 'mega', tier: 2, name: 'Maestro Mega', desc: 'Evoluciona a la forma Mega 10 veces.', value: megaEvos, goal: 10, reward: { t10: 1, coins: 500 }, title: 'Maestro Mega' },
+    { id: 'megaStone5', cat: 'mega', tier: 1, name: 'Cazador de Mega Piedras', desc: 'Consigue 5 Mega Piedras distintas.', value: megaStones, goal: 5, reward: { t1: 5, coins: 500 } },
+    { id: 'megaStone20', cat: 'mega', tier: 2, name: 'Coleccionista Mega', desc: 'Consigue 20 Mega Piedras distintas.', value: megaStones, goal: 20, reward: { t10: 1, coins: 1000 }, title: 'Coleccionista Mega' },
+    { id: 'megaRift10', cat: 'mega', tier: 2, name: 'Conquistador de Grietas Mega', desc: 'Derrota a 10 jefes Mega en grietas.', value: s => Math.max(megaWins(s), megaStones(s)), goal: 10, reward: { t10: 1, coins: 800 }, title: 'Destructor Mega' },
+    { id: 'megaLvl40', cat: 'mega', tier: 3, name: 'Vínculo Mega', desc: 'Llega al nivel 40 con un Pokémon Mega.', value: megaLvl, goal: 40, reward: { t10: 2, coins: 1500 }, title: 'Sinergia Pura' },
+    { id: 'megaAll', cat: 'mega', tier: 3, name: 'Poder Definitivo', desc: 'Consigue todas las Mega Piedras.', value: megaStones, goal: 48, reward: { t10: 5, coins: 5000 }, title: 'Leyenda Mega' },
+
     // ---------- misiones y más ----------
     { id: 'mis10', cat: 'otros', tier: 1, name: 'Cumplidor', desc: 'Completa 10 misiones.', value: st('missionsDone'), goal: 10, reward: { t1: 3 } },
     { id: 'mis50', cat: 'otros', tier: 2, name: 'Constante', desc: 'Completa 50 misiones.', value: st('missionsDone'), goal: 50, reward: { t10: 1 }, title: 'Constante' },
@@ -79,12 +93,31 @@ G.AchDefs = (() => {
     LIST.push({ id: 'leg_' + p.dex, cat: 'legendarios', tier: 2, dex: p.dex, name: 'Vence a ' + p.name,
                 desc: 'Derrota a ' + p.name + ' en una grieta.', value: s => (s.legends && s.legends[p.dex] ? 1 : 0), goal: 1, reward: { t1: 1 } });
   }
-  const totalLegends = LIST.filter(a => a.dex).length;
+  const totalLegends = LIST.filter(a => a.dex && a.cat === 'legendarios').length;
   for (const a of LIST) if (a.id === 'legAll') { a.goal = totalLegends; a.desc = `Vence a los ${totalLegends} legendarios.`; }
+
+  // Un logro por cada Mega Pokémon: "Vence a Mega Venusaur"...
+  const megaDexList = (G.Mega && G.Mega.ALL_MEGA_DEX) || [3, 6, 9, 15, 18, 65, 80, 94, 115, 127, 130, 142, 150, 181, 208, 212, 214, 229, 248, 254, 257, 260, 282, 302, 303, 306, 308, 310, 319, 323, 334, 354, 359, 362, 373, 376, 380, 381, 382, 383, 384, 428, 445, 448, 460, 475, 531, 719];
+  for (const dex of megaDexList) {
+    const p = G.DEX_BY && G.DEX_BY[dex];
+    if (!p || (G.SPRITE_META && !G.SPRITE_META[dex])) continue;
+    const megaInfo = G.Mega && G.Mega.getDefaultForm ? G.Mega.getDefaultForm(dex) : null;
+    const bName = megaInfo ? megaInfo.name : ('Mega ' + p.name);
+    LIST.push({
+      id: 'mega_' + dex, cat: 'mega', tier: 2, dex, name: 'Vence a ' + bName,
+      desc: 'Derrota a ' + bName + ' en una grieta.',
+      value: s => (s.megas && (s.megas[dex] || s.megas[dex + ':default'] || s.megas[dex + ':x']) ? 1 : 0),
+      goal: 1, reward: { t1: 1, coins: 100 }
+    });
+  }
+  const totalMegas = LIST.filter(a => a.dex && a.cat === 'mega').length;
+  for (const a of LIST) if (a.id === 'megaAll') { a.goal = totalMegas; a.desc = `Consigue las ${totalMegas} Mega Piedras.`; }
+
   // Metas que dependen de los datos del juego.
   for (const a of LIST) if (a.id === 'ownAll') { a.goal = G.DEX.length; a.desc = `Ten los ${G.DEX.length} Pokémon del juego.`; }
   const evoTotal = Object.keys(G.Moves.EVO).length;
   for (const a of LIST) if (a.id === 'evoAll') { a.goal = evoTotal; a.desc = `Evoluciona los ${evoTotal} movimientos distintos.`; }
+
 
   const BY = {};
   for (const a of LIST) BY[a.id] = a;

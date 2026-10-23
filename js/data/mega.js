@@ -415,8 +415,16 @@ G.Mega = (() => {
     pl.megaInfo = info;
     pl.megaName = info.name;
 
+    if (s) {
+      s.stats = s.stats || {};
+      s.stats.megaEvos = (s.stats.megaEvos || 0) + 1;
+      s.stats.megaMaxLevel = Math.max(s.stats.megaMaxLevel || 0, pl.level || 0);
+    }
+    if (G.Progress && G.Progress.checkAch) G.Progress.checkAch();
+
     // Thay đổi Hệ
     if (info.types && pl.mon) {
+
       pl.mon = Object.assign({}, pl.mon, { types: info.types });
     }
 

@@ -338,8 +338,14 @@ G.Player = class Player {
       this.level++;
       this.xpNext = Player.xpFor(this.level);
       leveled++;
+      if (this.isMega) {
+        const s = G.DB && G.DB.save;
+        if (s && s.stats) s.stats.megaMaxLevel = Math.max(s.stats.megaMaxLevel || 0, this.level);
+        if (G.Progress && G.Progress.checkAch) G.Progress.checkAch();
+      }
     }
     return leveled;
+
   }
 
   // ---------------- objeto equipado ----------------

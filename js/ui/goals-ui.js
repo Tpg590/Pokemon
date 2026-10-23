@@ -129,7 +129,30 @@
         }
         box.appendChild(lg);
       }
+
+      // Megaevolución: uno a uno con su sprite (en sombra si aún no tienes su piedra / no le has vencido).
+      if (cat === 'mega') {
+        const megas = all.filter(a => a.cat === 'mega' && a.dex);
+        const beaten = megas.filter(a => s.megas && (s.megas[a.dex] || s.megas[a.dex + ':x'] || s.megas[a.dex + ':default'])).length;
+        box.insertAdjacentHTML('beforeend', `<h3 style="margin:14px 0 6px">Mega Piedras conseguidas ${beaten} / ${megas.length}</h3>`);
+        const lg = document.createElement('div');
+        lg.className = 'leg-grid';
+        for (const a of megas) {
+          const ok = !!(s.megas && (s.megas[a.dex] || s.megas[a.dex + ':x'] || s.megas[a.dex + ':default']));
+          const c = document.createElement('div');
+          c.className = 'leg-cell' + (ok ? ' ok' : '');
+          const info = G.Mega ? G.Mega.getDefaultForm(a.dex) : null;
+          const mName = info ? info.name : (G.DEX_BY[a.dex] ? G.DEX_BY[a.dex].name : '???');
+          const stoneName = G.Mega ? G.Mega.getStoneName(a.dex) : '';
+          c.title = mName + (ok ? ' · ' + (stoneName || '¡conseguido!') : '');
+          c.appendChild(G.UI.spriteCanvas(a.dex, 64, 56, { scale: 1, silhouette: !ok, shadow: ok }));
+          c.insertAdjacentHTML('beforeend', `<small>${ok ? esc(mName) : '???'}</small>`);
+          lg.appendChild(c);
+        }
+        box.appendChild(lg);
+      }
     }
+
 
     function achCard(a, s) {
       const ok = !!(s.ach && s.ach[a.id]);

@@ -231,7 +231,14 @@ G.Rift = (() => {
 
     if (isMega && G.Mega) {
       G.Mega.unlockStone(arena.dex);
+      const s = G.DB && G.DB.save;
+      if (s) {
+        s.stats = s.stats || {};
+        s.stats.megaWins = (s.stats.megaWins || 0) + 1;
+      }
+      if (G.Progress && G.Progress.checkAch) G.Progress.checkAch();
       const stoneName = G.Mega.getStoneName(arena.dex);
+
       const isVi = G.I18n && G.I18n.lang === 'vi';
       const msg = isVi ? `✨ Bạn đã nhận được ${stoneName}!` : `✨ You obtained ${stoneName}!`;
       G.UI.toast(msg);
