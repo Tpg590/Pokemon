@@ -113,7 +113,7 @@
 
       // Legendarios: uno a uno, con su sprite (en sombra si aún no le has vencido).
       if (cat === 'legendarios') {
-        const legs = all.filter(a => a.dex);
+        const legs = all.filter(a => a.cat === 'legendarios' && a.dex);
         const beaten = legs.filter(a => s.legends && s.legends[a.dex]).length;
         box.insertAdjacentHTML('beforeend', `<h3 style="margin:14px 0 6px">Legendarios vencidos ${beaten} / ${legs.length}</h3>`);
         const lg = document.createElement('div');
@@ -136,15 +136,16 @@
         const beaten = megas.filter(a => s.megas && (s.megas[a.dex] || s.megas[a.dex + ':x'] || s.megas[a.dex + ':default'])).length;
         box.insertAdjacentHTML('beforeend', `<h3 style="margin:14px 0 6px">Mega Piedras conseguidas ${beaten} / ${megas.length}</h3>`);
         const lg = document.createElement('div');
-        lg.className = 'leg-grid';
+        lg.className = 'leg-grid mega-grid';
         for (const a of megas) {
           const ok = !!(s.megas && (s.megas[a.dex] || s.megas[a.dex + ':x'] || s.megas[a.dex + ':default']));
           const c = document.createElement('div');
-          c.className = 'leg-cell' + (ok ? ' ok' : '');
+          c.className = 'leg-cell mega-cell' + (ok ? ' ok' : '');
           const info = G.Mega ? G.Mega.getDefaultForm(a.dex) : null;
           const mName = info ? info.name : (G.DEX_BY[a.dex] ? G.DEX_BY[a.dex].name : '???');
           const stoneName = G.Mega ? G.Mega.getStoneName(a.dex) : '';
           c.title = mName + (ok ? ' · ' + (stoneName || '¡conseguido!') : '');
+          c.insertAdjacentHTML('beforeend', `<span class="mega-badge-corner" title="${esc(stoneName || 'Mega')}">${G.Icons.html('mega', 14)}</span>`);
           c.appendChild(G.UI.spriteCanvas(a.dex, 64, 56, { scale: 1, silhouette: !ok, shadow: ok }));
           c.insertAdjacentHTML('beforeend', `<small>${ok ? esc(mName) : '???'}</small>`);
           lg.appendChild(c);

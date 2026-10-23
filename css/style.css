@@ -703,6 +703,11 @@ select.field { font-family: var(--font); }
 .leg-cell { display: flex; flex-direction: column; align-items: center; padding: 4px; border-radius: 8px; background: rgba(0,0,0,.25); border: 2px solid transparent; }
 .leg-cell.ok { border-color: rgba(255,210,63,.5); }
 .leg-cell small { font-size: 10px; color: var(--muted); text-align: center; }
+.mega-cell { position: relative; }
+.mega-cell .mega-badge-corner { position: absolute; top: 3px; right: 4px; opacity: 0.65; pointer-events: none; }
+.mega-cell.ok { border-color: rgba(255, 75, 114, 0.7); background: rgba(255, 75, 114, 0.08); box-shadow: 0 0 8px rgba(255, 75, 114, 0.3); }
+.mega-cell.ok .mega-badge-corner { opacity: 1; filter: drop-shadow(0 0 3px #ff4b72); }
+.mega-cell.ok small { color: #ffb8c6; font-weight: bold; }
 .fav-slots { display: flex; gap: 12px; flex-wrap: wrap; margin: 6px 0; }
 .fav-slot {
   width: 140px; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center;

@@ -171,9 +171,8 @@ G.Progress = (() => {
   /** Un enemigo ha caído (anfitrión, solitario o copia en el invitado). */
   function kill(e) {
     // Los legendarios de la Sentencia de Arceus no cuentan como jefes (ni para
-    // misiones ni para logros de jefes): tienen su propio contador.
-    if (G.Judgment.active && e.boss) { G.Judgment.bossDown(); event('kill', { types: e.types || [], boss: false, legend: 0 }); return; }
-    const legend = e.legend || (G.Rift.inArena && e.boss) ? e.dex : 0;
+    const isMega = !!(e.isMega || (G.Rift && G.Rift.arena && G.Rift.arena.isMega));
+    const legend = (!isMega && (e.legend || (G.Rift && G.Rift.inArena && e.boss && G.DEX_BY && G.DEX_BY[e.dex] && G.DEX_BY[e.dex].leg))) ? e.dex : 0;
     event('kill', { types: e.types || [], boss: !!e.boss, legend });
   }
 
