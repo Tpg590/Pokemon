@@ -1141,7 +1141,7 @@ G.I18n.add({
   "Me faltan": "Còn thiếu",
   "Legendaria": "Huyền thoại",
   "Épica": "Sử thi",
-  "Rara": "Kỳ quặc",
+  "Rara": "Hiếm",
   "Poco común": "Khá",
   "Común": "Thường",
   "Ninguno con este filtro.": "Không có mục nào phù hợp bộ lọc.",

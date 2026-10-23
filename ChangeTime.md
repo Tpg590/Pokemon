@@ -4,6 +4,10 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
 
 ---
 
+## ⏱️ [2026-10-23 18:02:00] — Sửa bản dịch độ hiếm "Rara" từ "Kỳ quặc" thành "Hiếm" (Tiếng Việt)
+- **lang-vi.js & build_vietnamese_dict.py:** Sửa bản dịch `"Rara"` từ `"Kỳ quặc"` thành `"Hiếm"`. Trong tiếng Tây Ban Nha, "Rara" vừa là tính cách Quirky vừa là độ hiếm Rare (3 sao), do trùng từ nên trước đó bị dịch nhầm thành "Kỳ quặc" ở bộ lọc độ hiếm Pokédex và Gacha. Bản tính Quirky vẫn được bảo đảm dịch chuẩn qua key `"Quirky"`.
+- **Build & Bundle:** Chạy lại `tools/build.js` cập nhật `js/lang/vi.js`, `index.html` và `version.json`.
+
 ## ⏱️ [2026-10-23 17:55:00] — Sửa lỗi hiển thị placeholder ({x}/{max}) tại nút Multiplayer khi đang có phòng
 - **menu.js:** Chuyển `G.T('Volver a tu sala ({x}/{max})', { ... })` sang `G.I18n.f('Volver a tu sala ({x})', \`${room.members.length}/${G.Social.MAX_PLAYERS}\`)` để khớp với hệ thống format template `{x}` của engine đa ngôn ngữ, hiển thị chính xác `Quay lại phòng của bạn (1/4)` thay vì bị kẹt placeholder thô.
 - **Build & Bundle:** Chạy lại `tools/build.js` cập nhật `index.html`, `js/app.min.js` và `version.json`.

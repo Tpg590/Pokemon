@@ -131,7 +131,7 @@ TRANSLATIONS = {
     "Jolly": "Vui vẻ", "Alegre": "Vui vẻ",
     "Naughty": "Nghịch ngợm", "Pícara": "Nghịch ngợm",
     "Lax": "Lười biếng", "Floja": "Lười biếng",
-    "Quirky": "Kỳ quặc", "Rara": "Kỳ quặc",
+    "Quirky": "Kỳ quặc", "Rara": "Hiếm",
     "Naive": "Ngây thơ", "Ingenua": "Ngây thơ",
     "Brave": "Dũng cảm", "Audaz": "Dũng cảm",
     "Relaxed": "Thư thái", "Plácida": "Thư thái",
