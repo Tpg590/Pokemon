@@ -120,7 +120,7 @@ G.MenuUI = (() => {
     const multi = document.querySelector('#scr-menu [data-go=multiplayer] small');
     if (multi) {
       multi.textContent = room
-        ? G.T('Volver a tu sala ({x}/{max})', { x: room.members.length, max: G.Social.MAX_PLAYERS })
+        ? G.I18n.f('Volver a tu sala ({x})', `${room.members.length}/${G.Social.MAX_PLAYERS}`)
         : G.T('Juega en grupo con amigos');
     }
     const fr = G.Social.friends;
