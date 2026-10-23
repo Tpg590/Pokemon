@@ -261,12 +261,38 @@
     function close() { $('scr-profile').classList.add('hidden'); }
 
     /** Abre el perfil de otro jugador por su uid. */
-    async function show(uid) {
+    async function show(uid, fallback = null) {
       if (!uid) return;
       if (uid === G.Social.uid) { showData(G.Social.profileData()); return; }
       $('prof-body').innerHTML = '<p class="sub">Cargando…</p>';
       $('scr-profile').classList.remove('hidden');
-      const d = await G.Social.getProfile(uid);
+      let d = await G.Social.getProfile(uid);
+      if (!d && fallback) {
+        d = {
+          name: fallback.name || '???',
+          title: '',
+          favs: fallback.dex ? [{ dex: fallback.dex, shiny: !!fallback.shiny }] : [],
+          best: {
+            solo: fallback.t || 0,
+            group: 0,
+            level: fallback.lv || 1,
+            bosses: 0,
+            legends: 0,
+            kills: fallback.kills || 0,
+            medals: 0
+          },
+          medals: []
+        };
+      } else if (d && fallback) {
+        d.best = d.best || {};
+        if (fallback.name && (!d.name || d.name === '???')) d.name = fallback.name;
+        if ((!d.best.solo || d.best.solo === 0) && fallback.t) d.best.solo = fallback.t;
+        if ((!d.best.level || d.best.level <= 1) && fallback.lv) d.best.level = fallback.lv;
+        if ((!d.best.kills || d.best.kills === 0) && fallback.kills) d.best.kills = fallback.kills;
+        if ((!d.favs || d.favs.length === 0) && fallback.dex) {
+          d.favs = [{ dex: fallback.dex, shiny: !!fallback.shiny }];
+        }
+      }
       if (!d) { $('prof-body').innerHTML = '<p class="sub">Este jugador aún no tiene perfil.</p>'; return; }
       showData(d);
     }

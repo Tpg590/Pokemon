@@ -350,7 +350,7 @@ G.Game = (() => {
     // A la nube al acabar la partida (como mucho cada hora); si la marca entra
     // en un top (hoy, semana o mes), enseguida (abajo, tras subirla al ranking).
     G.DB.commit('run');
-    if (G.Social.me) G.Social.publishProfile();
+    if (G.Social.me) G.Social.publishProfile(true);
 
     // Ranking: en solitario cada uno lo suyo; en grupo lo sube el anfitrión.
     const mark = { t: Math.floor(time), lv: pl.level, kills: pl.kills };

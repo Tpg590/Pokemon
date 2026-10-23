@@ -4,6 +4,22 @@ Tài liệu này ghi lại chi tiết mốc thời gian, nội dung sửa đổi
 
 ---
 
+## ⏱️ [2026-10-23 19:48:00] — Khắc phục lỗi hồ sơ người chơi (Profile) trên Bảng xếp hạng bị trống / 0
+- **Nguyên nhân gốc rễ (Root Cause):**
+  1. Khi người chơi đăng ký tài khoản / đặt tên (`claimNick`), mã nguồn cũ chỉ ghi `{ name, lower, at }` vào Firestore collection `profiles`. Mã gọi `publishProfile(true)` sau 800ms bị Firestore Security Rules chặn hoàn toàn do quy định `every(resource.data.at, 20)` yêu cầu ít nhất 20 giây giữa 2 lần cập nhật cùng 1 tài liệu.
+  2. Hàm `publishProfile` cũ lưu cache `localStorage` trước khi gửi lên Firebase thành công, dẫn đến tài khoản bị kẹt vĩnh viễn và không bao giờ tải thông tin chi tiết (`best`, `favs`, `medals`, `title`) lên Firestore.
+  3. Khi kết thúc trận (`game.js`), hàm `publishProfile()` được gọi không có cờ `force`, bị giới hạn 2 tiếng chặn lại nên các kỷ lục mới không được cập nhật vào hồ sơ công khai.
+- **Giải pháp xử lý toàn diện:**
+  1. **Ghi đầy đủ hồ sơ ngay khi tạo tài khoản (`social.js`):** Trong `claimNick`, gộp trực tiếp `profileData()` vào transaction khởi tạo ban đầu, đảm bảo hồ sơ có ngay dữ liệu kỷ lục, Pokémon yêu thích, huy hiệu và danh hiệu ngay từ đầu mà không vi phạm quy tắc Firestore.
+  2. **Tự động đồng bộ khi đăng nhập & kết thúc trận (`social.js`, `game.js`):**
+     - Khi vào game (`online()`), tự động kích hoạt `publishProfile(true)` để cập nhật toàn bộ hồ sơ cho các tài khoản cũ từng bị thiếu dữ liệu.
+     - Kiểm tra khoảng cách thời gian `elapsed < 21s` để hẹn giờ thông minh, không bị lỗi `permission-denied` từ rule 20s của Firestore.
+     - Gọi `publishProfile(true)` ngay khi kết thúc trận đấu.
+  3. **Cơ chế Fallback thông minh từ Bảng xếp hạng (`ranking-ui.js`, `goals-ui.js`, `social-ui.js`):**
+     - Khi nhấn vào bất kỳ người chơi nào trên BXH (kể cả người chơi cũ chưa đăng nhập lại như `nagi2002`), dữ liệu của lượt chạy trên hàng BXH (thời gian kỷ lục `t`, cấp độ `lv`, số lượng hạ gục `kills`, Pokémon sử dụng `dex`, shiny) được truyền dưới dạng fallback sang `G.ProfileUI.show()`.
+     - Nếu hồ sơ trên Firestore của người chơi đó bị thiếu hoặc toàn số 0, giao diện Profile sẽ tự động lấy dữ liệu từ BXH: hiển thị chính xác thời gian kỷ lục (ví dụ 2:26), cấp độ tối đa (1), số hạ gục và hoạt ảnh Pokémon tương ứng (Weedle) thay vì hiển thị trống / 0:00.
+- **Build & Bundle:** Chạy lại `tools/build.js` cập nhật `index.html`, `js/app.min.js` và `version.json`. Kiểm tra 20/20 test i18n vượt qua.
+
 ## ⏱️ [2026-10-23 19:20:00] — Sửa lỗi ngắm thủ công trên PC & Thay thế tâm ngắm bằng mũi tên định hướng quanh nhân vật
 - **Khắc phục triệt để lỗi ngắm chuột thủ công trên PC (`player.js`, `input.js`):**
   - Xóa bỏ điều kiện `G.Settings.touch || G.Touch.active` trong `handAim()`: trước đó nếu màn hình PC có cảm ứng (hoặc chạm thử nghiệm) thì `handAim()` tự động trả về `null` khiến chuột hoàn toàn mất tác dụng ngắm bắn.

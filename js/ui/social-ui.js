@@ -109,7 +109,7 @@
         const inRoom = room && room.members.some(m => m.uid === f.uid);
         const stText = inRoom ? 'En tu sala' : (f.status === 'ok' ? (isOnline ? 'Online' : 'Offline') : stateText(f));
         el.innerHTML = `<i class="dot ${dot}"></i><b translate="no"><a href="#" class="plink" title="Ver su perfil">${esc(f.name)}</a></b><span class="st">${stText}</span><span class="grow"></span>`;
-        if (f.status === 'ok') el.querySelector('.plink').onclick = e => { e.preventDefault(); G.ProfileUI.show(f.uid); };
+        if (f.status === 'ok') el.querySelector('.plink').onclick = e => { e.preventDefault(); G.ProfileUI.show(f.uid, { name: f.name }); };
         else el.querySelector('.plink').onclick = e => e.preventDefault();
         const btn = (txt, cls, fn, disabled = false) => {
           const b = document.createElement('button');

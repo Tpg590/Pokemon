@@ -122,9 +122,22 @@ G.RankingUI = (() => {
     r.dex.forEach((d, i) => { if (G.DEX_BY[d]) mons.appendChild(G.UI.spriteCanvas(d, 44, 40, { scale: 1, shiny: !!r.shiny[i] })); });
     el.appendChild(mons);
     el.insertAdjacentHTML('beforeend',
-      `<span class="who"><b translate="no">${r.names.map((n, i) => `<a href="#" class="plink" data-u="${esc(r.uids[i] || '')}">${esc(n)}</a>`).join(' · ')}</b><small>Nv. ${r.lv || 1} · ${(r.kills || 0).toLocaleString(G.I18n.locale)} derrotados</small></span>
+      `<span class="who"><b translate="no">${r.names.map((n, i) => `<a href="#" class="plink" data-u="${esc(r.uids[i] || '')}" data-idx="${i}">${esc(n)}</a>`).join(' · ')}</b><small>Nv. ${r.lv || 1} · ${(r.kills || 0).toLocaleString(G.I18n.locale)} derrotados</small></span>
        <span class="time">${fmt(r.t)}</span>`);
-    el.querySelectorAll('.plink').forEach(a => { a.onclick = e => { e.preventDefault(); G.ProfileUI.show(a.dataset.u); }; });
+    el.querySelectorAll('.plink').forEach(a => {
+      a.onclick = e => {
+        e.preventDefault();
+        const i = parseInt(a.dataset.idx, 10) || 0;
+        G.ProfileUI.show(a.dataset.u, {
+          name: a.textContent,
+          t: r.t,
+          lv: r.lv,
+          kills: r.kills,
+          dex: (r.dex && r.dex[i]) || (r.dex && r.dex[0]) || null,
+          shiny: !!(r.shiny && (r.shiny[i] ?? r.shiny[0]))
+        });
+      };
+    });
     // Reportar una marca sospechosa (no la tuya). Lo revisa el admin (mod-ui.js).
     if (!mine && G.Social.me) {
       const rep = document.createElement('button');

@@ -103,6 +103,7 @@ G.Social = (() => {
     name = (name || '').trim();
     if (!VALID.test(name)) return { ok: false, error: 'El apodo debe tener 3-16 letras, números o _.' };
     const lower = name.toLowerCase();
+    const pData = profileData();
     try {
       await fb.fs.runTransaction(async tx => {
         const nref = fb.fs.collection('names').doc(lower);
@@ -110,17 +111,17 @@ G.Social = (() => {
         if (n.exists && n.data().uid !== uid) throw { code: 'taken' };
         if (!n.exists) tx.set(nref, { uid });
         tx.set(fb.fs.collection('profiles').doc(uid),
-          { name, lower, at: firebase.firestore.FieldValue.serverTimestamp() });
+          Object.assign(pData, { name, lower, at: firebase.firestore.FieldValue.serverTimestamp() }));
       });
     } catch (e) {
       if (e && e.code === 'taken') return { ok: false, error: 'Ese apodo ya lo tiene otro jugador.' };
       return { ok: false, error: 'No se pudo guardar el apodo (' + ((e && e.code) || 'error') + ').' };
     }
     me = { uid, name };
+    pubAt = Date.now();
     try { localStorage.setItem('ps.nick.' + uid, name); } catch (e) { /* nada */ }
     G.DB.setName(name);
     if (started && !beatT) online();
-    publishProfile(true);
     return { ok: true };
   }
 
@@ -141,6 +142,7 @@ G.Social = (() => {
     let known = false;
     try { known = localStorage.getItem(hasFrKey()) === '1'; } catch (e) { /* nada */ }
     if (known) listenInvites();
+    setTimeout(() => { if (me) publishProfile(true); }, 2500);
   }
 
   let presTimer = null;
@@ -738,22 +740,28 @@ G.Social = (() => {
    */
   function publishProfile(force = false) {
     if (!me || !fb) return;
-    if (!force && Date.now() - pubAt < 2 * 3600 * 1000) return;    // como mucho cada 2 h (era 30 min)
+    const elapsed = Date.now() - pubAt;
+    if (!force && elapsed < 30 * 60 * 1000) return;
     clearTimeout(pubT);
+    const delay = elapsed < 21000 ? Math.max(800, 21000 - elapsed + 500) : 800;
     pubT = setTimeout(() => {
       if (!me || !fb) return;
       const d = profileData();
-      // Para decidir si se sube (se recuerda entre sesiones): sin jefes ni derrotados.
       const key = JSON.stringify(Object.assign({}, d, { best: Object.assign({}, d.best, { kills: 0, bosses: 0 }) }));
       const lsKey = 'ps.pub.' + uid;
       if (!pubLast) { try { pubLast = localStorage.getItem(lsKey) || ''; } catch (e) { /* nada */ } }
-      if (key === pubLast) return;
-      pubLast = key; pubAt = Date.now();
-      try { localStorage.setItem(lsKey, key); } catch (e) { /* nada */ }
+      if (!force && key === pubLast) return;
       fb.fs.collection('profiles').doc(uid).set(Object.assign(d, {
         name: me.name, lower: me.name.toLowerCase(), at: firebase.firestore.FieldValue.serverTimestamp()
-      })).catch(e => { pubLast = ''; console.warn('[Social] perfil:', e.code || e.message); });
-    }, 800);
+      })).then(() => {
+        pubLast = key;
+        pubAt = Date.now();
+        try { localStorage.setItem(lsKey, key); } catch (e) { /* nada */ }
+      }).catch(e => {
+        pubLast = '';
+        console.warn('[Social] perfil:', e.code || e.message);
+      });
+    }, delay);
   }
 
   /** El perfil de otro jugador, limpio (ver G.U.int / str): sólo lo que el juego sabe pintar. */
