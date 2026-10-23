@@ -59,23 +59,27 @@ G.HUD = (() => {
     ctx.fillText(Math.ceil(pl.hp) + ' / ' + Math.round(pl.maxHp), px + 48 + 84, py + 26);
 
     // ---------- tabla de estadísticas (debajo de la vida) ----------
-    const stBoxX = px, stBoxY = py + 33, stBoxW = 264, stBoxH = 50;
+    const stBoxX = px, stBoxY = py + 31;
+    // Khớp chiều rộng vừa đúng với mép phải thanh máu (px + 48 + 168 = 216)
+    const stBoxW = touch ? 216 : 224;
+    const stBoxH = touch ? 38 : 42;
     ctx.fillStyle = 'rgba(18, 16, 16, 0.88)';
     ctx.fillRect(stBoxX, stBoxY, stBoxW, stBoxH);
     ctx.strokeStyle = '#3a322c';
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.2;
     ctx.strokeRect(stBoxX + 0.5, stBoxY + 0.5, stBoxW - 1, stBoxH - 1);
 
+    const fSize = touch ? 8.5 : 9.5;
     function drawStatItem(x, y, label, val, mul, isMod) {
       ctx.textAlign = 'left';
-      ctx.font = F(700, 10);
+      ctx.font = F(700, fSize);
       ctx.fillStyle = '#8fa3c4';
       ctx.fillText(label, x, y);
-      let curX = x + ctx.measureText(label).width + 4;
+      let curX = x + ctx.measureText(label).width + 3;
       if (val != null) {
         ctx.fillStyle = '#ffffff';
         ctx.fillText(val, curX, y);
-        curX += ctx.measureText(val).width + 3;
+        curX += ctx.measureText(val).width + 2;
       }
       if (mul != null) {
         ctx.fillStyle = isMod ? '#ffcb3d' : '#cccccc';
@@ -83,8 +87,9 @@ G.HUD = (() => {
       }
     }
 
-    const c1 = stBoxX + 6, c2 = stBoxX + 94, c3 = stBoxX + 180;
-    const y1 = stBoxY + 14, y2 = stBoxY + 29, y3 = stBoxY + 44;
+    const c1 = stBoxX + 4, c2 = stBoxX + (touch ? 74 : 77), c3 = stBoxX + (touch ? 146 : 151);
+    const yStart = stBoxY + (touch ? 10 : 12), dy = touch ? 12 : 13;
+    const y1 = yStart, y2 = yStart + dy, y3 = yStart + dy * 2;
 
     const atkBase = Math.round(pl.baseAtk < 5 ? pl.baseAtk * 100 : pl.baseAtk);
     const atkMulVal = pl.baseAtk ? pl.atk / pl.baseAtk : pl.atkMul;
@@ -98,11 +103,12 @@ G.HUD = (() => {
 
     drawStatItem(c1, y2, 'CD', null, '*' + pl.cdMul.toFixed(2), Math.abs(pl.cdMul - 1) > 0.01);
     drawStatItem(c2, y2, 'DEF', '+' + Math.round(pl.reduction * 100) + '%', null, pl.reduction > 0);
-    drawStatItem(c3, y2, 'REGEN', '+' + pl.regen.toFixed(1) + '/s', null, pl.regen > 0);
+    drawStatItem(c3, y2, touch ? 'REG' : 'REGEN', '+' + pl.regen.toFixed(1) + '/s', null, pl.regen > 0);
 
     const magMulVal = pl.magnet / 78;
-    drawStatItem(c1, y3, 'MAGNET', null, '*' + magMulVal.toFixed(2), Math.abs(magMulVal - 1) > 0.01);
+    drawStatItem(c1, y3, touch ? 'MAG' : 'MAGNET', null, '*' + magMulVal.toFixed(2), Math.abs(magMulVal - 1) > 0.01);
     drawStatItem(c2, y3, 'XP', null, '*' + pl.xpMul.toFixed(2), Math.abs(pl.xpMul - 1) > 0.01);
+    drawStatItem(c3, y3, 'CRIT', Math.round((pl.critChance || 0) * 100) + '%', null, (pl.critChance || 0) > 0);
 
     // buffs activos (debajo de la tabla de estadísticas)
     const COL = { atk: '#ff6b4d', patk: '#ff6b4d', satk: '#c47bff', spd: '#7fe0ff', def: '#b0b8c8', regen: '#5fe08a' };
