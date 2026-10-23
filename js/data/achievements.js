@@ -75,10 +75,10 @@ G.AchDefs = (() => {
     { id: 'megaEvo1', cat: 'mega', tier: 1, name: 'Despertar Mega', desc: 'Evoluciona a la forma Mega en una partida.', value: megaEvos, goal: 1, reward: { t1: 3, coins: 300 }, title: 'Despertado' },
     { id: 'megaEvo10', cat: 'mega', tier: 2, name: 'Maestro Mega', desc: 'Evoluciona a la forma Mega 10 veces.', value: megaEvos, goal: 10, reward: { t10: 1, coins: 500 }, title: 'Maestro Mega' },
     { id: 'megaStone5', cat: 'mega', tier: 1, name: 'Cazador de Mega Piedras', desc: 'Consigue 5 Mega Piedras distintas.', value: megaStones, goal: 5, reward: { t1: 5, coins: 500 } },
-    { id: 'megaStone20', cat: 'mega', tier: 2, name: 'Coleccionista Mega', desc: 'Consigue 20 Mega Piedras distintas.', value: megaStones, goal: 20, reward: { t10: 1, coins: 1000 }, title: 'Coleccionista Mega' },
+    { id: 'megaStone15', cat: 'mega', tier: 2, name: 'Coleccionista Mega', desc: 'Consigue 15 Mega Piedras distintas.', value: megaStones, goal: 15, reward: { t10: 1, coins: 1000 }, title: 'Coleccionista Mega' },
     { id: 'megaRift10', cat: 'mega', tier: 2, name: 'Conquistador de Grietas Mega', desc: 'Derrota a 10 jefes Mega en grietas.', value: s => Math.max(megaWins(s), megaStones(s)), goal: 10, reward: { t10: 1, coins: 800 }, title: 'Destructor Mega' },
     { id: 'megaLvl40', cat: 'mega', tier: 3, name: 'Vínculo Mega', desc: 'Llega al nivel 40 con un Pokémon Mega.', value: megaLvl, goal: 40, reward: { t10: 2, coins: 1500 }, title: 'Sinergia Pura' },
-    { id: 'megaAll', cat: 'mega', tier: 3, name: 'Poder Definitivo', desc: 'Consigue todas las Mega Piedras.', value: megaStones, goal: 48, reward: { t10: 5, coins: 5000 }, title: 'Leyenda Mega' },
+    { id: 'megaAll', cat: 'mega', tier: 3, name: 'Poder Definitivo', desc: 'Consigue todas las Mega Piedras.', value: megaStones, goal: 30, reward: { t10: 5, coins: 5000 }, title: 'Leyenda Mega' },
 
     // ---------- misiones y más ----------
     { id: 'mis10', cat: 'otros', tier: 1, name: 'Cumplidor', desc: 'Completa 10 misiones.', value: st('missionsDone'), goal: 10, reward: { t1: 3 } },
@@ -96,8 +96,8 @@ G.AchDefs = (() => {
   const totalLegends = LIST.filter(a => a.dex && a.cat === 'legendarios').length;
   for (const a of LIST) if (a.id === 'legAll') { a.goal = totalLegends; a.desc = `Vence a los ${totalLegends} legendarios.`; }
 
-  // Un logro por cada Mega Pokémon: "Vence a Mega Venusaur"...
-  const megaDexList = (G.Mega && G.Mega.ALL_MEGA_DEX) || [3, 6, 9, 15, 18, 65, 80, 94, 115, 127, 130, 142, 150, 181, 208, 212, 214, 229, 248, 254, 257, 260, 282, 302, 303, 306, 308, 310, 319, 323, 334, 354, 359, 362, 373, 376, 380, 381, 382, 383, 384, 428, 445, 448, 460, 475, 531, 719];
+  // Un logro por cada Mega Pokémon: "Vence a Mega Charizard X"...
+  const megaDexList = (G.Mega && G.Mega.ALL_MEGA_DEX) || [6, 65, 80, 94, 115, 142, 150, 208, 229, 248, 282, 302, 303, 308, 310, 319, 323, 334, 354, 359, 362, 380, 381, 382, 383, 384, 428, 448, 475, 719];
   for (const dex of megaDexList) {
     const p = G.DEX_BY && G.DEX_BY[dex];
     if (!p || (G.SPRITE_META && !G.SPRITE_META[dex])) continue;
@@ -106,7 +106,7 @@ G.AchDefs = (() => {
     LIST.push({
       id: 'mega_' + dex, cat: 'mega', tier: 2, dex, name: 'Vence a ' + bName,
       desc: 'Derrota a ' + bName + ' en una grieta.',
-      value: s => (s.megas && (s.megas[dex] || s.megas[dex + ':default'] || s.megas[dex + ':x']) ? 1 : 0),
+      value: s => (s.megas && (s.megas[dex] || s.megas[dex + ':default'] || s.megas[dex + ':x'] || s.megas[dex + ':y']) ? 1 : 0),
       goal: 1, reward: { t1: 1, coins: 100 }
     });
   }

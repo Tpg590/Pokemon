@@ -350,7 +350,7 @@ G.I18n.add({
   'Despertar Mega': 'Mega Awakening', 'Evoluciona a la forma Mega en una partida.': 'Mega Evolve in a run.', 'Despertado': 'Awakened',
   'Maestro Mega': 'Mega Master', 'Evoluciona a la forma Mega 10 veces.': 'Mega Evolve 10 times.',
   'Cazador de Mega Piedras': 'Mega Stone Hunter', 'Consigue 5 Mega Piedras distintas.': 'Obtain 5 different Mega Stones.',
-  'Coleccionista Mega': 'Mega Collector', 'Consigue 20 Mega Piedras distintas.': 'Obtain 20 different Mega Stones.',
+  'Coleccionista Mega': 'Mega Collector', 'Consigue 15 Mega Piedras distintas.': 'Obtain 15 different Mega Stones.',
   'Conquistador de Grietas Mega': 'Mega Rift Conqueror', 'Derrota a 10 jefes Mega en grietas.': 'Defeat 10 Mega bosses in rifts.', 'Destructor Mega': 'Mega Slayer',
   'Vínculo Mega': 'Mega Synergy', 'Llega al nivel 40 con un Pokémon Mega.': 'Reach level 40 with a Mega Pokémon.', 'Sinergia Pura': 'Pure Synergy',
   'Poder Definitivo': 'Ultimate Power', 'Consigue todas las Mega Piedras.': 'Obtain all Mega Stones.', 'Consigue las {x} Mega Piedras.': 'Obtain all {x} Mega Stones.', 'Leyenda Mega': 'Mega Legend',

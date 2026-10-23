@@ -10,7 +10,7 @@ G.I18n.add({
   "Cazador de Mega Piedras": "Thợ săn Đá Mega",
   "Consigue 5 Mega Piedras distintas.": "Thu thập 5 Đá Mega khác nhau.",
   "Coleccionista Mega": "Nhà sưu tập Mega",
-  "Consigue 20 Mega Piedras distintas.": "Thu thập 20 Đá Mega khác nhau.",
+  "Consigue 15 Mega Piedras distintas.": "Thu thập 15 Đá Mega khác nhau.",
   "Conquistador de Grietas Mega": "Chinh phục Vết nứt Mega",
   "Derrota a 10 jefes Mega en grietas.": "Đánh bại 10 Boss Mega trong Vết nứt.",
   "Destructor Mega": "Kẻ diệt Mega",

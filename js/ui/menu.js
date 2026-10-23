@@ -403,9 +403,8 @@ G.MenuUI = (() => {
             o derrotándolo cuando salga shiny.</p>`}
     `;
     for (const [el, t] of scrolls) el.scrollTop = t;
-    $('dex-big').style.setProperty('--stage-c', !own ? '#5b83d6' : viewShiny ? '#9ae6ff' : G.U.TYPE_COLOR[dispTypes[0]]);
-    $('dex-big').classList.toggle('shiny', own && viewShiny);
-    G.UI.sprite($('dex-big'), dex, { lively: own, spin: own, silhouette: !own, scale: 3, hero: true, shiny: own && viewShiny });
+    const activeSprId = (activeMega && G.SPRITE_META && G.SPRITE_META['m' + dex]) ? ('m' + dex) : dex;
+    G.UI.sprite($('dex-big'), activeSprId, { lively: own, spin: own, silhouette: !own, scale: 3, hero: true, shiny: own && viewShiny });
     box.querySelectorAll('.seg button').forEach(b => {
       b.onclick = () => { viewShiny = b.dataset.v === '1'; showDetail(dex); };
     });

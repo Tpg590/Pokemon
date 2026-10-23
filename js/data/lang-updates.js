@@ -444,7 +444,7 @@
     ["Cazador de Mega Piedras", "Chasseur de Méga-Gemmes", "Cacciatore di Megapietre", "Caçador de Megapedras", "超级石猎人", "超級石獵人"],
     ["Consigue 5 Mega Piedras distintas.", "Obtiens 5 Méga-Gemmes différentes.", "Ottieni 5 Megapietre diverse.", "Obtenha 5 Megapedras diferentes.", "获得 5 颗不同的超级石。", "獲得 5 顆不同的超級石。"],
     ["Coleccionista Mega", "Collectionneur Méga", "Collezionista Mega", "Colecionador Mega", "超级收藏家", "超級收藏家"],
-    ["Consigue 20 Mega Piedras distintas.", "Obtiens 20 Méga-Gemmes différentes.", "Ottieni 20 Megapietre diverse.", "Obtenha 20 Megapedras diferentes.", "获得 20 颗不同的超级石。", "獲得 20 顆不同的超級石。"],
+    ["Consigue 15 Mega Piedras distintas.", "Obtiens 15 Méga-Gemmes différentes.", "Ottieni 15 Megapietre diverse.", "Obtenha 15 Megapedras diferentes.", "获得 15 颗不同的超级石。", "獲得 15 顆不同的超級石。"],
     ["Conquistador de Grietas Mega", "Conquérant des Failles Méga", "Conquistatore di Faglie Mega", "Conquistador de Fendas Mega", "超级裂隙征服者", "超級裂隙征服者"],
     ["Derrota a 10 jefes Mega en grietas.", "Bats 10 boss Méga dans les failles.", "Sconfiggi 10 boss Mega nelle faglie.", "Derrote 10 chefes Mega em fendas.", "在裂隙中击败 10 位超级首领。", "在裂隙中擊敗 10 位超級首領。"],
     ["Destructor Mega", "Destructeur Méga", "Distruttore Mega", "Destruidor Mega", "超级毁灭者", "超級毀滅者"],

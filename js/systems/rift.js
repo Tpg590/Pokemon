@@ -176,10 +176,12 @@ G.Rift = (() => {
       shotDmg: Math.round((18 + t / 40) * dmgMul), shotCd: isMega ? 0.75 : 0.9, range: isMega ? 340 : 300
     };
     const e = new G.Enemy(def, arena.x, arena.y - ts * 3.5, { hp: 1, spd: 1, dmg: 1 }, true);
-    e.legend = true;
+    e.legend = !isMega;
     e.isMega = isMega;
     e.flying = false;
-    if (isMega) e.scale = (e.scale || 1) * 1.2;
+    if (isMega && G.SPRITE_META && G.SPRITE_META['m' + mon.dex]) {
+      e.anim = new G.Sprites.Animator('m' + mon.dex, e.scale, !!arena.shiny);
+    }
     if (arena.shiny) e.makeShiny();
     G.EnemyMgr.add(e);
     arena.bossId = e.id;

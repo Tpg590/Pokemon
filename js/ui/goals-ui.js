@@ -146,7 +146,8 @@
           const stoneName = G.Mega ? G.Mega.getStoneName(a.dex) : '';
           c.title = mName + (ok ? ' · ' + (stoneName || '¡conseguido!') : '');
           c.insertAdjacentHTML('beforeend', `<span class="mega-badge-corner" title="${esc(stoneName || 'Mega')}">${G.Icons.html('mega', 14)}</span>`);
-          c.appendChild(G.UI.spriteCanvas(a.dex, 64, 56, { scale: 1, silhouette: !ok, shadow: ok }));
+          const sprId = (G.SPRITE_META && G.SPRITE_META['m' + a.dex]) ? ('m' + a.dex) : a.dex;
+          c.appendChild(G.UI.spriteCanvas(sprId, 64, 56, { scale: 1, silhouette: !ok, shadow: ok }));
           c.insertAdjacentHTML('beforeend', `<small>${ok ? esc(mName) : '???'}</small>`);
           lg.appendChild(c);
         }
