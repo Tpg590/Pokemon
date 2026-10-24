@@ -307,7 +307,7 @@ G.I18n.add({
   'Pokémon': 'Pokémon',
 
   // ---------------- misiones, logros y perfil ----------------
-  'Logros': 'Achievements', 'Perfil': 'Profile', 'Diarias': 'Daily', 'Semanales': 'Weekly', 'Se renuevan en {x}': 'Refreshes in {x}',
+  'Logros': 'Achievements', 'Perfil': 'Profile', 'Diarias': 'Daily', 'Cada 6 horas': 'Every 6 Hours', 'Semanales': 'Weekly', 'Se renuevan en {x}': 'Refreshes in {x}',
   'Recoger': 'Claim', 'Recogido': 'Claimed', 'En curso': 'In progress', 'Cambiar': 'Swap', 'Cambia esta misión por otra (una vez al día)': 'Swap this mission for another (once a day)',
   '¡Premio recogido!': 'Reward claimed!', 'Misión completada: {x}': 'Mission complete: {x}', 'Recoge el premio en Misiones': 'Claim your reward in Missions',
   '¡Logro: {x}!': 'Achievement: {x}!', 'Nuevo título: {x}': 'New title: {x}', '¡Conseguido!': 'Unlocked!',
@@ -324,7 +324,7 @@ G.I18n.add({
   'Aguanta {x} minutos con un Pokémon de tipo {x}': 'Survive {x} minutes with a {x}-type Pokémon', 'Llega al nivel {x} en una run': 'Reach level {x} in a run',
   'Recoge {x} monedas en tus runs': 'Collect {x} coins in your runs', 'Abre un cofre con candado': 'Open a locked chest', 'Abre {x} cofres con candado': 'Open {x} locked chests',
   'Gana una pelea en una grieta': 'Win a rift battle', 'Gana {x} peleas en grietas': 'Win {x} rift battles', 'Evoluciona un movimiento': 'Evolve a move',
-  'Evoluciona {x} movimientos': 'Evolve {x} moves', 'Encuentra un objeto equipable': 'Find a held item', 'Completa {x} misiones diarias': 'Complete {x} daily missions',
+  'Evoluciona {x} movimientos': 'Evolve {x} moves', 'Encuentra un objeto equipable': 'Find a held item', 'Encuentra {x} objetos equipables': 'Find {x} held items', 'Completa {x} misiones diarias': 'Complete {x} daily missions',
   // logros
   'Colección': 'Collection', 'Supervivencia': 'Survival', 'Combate': 'Combat', 'Grietas': 'Rifts', 'Misiones y más': 'Missions & more',
   'Primer compañero': 'First partner', 'Pequeño equipo': 'Small team', 'Coleccionista': 'Collector', 'Enciclopedia': 'Encyclopedia',

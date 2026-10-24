@@ -833,6 +833,8 @@
     ["⚡ Pasiva en Partida", "⚡ In-run Passive", "⚡ In-run Passive", "⚡ In-run Passive", "⚡ In-run Passive", "⚡ In-run Passive"],
     ["⭐ Efecto", "⭐ Custom Effect", "⭐ Custom Effect", "⭐ Custom Effect", "⭐ Custom Effect", "⭐ Custom Effect"],
     ["⭐ Efecto Único de Combate", "⭐ Unique Combat Effect", "⭐ Unique Combat Effect", "⭐ Unique Combat Effect", "⭐ Unique Combat Effect", "⭐ Unique Combat Effect"],
+    ["Cada 6 horas", "Toutes les 6 heures", "Ogni 6 ore", "A cada 6 horas", "每 6 小时", "每 6 小時"],
+    ["Encuentra {x} objetos equipables", "Trouve {x} objets tenus", "Trova {x} strumenti tenuti", "Encontre {x} itens segurados", "找到 {x} 个携带道具", "找到 {x} 個攜帶道具"],
     ["🌿 Pasiva de Tipo", "🌿 Type Passive (+8%)", "🌿 Type Passive (+8%)", "🌿 Type Passive (+8%)", "🌿 Type Passive (+8%)", "🌿 Type Passive (+8%)"],
     ["🌿 Tipo (+8%)", "🌿 Type (+8%)", "🌿 Type (+8%)", "🌿 Type (+8%)", "🌿 Type (+8%)", "🌿 Type (+8%)"],
     ["📦 Equipable", "📦 Held", "📦 Held", "📦 Held", "📦 Held", "📦 Held"],

@@ -67,7 +67,7 @@
           el.className = 'mission' + (m.claimed ? ' claimed' : done ? ' ready' : '');
           const pct = Math.min(100, m.prog / m.goal * 100);
           el.innerHTML = `
-            <div class="m-txt"><b>${esc(G.Progress.text(m))}</b>
+            <div class="m-txt"><b>${esc(G.T(G.Progress.text(m)))}</b>
               <div class="bar"><i style="width:${pct}%"></i></div>
               <small>${Math.min(m.prog, m.goal).toLocaleString(G.I18n.locale)} / ${m.goal.toLocaleString(G.I18n.locale)}</small></div>
             <div class="m-rw">${G.Progress.rewardText(d.reward)}</div>`;

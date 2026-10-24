@@ -53,18 +53,18 @@ G.Progress = (() => {
     const key = String(s.created || 0);
     s.missions = s.missions || {};
     const M = s.missions;
-    if (M.day !== ids.d || !M.daily || M.daily.length < 5) {
+    if (M.day !== ids.d || !M.daily || M.daily.length < 5 || (M.daily[0] && !M.daily[0].id.startsWith('d_'))) {
       M.day = ids.d; M.rerolled = false;
       M.daily = pickSet(G.MissionDefs.daily, 5, rng(ids.d + key));
     }
     const now = new Date();
     const h6 = Math.floor(now.getHours() / 6);
     const h6Id = ids.d + '-6h-' + h6;
-    if (M.h6 !== h6Id || !M.periodic6h || M.periodic6h.length < 5) {
+    if (M.h6 !== h6Id || !M.periodic6h || M.periodic6h.length < 5 || (M.periodic6h[0] && !M.periodic6h[0].id.startsWith('h6_'))) {
       M.h6 = h6Id;
-      M.periodic6h = pickSet(G.MissionDefs.daily, 5, rng(h6Id + key));
+      M.periodic6h = pickSet(G.MissionDefs.periodic6h, 5, rng(h6Id + key));
     }
-    if (M.week !== ids.w || !M.weekly || M.weekly.length < 5) {
+    if (M.week !== ids.w || !M.weekly || M.weekly.length < 5 || (M.weekly[0] && G.MissionDefs.BY[M.weekly[0].id] && G.MissionDefs.BY[M.weekly[0].id].reward.t10 < 3)) {
       M.week = ids.w;
       M.weekly = pickSet(G.MissionDefs.weekly, 5, rng(ids.w + key));
     }
