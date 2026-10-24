@@ -459,8 +459,16 @@ G.MenuUI = (() => {
       const trDesc = G.T(m.desc || '');
       const cat = m.stat === 'patk' || m.stat === 'satk' || m.kind === 'buff' ? G.T('🛡️ Buff')
         : (G.Moves.isSpecial && G.Moves.isSpecial(m.id) ? G.T('🔮 Ataque Especial') : G.T('⚔️ Ataque Físico'));
+      const rCol = m.rarity === 'epic' ? '#c084fc' : m.rarity === 'rare' ? '#60a5fa' : '#4ade80';
+      const rName = G.T(m.rarity || 'uncommon');
+      const rTag = `<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:${rCol}22;color:${rCol};border:1px solid ${rCol}55;text-transform:capitalize">${rName}</span>`;
       const stats = [];
-      if (m.dmg) stats.push(`💥 ${G.T('Daño:')} <b class="gold">${m.dmg}</b>`);
+      if (m.power !== undefined) stats.push(`⚡ ${G.T('Poder:')} <b class="gold">${m.power}</b>`);
+      if (m.dmg) {
+        const scaleStat = m.stat === 'patk' || m.stat === 'satk' || m.kind === 'buff' ? ''
+          : (G.Moves.isSpecial && G.Moves.isSpecial(m.id) ? ` (${G.T('Escala con At. Esp.')})` : ` (${G.T('Escala con Ataque')})`);
+        stats.push(`💥 ${G.T('Daño:')} <b class="gold">${m.dmg}</b><small style="opacity:0.85">${scaleStat}</small>`);
+      }
       if (m.cd) stats.push(`⏱️ ${G.T('Recarga:')} <b class="gold">${m.cd}s</b>`);
       if (m.count && m.count > 1) stats.push(`🎯 ${G.T('Cantidad:')} <b class="gold">${m.count}</b>`);
       prevBox.innerHTML = `
@@ -469,6 +477,7 @@ G.MenuUI = (() => {
             ${G.Icons.html('move:' + m.id, 18)}
             <b style="color:#fff;font-size:14px">${esc(trName)}</b>
             ${G.UI.typeChips([m.type])}
+            ${rTag}
           </div>
           <span style="font-size:11px;color:var(--muted)">${cat}</span>
         </div>

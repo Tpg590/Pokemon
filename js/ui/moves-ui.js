@@ -319,14 +319,23 @@ G.MovesUI = (() => {
       const isEvo = !!(G.Moves.EVO && G.Moves.EVO[m.id]);
       const cat = m.stat === 'patk' || m.stat === 'satk' || m.kind === 'buff' ? G.T('🛡️ Buff')
         : (G.Moves.isSpecial && G.Moves.isSpecial(m.id) ? G.T('🔮 Esp.') : G.T('⚔️ Fís.'));
+      const rCol = m.rarity === 'epic' ? '#c084fc' : m.rarity === 'rare' ? '#60a5fa' : '#4ade80';
+      const rName = G.T(m.rarity || 'uncommon');
+      const rTag = `<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:${rCol}22;color:${rCol};border:1px solid ${rCol}55;text-transform:capitalize">${rName}</span>`;
+      const pwrTag = m.power ? `<span style="font-size:11px;color:#fde047;font-weight:bold">${m.power} PWR</span>` : '';
 
       item.innerHTML = `
         <div class="row" style="gap:6px;align-items:center">
           ${G.UI.typeChips([m.type])}
           <b class="m-name">${esc(trName)}</b>
+          <span class="grow"></span>
+          ${pwrTag}
         </div>
-        <div class="row between" style="font-size:12px;color:var(--muted);margin-top:4px">
-          <span>${cat}</span>
+        <div class="row between" style="font-size:12px;color:var(--muted);margin-top:4px;align-items:center">
+          <div class="row" style="gap:6px;align-items:center">
+            <span>${cat}</span>
+            ${rTag}
+          </div>
           ${isEvo ? `<span class="evo-badge">${G.T('⚡ Evoluciona')}</span>` : ''}
         </div>
       `;
@@ -356,9 +365,20 @@ G.MovesUI = (() => {
     const ladder = LADDERS[m.kind] || [];
     const evoText = EVO_TEXTS[m.kind] || '';
 
+    const rCol = m.rarity === 'epic' ? '#c084fc' : m.rarity === 'rare' ? '#60a5fa' : '#4ade80';
+    const rName = G.T(m.rarity || 'uncommon');
+    const rarityBadge = `<span class="m-kind-badge" style="background:${rCol}22;color:${rCol};border-color:${rCol}66;font-weight:bold;text-transform:capitalize">⭐ ${rName}</span>`;
+
     // Stats line
     const statsHtml = [];
-    if (m.dmg) statsHtml.push(`<span>💥 ${G.T('Daño base:')} <b class="gold">${m.dmg}</b></span>`);
+    if (m.power !== undefined) {
+      statsHtml.push(`<span>⚡ ${G.T('Poder:')} <b class="gold">${m.power}</b></span>`);
+    }
+    if (m.dmg) {
+      const scaleStat = m.stat === 'patk' || m.stat === 'satk' || m.kind === 'buff' ? ''
+        : (G.Moves.isSpecial && G.Moves.isSpecial(m.id) ? ` (${G.T('Escala con At. Esp.')})` : ` (${G.T('Escala con Ataque')})`);
+      statsHtml.push(`<span>💥 ${G.T('Daño base:')} <b class="gold">${m.dmg}</b><small style="opacity:0.85">${scaleStat}</small></span>`);
+    }
     if (m.cd) statsHtml.push(`<span>⏱️ ${G.T('Recarga:')} <b class="gold">${m.cd}s</b></span>`);
     if (m.count && m.count > 1) statsHtml.push(`<span>🎯 ${G.T('Cantidad:')} <b class="gold">${m.count}</b></span>`);
     if (m.burn) statsHtml.push(`<span style="color:#ff7675">🔥 ${G.T('Quema')}</span>`);
@@ -417,6 +437,7 @@ G.MovesUI = (() => {
           <div class="row" style="gap:8px;align-items:center">
             ${G.UI.typeChips([m.type])}
             <h3 class="m-title" style="margin:0">${esc(trName)}</h3>
+            ${rarityBadge}
           </div>
           <span class="m-kind-badge">${esc(catBadge)}</span>
         </div>
@@ -482,6 +503,11 @@ G.MovesUI = (() => {
       if (!m) continue;
       const count = (G.TM_MOVES[id] || []).length;
       const trName = G.T(m.name || id, 'move');
+      const rCol = m.rarity === 'epic' ? '#c084fc' : m.rarity === 'rare' ? '#60a5fa' : '#4ade80';
+      const rName = G.T(m.rarity || 'uncommon');
+      const rTag = `<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:${rCol}22;color:${rCol};border:1px solid ${rCol}55;text-transform:capitalize">${rName}</span>`;
+      const pwrTag = m.power ? `<span style="font-size:11px;color:#fde047;font-weight:bold">${m.power} PWR</span>` : '';
+
       const item = document.createElement('div');
       item.className = 'move-row-item' + (id === selTMId ? ' on' : '');
       item.innerHTML = `
@@ -489,10 +515,12 @@ G.MovesUI = (() => {
           ${G.Icons.html('tm', 18)}
           <b class="m-name">${esc(trName)}</b>
           <span class="grow"></span>
+          ${pwrTag}
           ${G.UI.typeChips([m.type])}
         </div>
-        <div class="row between" style="font-size:12px;color:var(--muted);margin-top:4px">
+        <div class="row between" style="font-size:12px;color:var(--muted);margin-top:4px;align-items:center">
           <span>👥 ${G.I18n.f('Lo aprenden: {x} especies', count)}</span>
+          ${rTag}
         </div>
       `;
       item.onclick = () => {
@@ -522,11 +550,26 @@ G.MovesUI = (() => {
     const ownedMap = s.owned || {};
     const ownedCount = pokes.filter(dex => !!ownedMap[dex]).length;
 
+    const rCol = m.rarity === 'epic' ? '#c084fc' : m.rarity === 'rare' ? '#60a5fa' : '#4ade80';
+    const rName = G.T(m.rarity || 'uncommon');
+    const rarityBadge = `<span class="m-kind-badge" style="background:${rCol}22;color:${rCol};border-color:${rCol}66;font-weight:bold;text-transform:capitalize">⭐ ${rName}</span>`;
+
     // Stats line
     const statsHtml = [];
-    if (m.dmg) statsHtml.push(`<span>💥 ${G.T('Daño base:')} <b class="gold">${m.dmg}</b></span>`);
+    if (m.power !== undefined) {
+      statsHtml.push(`<span>⚡ ${G.T('Poder:')} <b class="gold">${m.power}</b></span>`);
+    }
+    if (m.dmg) {
+      const scaleStat = m.stat === 'patk' || m.stat === 'satk' || m.kind === 'buff' ? ''
+        : (G.Moves.isSpecial && G.Moves.isSpecial(m.id) ? ` (${G.T('Escala con At. Esp.')})` : ` (${G.T('Escala con Ataque')})`);
+      statsHtml.push(`<span>💥 ${G.T('Daño base:')} <b class="gold">${m.dmg}</b><small style="opacity:0.85">${scaleStat}</small></span>`);
+    }
     if (m.cd) statsHtml.push(`<span>⏱️ ${G.T('Recarga:')} <b class="gold">${m.cd}s</b></span>`);
     if (m.count && m.count > 1) statsHtml.push(`<span>🎯 ${G.T('Cantidad:')} <b class="gold">${m.count}</b></span>`);
+
+    const tmUnlockNote = `<div style="font-size:12px;color:#67e8f9;background:rgba(103,232,249,0.1);border:1px solid rgba(103,232,249,0.25);padding:6px 10px;border-radius:6px;margin:6px 0 10px">
+      💡 ${G.T('Aprender esta MT desbloquea este movimiento para ser elegido como Ataque Inicial en Mejoras.')}
+    </div>`;
 
     box.innerHTML = `
       <div class="tm-detail-card">
@@ -535,11 +578,13 @@ G.MovesUI = (() => {
             ${G.Icons.html('tm', 26)}
             <h3 class="m-title" style="margin:0">${esc(trName)}</h3>
             ${G.UI.typeChips([m.type])}
+            ${rarityBadge}
           </div>
           <span class="m-count-badge">${G.I18n.f('{x} Pokémon en total', pokes.length)} (${G.I18n.f('{x} conseguidos', ownedCount)})</span>
         </div>
         <p class="m-desc">${esc(trDesc)}</p>
-        ${statsHtml.length ? `<div class="m-stats-row" style="margin-bottom:12px">${statsHtml.join(' · ')}</div>` : ''}
+        ${statsHtml.length ? `<div class="m-stats-row">${statsHtml.join(' · ')}</div>` : ''}
+        ${tmUnlockNote}
 
         <h4 class="sec-title" style="margin:12px 0 8px">📋 ${G.T('Pokémon que pueden aprender este movimiento por MT:')}</h4>
         <div class="tm-poke-grid" id="tm-poke-grid"></div>

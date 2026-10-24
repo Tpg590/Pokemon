@@ -2983,5 +2983,16 @@ G.I18n.add({
   "Has sido expulsado de la sala": "Bạn đã bị chủ phòng mời ra khỏi phòng",
   "Has sido expulsado de esta sala.": "Bạn đã bị đuổi khỏi phòng này.",
   "Izquierda: mover · Derecha: apuntar · Toca un ataque para cambiarlo": "Trái: di chuyển · Phải: hướng đánh · Chạm chiêu để đổi",
-  "Elige el Pokémon que quieres usar en esta partida cooperativa.": "Chọn Pokémon bạn muốn dùng cho trận đấu tổ đội này."
+  "Elige el Pokémon que quieres usar en esta partida cooperativa.": "Chọn Pokémon bạn muốn dùng cho trận đấu tổ đội này.",
+  "Poder:": "Sức mạnh (Power):",
+  "Escala con Ataque": "Scale theo Tấn công (Atk)",
+  "Escala con At. Esp.": "Scale theo Công đặc biệt (Sp.Atk)",
+  "Poco común": "Uncommon",
+  "Raro": "Rare",
+  "Épico": "Epic",
+  "uncommon": "Uncommon",
+  "rare": "Rare",
+  "epic": "Epic",
+  "Aprender esta MT desbloquea este movimiento para ser elegido como Ataque Inicial en Mejoras.": "Học Đĩa TM này sẽ mở khóa chiêu thức trong mục Nâng cấp khởi đầu cho Pokémon tương ứng.",
+  "Solo ataques Poco comunes (Uncommon). Los Raros (Rare) y Épicos (Epic) requieren MTs aprendidas.": "Chỉ kỹ năng Uncommon có sẵn từ đầu. Kỹ năng Rare & Epic cần học qua Đĩa kỹ năng (TM) để mở khóa."
 }, "vi");

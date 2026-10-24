@@ -1047,5 +1047,16 @@ G.I18n.add({
   "Has sido expulsado de la sala": "You have been kicked from the room",
   "Has sido expulsado de esta sala.": "You have been kicked from this room.",
   "Izquierda: mover · Derecha: apuntar · Toca un ataque para cambiarlo": "Left: move · Right: aim · Tap a move to switch",
-  "Elige el Pokémon que quieres usar en esta partida cooperativa.": "Choose the Pokémon you want to use in this party."
+  "Elige el Pokémon que quieres usar en esta partida cooperativa.": "Choose the Pokémon you want to use in this party.",
+  "Poder:": "Power:",
+  "Escala con Ataque": "Scales with Attack",
+  "Escala con At. Esp.": "Scales with Sp. Atk",
+  "Poco común": "Uncommon",
+  "Raro": "Rare",
+  "Épico": "Epic",
+  "uncommon": "Uncommon",
+  "rare": "Rare",
+  "epic": "Epic",
+  "Aprender esta MT desbloquea este movimiento para ser elegido como Ataque Inicial en Mejoras.": "Learning this TM unlocks this move to be chosen as a Starter Move in Upgrades.",
+  "Solo ataques Poco comunes (Uncommon). Los Raros (Rare) y Épicos (Epic) requieren MTs aprendidas.": "Only Uncommon moves initially. Rare & Epic moves require learned TMs."
 });
