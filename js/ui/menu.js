@@ -318,13 +318,15 @@ G.MenuUI = (() => {
     const megaForms = isMega ? G.Mega.getForms(dex) : [];
     const activeMega = isMega && viewMega ? G.Mega.getFormInfo(dex, viewMega) : null;
     const isVi = G.I18n && G.I18n.lang === 'vi';
+    const isArceus = dex === 493;
+    const curArceusType = isArceus ? ((s.arceusType) || 'normal') : null;
     const stoneName = isMega ? G.Mega.getStoneName(dex, viewMega || (megaForms[0] && megaForms[0].form)) : '';
 
     const max = { hp: 255, atk: 190, spd: 200, def: 250 };
     // Con su naturaleza (20-10-2026): el stat que sube, en verde; el que baja, en rojo.
     const nat = own ? G.Mons.natureOf(dex) : null;
     let q = own ? G.Mons.monFor(dex) : p;
-    let dispTypes = p.types;
+    let dispTypes = isArceus && own ? [curArceusType] : p.types;
     let dispName = own ? p.name : '???';
 
     if (activeMega) {
@@ -357,6 +359,19 @@ G.MenuUI = (() => {
         `).join('')}
       </div>` : '';
 
+    const arceusPlatesHtml = (isArceus && own) ? `
+      <div class="arceus-plates-box" style="margin:10px 0;padding:8px 10px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:8px">
+        <div style="font-size:12px;font-weight:bold;color:#fde047;margin-bottom:6px">⚜️ ${isVi ? 'Bảng Đá Nguyên Thủy (Đổi Hệ Arceus):' : 'Plates of Creation (Switch Arceus Type):'}</div>
+        <div class="arceus-plates-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px">
+          ${Object.keys(G.U.TYPE_NAME).map(t => `
+            <button type="button" class="arceus-plate-btn chip ${t === curArceusType ? 'on' : ''}" data-type="${t}" style="padding:3px 2px;font-size:10px;display:flex;align-items:center;justify-content:center;border-color:${t === curArceusType ? '#ffd23f' : G.U.TYPE_COLOR[t]};background:${t === curArceusType ? G.U.TYPE_COLOR[t] + '55' : 'rgba(0,0,0,0.3)'}">
+              <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${G.U.TYPE_COLOR[t]};margin-right:2px;flex-shrink:0"></span>${G.U.TYPE_NAME[t]}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    ` : '';
+
     const hasStone = activeMega ? G.Mega.hasStone(dex, activeMega.form) : false;
     const equippedForm = isMega ? G.Mega.getEquippedForm(dex) : null;
     const isEquipped = activeMega ? equippedForm === (activeMega.form || 'default') : false;
@@ -382,6 +397,7 @@ G.MenuUI = (() => {
         ${megaLine}
         <div style="margin:6px 0">${own ? G.UI.typeChips(dispTypes) : ''}</div>
         ${megaTabs}
+        ${arceusPlatesHtml}
       </div>
       ${own ? `
         ${bar('Vida', q.hp, max.hp, Math.round(q.hp))}
@@ -418,6 +434,17 @@ G.MenuUI = (() => {
         const m = b.dataset.mega;
         viewMega = (m === 'base') ? null : m;
         showDetail(dex);
+      };
+    });
+    box.querySelectorAll('.arceus-plate-btn').forEach(b => {
+      b.onclick = () => {
+        const t = b.dataset.type;
+        s.arceusType = t;
+        if (s.pstart && s.pstart[493]) delete s.pstart[493];
+        if (s.pstart2 && s.pstart2[493]) delete s.pstart2[493];
+        G.DB.commit(true);
+        G.Audio.sfx('confirm');
+        showDetail(493);
       };
     });
     const eqBtn = $('mega-equip-btn');
@@ -599,21 +626,21 @@ G.MenuUI = (() => {
       // Mejoras que necesitan otra (Segundo movimiento inicial → Repertorio).
       const locked = !maxed && u.needs && !levels[u.needs];
       const pick2 = u.id === 'start2' && lvl > 0 ? G.startMove2Of(upgDex) : null;
-      const el = document.createElement('div');
       el.className = 'panel upg-item';
       el.innerHTML = `
         <div class="ic">${G.Icons.html(u.icon, 32)}</div>
-        <div>
-          <b>${u.name}</b> <span style="color:var(--muted);font-size:13px">${u.unit}</span>
+        <div class="upg-info">
+          <b>${G.T(u.name)}</b>
+          <div class="upg-desc">${G.T(u.unit)}</div>
           <div class="pips">${Array.from({ length: u.max }, (_, i) => `<i class="${i < lvl ? 'on' : ''}"></i>`).join('')}</div>
         </div>
         <div class="upg-btns">
-          ${u.id === 'ban' && lvl > 0 ? `<button class="btn small" data-ban>Elegir (${banList().length}/${lvl})</button>` : ''}
-          ${u.id === 'start' && lvl > 0 ? `<button class="btn small" data-start>Elegir: ${G.Moves.BY_ID[G.startMoveOf(upgDex)].name}</button>` : ''}
-          ${u.id === 'start2' && lvl > 0 ? `<button class="btn small" data-start2>Elegir: ${pick2 ? G.Moves.BY_ID[pick2].name : G.T('Al azar')}</button>` : ''}
+          ${u.id === 'ban' && lvl > 0 ? `<button class="btn small" data-ban>${G.I18n.f('Elegir ({x}/{y})', banList().length, lvl)}</button>` : ''}
+          ${u.id === 'start' && lvl > 0 ? `<button class="btn small" data-start>${G.T('Elegir')}: ${G.Moves.BY_ID[G.startMoveOf(upgDex)] ? G.T(G.Moves.BY_ID[G.startMoveOf(upgDex)].name, 'move') : '---'}</button>` : ''}
+          ${u.id === 'start2' && lvl > 0 ? `<button class="btn small" data-start2>${G.T('Elegir')}: ${pick2 && G.Moves.BY_ID[pick2] ? G.T(G.Moves.BY_ID[pick2].name, 'move') : G.T('Al azar')}</button>` : ''}
           <button class="btn small ${maxed ? '' : 'gold'}" data-buy data-sfx="none" ${maxed || locked || s.coins < cost ? 'disabled' : ''}
             ${locked ? `title="${G.T('Primero compra Repertorio')}"` : ''}>
-          ${maxed ? 'Máx.' : locked ? G.T('Necesita Repertorio') : `<span class="coin"></span> ${cost}`}</button></div>`;
+          ${maxed ? G.T('Máx.') : locked ? G.T('Necesita Repertorio') : `<span class="coin"></span> ${cost}`}</button></div>`;
       if (u.id === 'ban' && lvl > 0) el.querySelector('[data-ban]').onclick = () => { banOpen = !banOpen; renderUpgrades(); };
       if (u.id === 'start' && lvl > 0) el.querySelector('[data-start]').onclick = () => { startOpen = !startOpen; renderUpgrades(); };
       if (u.id === 'start2' && lvl > 0) el.querySelector('[data-start2]').onclick = () => { start2Open = !start2Open; renderUpgrades(); };

@@ -42,10 +42,14 @@
 
     function untilText(kind) {
       const now = new Date();
-      // Medianoche (diarias) o lunes (semanales), hora de España aproximada por la del navegador.
       const end = new Date(now);
-      end.setHours(24, 0, 0, 0);
-      if (kind === 'w') { const add = (8 - (now.getDay() || 7)) % 7; end.setDate(end.getDate() + add); }
+      if (kind === '6h') {
+        const nextHour = (Math.floor(now.getHours() / 6) + 1) * 6;
+        end.setHours(nextHour, 0, 0, 0);
+      } else {
+        end.setHours(24, 0, 0, 0);
+        if (kind === 'w') { const add = (8 - (now.getDay() || 7)) % 7; end.setDate(end.getDate() + add); }
+      }
       const mins = Math.max(1, Math.round((end - now) / 60000));
       return mins >= 1440 ? Math.floor(mins / 1440) + ' d ' + Math.floor(mins % 1440 / 60) + ' h'
                           : Math.floor(mins / 60) + ' h ' + (mins % 60) + ' min';
@@ -53,10 +57,10 @@
 
     function missions(box) {
       const M = G.DB.save.missions;
-      const section = (title, list, weekly) => {
-        box.insertAdjacentHTML('beforeend', `<div class="row between goals-h"><h3>${title}</h3>
-          <span class="sub">Se renuevan en ${untilText(weekly ? 'w' : 'd')}</span></div>`);
-        list.forEach((m, i) => {
+      const section = (title, list, periodKind) => {
+        box.insertAdjacentHTML('beforeend', `<div class="row between goals-h"><h3>${G.T(title)}</h3>
+          <span class="sub">${G.I18n.f('Se renuevan en {x}', untilText(periodKind))}</span></div>`);
+        (list || []).forEach((m, i) => {
           const d = G.MissionDefs.BY[m.id];
           const done = G.Progress.done(m);
           const el = document.createElement('div');
@@ -68,21 +72,22 @@
               <small>${Math.min(m.prog, m.goal).toLocaleString(G.I18n.locale)} / ${m.goal.toLocaleString(G.I18n.locale)}</small></div>
             <div class="m-rw">${G.Progress.rewardText(d.reward)}</div>`;
           const btn = document.createElement('button');
-          if (m.claimed) { btn.className = 'btn small'; btn.disabled = true; btn.textContent = 'Recogido'; }
+          if (m.claimed) { btn.className = 'btn small'; btn.disabled = true; btn.textContent = G.T('Recogido'); }
           else if (done) {
-            btn.className = 'btn small gold'; btn.textContent = 'Recoger'; btn.dataset.sfx = 'none';
-            btn.onclick = () => { if (G.Progress.claim(m, weekly)) { G.Audio.sfx('buy'); G.UI.toast('¡Premio recogido!'); render(); } };
-          } else if (!weekly && !M.rerolled) {
-            btn.className = 'btn small ghost'; btn.textContent = 'Cambiar';
-            btn.title = 'Cambia esta misión por otra (una vez al día)';
+            btn.className = 'btn small gold'; btn.textContent = G.T('Recoger'); btn.dataset.sfx = 'none';
+            btn.onclick = () => { if (G.Progress.claim(m, periodKind === 'w' ? 'weekly' : periodKind === '6h' ? '6h' : 'daily')) { G.Audio.sfx('buy'); G.UI.toast(G.T('¡Premio recogido!')); render(); } };
+          } else if (periodKind === 'd' && !M.rerolled) {
+            btn.className = 'btn small ghost'; btn.textContent = G.T('Cambiar');
+            btn.title = G.T('Cambia esta misión por otra (una vez al día)');
             btn.onclick = () => { if (G.Progress.reroll(i)) render(); };
-          } else { btn.className = 'btn small ghost'; btn.disabled = true; btn.textContent = 'En curso'; }
+          } else { btn.className = 'btn small ghost'; btn.disabled = true; btn.textContent = G.T('En curso'); }
           el.appendChild(btn);
           box.appendChild(el);
         });
       };
-      section('Diarias', M.daily, false);
-      section('Semanales', M.weekly, true);
+      section('Diarias', M.daily, 'd');
+      section('Cada 6 horas', M.periodic6h, '6h');
+      section('Semanales', M.weekly, 'w');
     }
 
     // ---------------- logros ----------------

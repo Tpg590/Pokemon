@@ -41,6 +41,11 @@ for (const s of G.STARTERS) G.STARTER_BY[s.dex] = s;
 
 /** Movimiento inicial de serie de cualquier Pokémon (starter o del gacha). */
 G.baseStartOf = dex => {
+  if (dex === 493) {
+    const s = G.DB && G.DB.save;
+    const aType = (s && s.arceusType) || 'normal';
+    return G.Moves.startFor({ types: [aType] });
+  }
   const s = G.STARTER_BY[dex];
   return s ? s.start : G.Moves.startFor(G.DEX_BY[dex]);
 };
@@ -50,8 +55,9 @@ G.baseStartOf = dex => {
  * y siempre el de serie (aunque no sea de su tipo, como Confusión en Psyduck), para poder volver a él.
  */
 G.startChoices = dex => {
+  const mon = (dex === 493 && G.Mons && G.Mons.monFor) ? G.Mons.monFor(493) : G.DEX_BY[dex];
   const taught = (G.Mons && G.Mons.taught) ? G.Mons.taught(dex) : [];
-  const ids = G.Moves.poolFor(G.DEX_BY[dex]).filter(id => {
+  const ids = G.Moves.poolFor(mon).filter(id => {
     const d = G.Moves.BY_ID[id];
     if (!d || d.kind === 'buff') return false;
     // Chỉ hiển thị uncommon; rare và epic cần học qua TM mới có thể chọn

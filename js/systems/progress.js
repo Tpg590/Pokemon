@@ -46,20 +46,27 @@ G.Progress = (() => {
     return out;
   }
 
-  /** Crea las misiones del día / semana si han cambiado. */
+  /** Crea las misiones del día / 6 horas / semana si han cambiado. */
   function ensure(s) {
     if (!s) return;
     const ids = G.Ranking.periodIds();
     const key = String(s.created || 0);
     s.missions = s.missions || {};
     const M = s.missions;
-    if (M.day !== ids.d) {
+    if (M.day !== ids.d || !M.daily || M.daily.length < 5) {
       M.day = ids.d; M.rerolled = false;
-      M.daily = pickSet(G.MissionDefs.daily, 3, rng(ids.d + key));
+      M.daily = pickSet(G.MissionDefs.daily, 5, rng(ids.d + key));
     }
-    if (M.week !== ids.w) {
+    const now = new Date();
+    const h6 = Math.floor(now.getHours() / 6);
+    const h6Id = ids.d + '-6h-' + h6;
+    if (M.h6 !== h6Id || !M.periodic6h || M.periodic6h.length < 5) {
+      M.h6 = h6Id;
+      M.periodic6h = pickSet(G.MissionDefs.daily, 5, rng(h6Id + key));
+    }
+    if (M.week !== ids.w || !M.weekly || M.weekly.length < 5) {
       M.week = ids.w;
-      M.weekly = pickSet(G.MissionDefs.weekly, 2, rng(ids.w + key));
+      M.weekly = pickSet(G.MissionDefs.weekly, 5, rng(ids.w + key));
     }
   }
 
@@ -82,13 +89,13 @@ G.Progress = (() => {
   }
 
   /** Recoge el premio de una misión terminada. */
-  function claim(m, weekly = false) {
+  function claim(m, missionType = 'daily') {
     const s = G.DB.save;
     if (!s || m.claimed || !done(m)) return false;
     m.claimed = true;
     grant(G.MissionDefs.BY[m.id].reward);
     s.stats.missionsDone = (s.stats.missionsDone || 0) + 1;
-    event('missionDone', { daily: !weekly });
+    event('missionDone', { daily: missionType !== 'weekly' });
     G.DB.commit(true);
     return true;
   }
@@ -162,6 +169,7 @@ G.Progress = (() => {
         break;
     }
     advance(s.missions.daily, kind, d);
+    advance(s.missions.periodic6h, kind, d);
     advance(s.missions.weekly, kind, d);
     // Los logros se miran como mucho una vez por segundo (hay cientos de bajas).
     if (kind !== 'kill' || d.boss || d.legend) checkAch();
@@ -203,7 +211,7 @@ G.Progress = (() => {
     const s = G.DB.save;
     if (!s) return 0;
     ensure(s);
-    return [...s.missions.daily, ...s.missions.weekly].filter(m => done(m) && !m.claimed).length;
+    return [...(s.missions.daily || []), ...(s.missions.periodic6h || []), ...(s.missions.weekly || [])].filter(m => done(m) && !m.claimed).length;
   }
 
   // ---------------- avisos ----------------

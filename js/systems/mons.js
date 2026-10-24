@@ -69,6 +69,10 @@ G.Mons = (() => {
     if (n.down) m[n.down] = base[n.down] * 0.9;
     m.atk = Math.max(m.pa, m.sa);
     m.nature = n.id;
+    if (dex === 493) {
+      const s = save();
+      m.types = [(s && s.arceusType) || 'normal'];
+    }
     return m;
   }
 

@@ -819,7 +819,18 @@ G.MovesUI = (() => {
     box.innerHTML = '';
 
     const abilMap = G.ABIL || {};
-    const allIds = Object.keys(abilMap).sort((a, b) => {
+    const dexAbil = G.DEX_ABIL || {};
+    const pokeCounts = {};
+    for (let dex = 1; dex <= 966; dex++) {
+      const a = dexAbil[dex];
+      if (a) {
+        if (a[0]) pokeCounts[a[0]] = (pokeCounts[a[0]] || 0) + 1;
+        if (a[1]) pokeCounts[a[1]] = (pokeCounts[a[1]] || 0) + 1;
+        if (a[2]) pokeCounts[a[2]] = (pokeCounts[a[2]] || 0) + 1;
+      }
+    }
+
+    const allIds = Object.keys(abilMap).filter(id => (pokeCounts[id] || 0) > 0).sort((a, b) => {
       const na = G.Mons ? G.Mons.abilityName(a) : (abilMap[a][0] || a);
       const nb = G.Mons ? G.Mons.abilityName(b) : (abilMap[b][0] || b);
       return na.localeCompare(nb);
