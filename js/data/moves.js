@@ -647,6 +647,13 @@
    * con `natural`, los que ha aprendido con MT (Tienda Kecleon, ver G.Mons).
    */
   function poolFor(mon, natural) {
+    if (mon && mon.dex === 493) {
+      const s = G.DB && G.DB.save;
+      const aType = (mon.types && mon.types[0]) || (s && s.arceusType) || 'normal';
+      const ids = new Set(POOL[aType] || POOL.normal);
+      if (!natural && G.Mons && mon.dex) for (const id of G.Mons.taught(mon.dex)) ids.add(id);
+      return [...ids];
+    }
     const ids = new Set(POOL.normal);
     for (const t of mon.types) for (const id of (POOL[t] || [])) ids.add(id);
     if (!natural && G.Mons && mon.dex) for (const id of G.Mons.taught(mon.dex)) ids.add(id);

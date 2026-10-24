@@ -414,7 +414,7 @@ G.MenuUI = (() => {
         ${dispTypes.length === 1 ? `<p class="sub center" style="margin:2px 0 0">Monotipo: +20 % de daño con sus ataques de tipo ${G.U.TYPE_NAME[dispTypes[0]]}</p>` : ''}
         <p style="font-size:14px;margin:10px 0 4px">${G.T('Empieza con')} <b class="gold dex-start-move-btn" data-move-id="${(G.startMoveOf && G.startMoveOf(dex)) || ''}" style="cursor:pointer;text-decoration:underline" title="${G.T('Pulsa para ver detalles')}">${esc(G.startMoveOf && G.Moves.BY_ID[G.startMoveOf(dex)] ? G.T(G.Moves.BY_ID[G.startMoveOf(dex)].name, 'move') : '---')}</b></p>
         <p class="move-icons" title="${G.T('Movimientos que puede aprender')}">
-          ${(G.Moves && G.Moves.poolFor ? G.Moves.poolFor(p) : []).map(id => {
+          ${(G.Moves && G.Moves.poolFor ? G.Moves.poolFor(q) : []).map(id => {
             const m = G.Moves.BY_ID[id];
             if (!m) return '';
             return `<span class="dex-move-chip" data-move-id="${id}" style="cursor:pointer;display:inline-block;padding:2px" title="${esc(G.T(m.name, 'move'))}">${G.Icons.html('move:' + id, 18)}</span>`;
