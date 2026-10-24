@@ -49,9 +49,9 @@ G.Enemies = (() => {
     { at: 900, hp: 16000, dmg: 68, xp: 1800, bst: [600, 700] }
   ];
 
-  // Stats base aproximados a partir de los de juego (inverso de fetch_pokedex).
-  const baseHp = p => (p.hp - 70) / 0.45;
-  const baseSpd = p => (p.spd - 78) / 0.42;
+  // Stats base directamente de los datos del Pokémon (pokemondb).
+  const baseHp = p => p.hp;
+  const baseSpd = p => p.spd;
 
   const H = (d, s) => G.U.hash(d, 7, s);
 

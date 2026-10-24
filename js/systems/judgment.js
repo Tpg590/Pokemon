@@ -376,7 +376,7 @@ G.Judgment = (() => {
     const def = {
       dex, name: mon.name,
       hp: Math.round(base * k),
-      spd: Math.round(Math.max(G.U.clamp(48 + (mon.spd - 78) * 0.6, 48, 105), fast * 0.8)),
+      spd: Math.round(Math.max(G.U.clamp(48 + mon.spd * 0.252, 48, 105), fast * 0.8)),
       dmg: Math.round((36 + t / 20) * k), xp: Math.round(500 + t * 1.2),
       behavior: mon.types.some(x => ['psychic', 'electric', 'ghost', 'fairy', 'fire', 'water', 'ice', 'dragon'].includes(x)) ? 'ranged' : 'charger',
       shotDmg: Math.round((18 + t / 40) * k), shotCd: 0.9, range: 300

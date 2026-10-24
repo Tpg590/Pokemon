@@ -175,7 +175,7 @@ G.Rift = (() => {
     const def = {
       dex: mon.dex, name: bossName,
       hp: Math.round((3200 + t * 9) * G.Coop.scaleHp(n) * (n > 1 ? 1.4 : 1) * hpMul),
-      spd: Math.round(G.U.clamp(48 + (mon.spd - 78) * 0.6, 48, 105)),
+      spd: Math.round(G.U.clamp(48 + mon.spd * 0.252, 48, 105)),
       dmg: Math.round((36 + t / 20) * dmgMul), xp: Math.round((500 + t * 1.2) * (isMega ? 1.5 : 1)),
       behavior: types.some(x => ['psychic', 'electric', 'ghost', 'fairy', 'fire', 'water', 'ice', 'dragon'].includes(x)) ? 'ranged' : 'charger',
       shotDmg: Math.round((18 + t / 40) * dmgMul), shotCd: isMega ? 0.75 : 0.9, range: isMega ? 340 : 300

@@ -159,7 +159,7 @@ G.AbilityFX = (() => {
       tick: (pl, dt) => { pl.stanceT = (pl.stanceT || 0) + dt; if (pl.stanceT >= 8) { pl.stanceT = 0; pl.shieldForm = !pl.shieldForm; } },
       out: pl => (pl.shieldForm ? 1 : 1.2), inMul: pl => (pl.shieldForm ? 0.8 : 1) },
     'imposter': { d: 'Se transforma: pega y aguanta como un Pokémon equilibrado.',
-      start: pl => { const m = pl.mon; m.pa = m.sa = m.atk = pl.baseAtk = Math.max(m.atk, 1.12); m.df = Math.max(m.df, 72); m.sd = Math.max(m.sd, 72); } },
+      start: pl => { const m = pl.mon; m.pa = m.sa = m.atk = Math.max(m.atk, 76); pl.baseAtk = Math.max(pl.baseAtk, 1.12); m.df = Math.max(m.df, 72); m.sd = Math.max(m.sd, 72); } },
 
     // --- las genéricas más comunes (suman también la pasiva de su tipo: plus) ---
     'keen-eye': { d: '+5 % de probabilidad de golpe crítico.', plus: true, start: pl => { pl.critChance += 0.05; } },

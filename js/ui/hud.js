@@ -91,14 +91,15 @@ G.HUD = (() => {
     const yStart = stBoxY + (touch ? 10 : 12), dy = touch ? 12 : 13;
     const y1 = yStart, y2 = yStart + dy, y3 = yStart + dy * 2;
 
-    const atkBase = Math.round(pl.baseAtk < 5 ? pl.baseAtk * 100 : pl.baseAtk);
+    const atkBase = Math.round(pl.mon ? pl.mon.atk : (pl.baseAtk < 5 ? pl.baseAtk * 100 : pl.baseAtk));
     const atkMulVal = pl.baseAtk ? pl.atk / pl.baseAtk : pl.atkMul;
     drawStatItem(c1, y1, 'ATK', atkBase, '*' + atkMulVal.toFixed(2), Math.abs(atkMulVal - 1) > 0.01);
 
     const spdMulVal = pl.baseSpd ? pl.spd / pl.baseSpd : pl.spdMul;
     drawStatItem(c2, y1, 'SPE', Math.round(pl.spd), '*' + spdMulVal.toFixed(2), Math.abs(spdMulVal - 1) > 0.01);
 
-    const hpMulVal = pl.mon && pl.mon.hp ? pl.maxHp / pl.mon.hp : 1;
+    const baseExpectedHp = pl.mon ? Math.round(70 + pl.mon.hp * 0.45) : pl.maxHp;
+    const hpMulVal = baseExpectedHp ? pl.maxHp / baseExpectedHp : 1;
     drawStatItem(c3, y1, 'HP', Math.round(pl.maxHp), '*' + hpMulVal.toFixed(2), Math.abs(hpMulVal - 1) > 0.01);
 
     drawStatItem(c1, y2, 'CD', null, '*' + pl.cdMul.toFixed(2), Math.abs(pl.cdMul - 1) > 0.01);

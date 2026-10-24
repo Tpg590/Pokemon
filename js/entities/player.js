@@ -28,10 +28,10 @@ G.Player = class Player {
     this.xpMul = perks.xpMul || 1;
     this.coinMul = perks.coinMul || 1;
 
-    this.maxHp = mon.hp + (perks.hp || 0);
+    this.maxHp = Math.round(70 + mon.hp * 0.45) + (perks.hp || 0);
     this.hp = this.maxHp;
-    this.baseSpd = mon.spd;
-    this.baseAtk = mon.atk;
+    this.baseSpd = Math.round(78 + mon.spd * 0.42);
+    this.baseAtk = 0.70 + (mon.atk > 5 ? mon.atk / 100 * 0.55 : mon.atk);
 
     this.moves = [];           // todos los movimientos aprendidos
     this.slots = [];           // huecos: cada uno, una lista de movimientos que se lanzan a la vez

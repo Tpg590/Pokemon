@@ -320,7 +320,7 @@ G.MenuUI = (() => {
     const isVi = G.I18n && G.I18n.lang === 'vi';
     const stoneName = isMega ? G.Mega.getStoneName(dex, viewMega || (megaForms[0] && megaForms[0].form)) : '';
 
-    const max = { hp: 183, atk: 2.15, spd: 170, def: 250 };
+    const max = { hp: 255, atk: 190, spd: 200, def: 250 };
     // Con su naturaleza (20-10-2026): el stat que sube, en verde; el que baja, en rojo.
     const nat = own ? G.Mons.natureOf(dex) : null;
     let q = own ? G.Mons.monFor(dex) : p;
@@ -384,9 +384,9 @@ G.MenuUI = (() => {
         ${megaTabs}
       </div>
       ${own ? `
-        ${bar('Vida', q.hp, max.hp, q.hp)}
-        ${bar('Ataque', q.pa, max.atk, '×' + q.pa.toFixed(2), 'pa')}
-        ${bar('At. Esp.', q.sa, max.atk, '×' + q.sa.toFixed(2), 'sa')}
+        ${bar('Vida', q.hp, max.hp, Math.round(q.hp))}
+        ${bar('Ataque', q.pa, max.atk, Math.round(q.pa), 'pa')}
+        ${bar('At. Esp.', q.sa, max.atk, Math.round(q.sa), 'sa')}
         ${bar('Defensa', q.df, max.def, Math.round(q.df), 'df')}
         ${bar('Def. Esp.', q.sd, max.def, Math.round(q.sd), 'sd')}
         ${bar('Velocidad', q.spd, max.spd, Math.round(q.spd), 'spd')}
