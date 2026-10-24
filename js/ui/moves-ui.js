@@ -179,8 +179,12 @@ G.MovesUI = (() => {
   let curType = 'all';
   let qMoves = '';
   let qTMs = '';
+  let qItems = '';
+  let qAbilities = '';
   let selMoveId = 'ember';
   let selTMId = 'flamethrower';
+  let selItemId = 'leftovers';
+  let selAbilityId = 'overgrow';
 
   function init() {
     const tabs = $('moves-main-tabs');
@@ -192,8 +196,12 @@ G.MovesUI = (() => {
           curTab = t.dataset.tab;
           if ($('moves-tab-types')) $('moves-tab-types').classList.toggle('hidden', curTab !== 'types');
           if ($('moves-tab-tms')) $('moves-tab-tms').classList.toggle('hidden', curTab !== 'tms');
+          if ($('moves-tab-items')) $('moves-tab-items').classList.toggle('hidden', curTab !== 'items');
+          if ($('moves-tab-abilities')) $('moves-tab-abilities').classList.toggle('hidden', curTab !== 'abilities');
           if (curTab === 'types') renderTypesTab();
-          else renderTMsTab();
+          else if (curTab === 'tms') renderTMsTab();
+          else if (curTab === 'items') renderItemsTab();
+          else if (curTab === 'abilities') renderAbilitiesTab();
         };
       });
     }
@@ -210,6 +218,18 @@ G.MovesUI = (() => {
         renderTMsList();
       };
     }
+    if ($('items-search')) {
+      $('items-search').oninput = e => {
+        qItems = (e.target.value || '').toLowerCase().trim();
+        renderItemsList();
+      };
+    }
+    if ($('abilities-search')) {
+      $('abilities-search').oninput = e => {
+        qAbilities = (e.target.value || '').toLowerCase().trim();
+        renderAbilitiesList();
+      };
+    }
   }
 
   function open(targetId, tab) {
@@ -220,11 +240,19 @@ G.MovesUI = (() => {
       curTab = tab;
     } else if (targetId && G.TM_MOVES && G.TM_MOVES[targetId]) {
       curTab = 'tms';
+    } else if (targetId && G.ABIL && G.ABIL[targetId]) {
+      curTab = 'abilities';
+    } else if (targetId && ((G.Items && G.Items.BY && G.Items.BY[targetId]) || (G.LevelUp && G.LevelUp.STATS && G.LevelUp.STATS.some(s => s.id === targetId)))) {
+      curTab = 'items';
     }
 
     if (targetId) {
       if (curTab === 'tms') {
         selTMId = targetId;
+      } else if (curTab === 'abilities') {
+        selAbilityId = targetId;
+      } else if (curTab === 'items') {
+        selItemId = targetId;
       } else {
         selMoveId = targetId;
         const m = (G.Moves.ALL || []).find(x => x.id === targetId);
@@ -240,12 +268,18 @@ G.MovesUI = (() => {
     }
     if ($('moves-tab-types')) $('moves-tab-types').classList.toggle('hidden', curTab !== 'types');
     if ($('moves-tab-tms')) $('moves-tab-tms').classList.toggle('hidden', curTab !== 'tms');
+    if ($('moves-tab-items')) $('moves-tab-items').classList.toggle('hidden', curTab !== 'items');
+    if ($('moves-tab-abilities')) $('moves-tab-abilities').classList.toggle('hidden', curTab !== 'abilities');
 
     renderTypesBar();
     if (curTab === 'types') {
       renderTypesTab();
-    } else {
+    } else if (curTab === 'tms') {
       renderTMsTab();
+    } else if (curTab === 'items') {
+      renderItemsTab();
+    } else if (curTab === 'abilities') {
+      renderAbilitiesTab();
     }
   }
 
@@ -608,6 +642,301 @@ G.MovesUI = (() => {
         `;
         const sBox = cell.querySelector('.tp-sprite');
         if (sBox) sBox.appendChild(G.UI.spriteCanvas(dex, 44, 44, { lively: true }));
+        grid.appendChild(cell);
+      }
+    }
+  }
+
+  // ---------------- Tab 3: Objetos & Pasivas ----------------
+
+  function renderItemsTab() {
+    renderItemsList();
+    renderItemDetail(selItemId);
+  }
+
+  function renderItemsList() {
+    const box = $('items-list');
+    if (!box) return;
+    box.innerHTML = '';
+
+    const held = (G.Items && G.Items.LIST) || [];
+    const passives = (G.LevelUp && G.LevelUp.STATS) || [];
+
+    const allItems = [
+      ...held.map(it => ({ ...it, isHeld: true })),
+      ...passives.map(st => ({ id: st.id, name: st.title, desc: st.desc, icon: st.icon, isPassive: true, max: st.max }))
+    ];
+
+    const filtered = allItems.filter(it => {
+      if (!it) return false;
+      if (qItems) {
+        const trName = String(G.T(it.name || it.id)).toLowerCase();
+        const trDesc = String(G.T(it.desc || '')).toLowerCase();
+        return it.id.includes(qItems) || (it.name || '').toLowerCase().includes(qItems) || trName.includes(qItems) || trDesc.includes(qItems);
+      }
+      return true;
+    });
+
+    if (!filtered.length) {
+      box.innerHTML = `<p class="sub center" style="padding:20px">${G.T('No se encontró ningún objeto.')}</p>`;
+      return;
+    }
+
+    if (!filtered.some(x => x.id === selItemId)) {
+      selItemId = filtered[0].id;
+    }
+
+    for (const it of filtered) {
+      const trName = G.T(it.name || it.id);
+      const isH = it.isHeld;
+      const tag = isH 
+        ? `<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:#3b82f622;color:#60a5fa;border:1px solid #3b82f655">${G.T('📦 Equipable')}</span>`
+        : `<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:#eab30822;color:#facc15;border:1px solid #eab30855">${G.T('⚡ Pasiva')}</span>`;
+      const ic = isH ? G.Icons.html('bag', 18) : (it.icon ? G.Icons.html(it.icon, 18) : '⚡');
+
+      const item = document.createElement('div');
+      item.className = 'move-row-item' + (it.id === selItemId ? ' on' : '');
+      item.innerHTML = `
+        <div class="row" style="gap:6px;align-items:center">
+          ${ic}
+          <b class="m-name">${esc(trName)}</b>
+          <span class="grow"></span>
+          ${tag}
+        </div>
+        <div class="row between" style="font-size:12px;color:var(--muted);margin-top:4px">
+          <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${esc(G.T(it.desc || ''))}</span>
+        </div>
+      `;
+      item.onclick = () => {
+        selItemId = it.id;
+        box.querySelectorAll('.move-row-item').forEach(x => x.classList.remove('on'));
+        item.classList.add('on');
+        renderItemDetail(it.id);
+      };
+      box.appendChild(item);
+    }
+    renderItemDetail(selItemId);
+  }
+
+  function renderItemDetail(id) {
+    const box = $('item-detail');
+    if (!box) return;
+
+    const held = (G.Items && G.Items.BY && G.Items.BY[id]);
+    const passive = (G.LevelUp && G.LevelUp.STATS && G.LevelUp.STATS.find(s => s.id === id));
+    if (!held && !passive) {
+      box.innerHTML = `<p class="sub center" style="padding:30px">${G.T('Selecciona un objeto para ver sus detalles.')}</p>`;
+      return;
+    }
+
+    if (held) {
+      const trName = G.T(held.name || id);
+      const trDesc = G.T(held.desc || '');
+      box.innerHTML = `
+        <div class="tm-detail-card">
+          <div class="row between" style="align-items:center;flex-wrap:wrap;gap:8px">
+            <div class="row" style="gap:8px;align-items:center">
+              ${G.Icons.html('bag', 26)}
+              <h3 class="m-title" style="margin:0">${esc(trName)}</h3>
+              <span class="m-kind-badge" style="background:#3b82f622;color:#60a5fa;border-color:#3b82f666;font-weight:bold">${G.T('📦 Objeto Equipable')}</span>
+            </div>
+            <span class="m-count-badge">1 ${G.T('por partida')}</span>
+          </div>
+          <p class="m-desc" style="font-size:16px;margin:10px 0">${esc(trDesc)}</p>
+          <div style="font-size:13px;color:#cbd5e1;background:rgba(255,255,255,0.05);padding:10px 14px;border-radius:8px;line-height:1.5">
+            ℹ️ ${G.T('Los objetos equipables se encuentran en cofres durante la partida o al derrotar jefes. Sólo puedes llevar uno equipado a la vez; si encuentras otro, puedes sustituirlo.')}
+          </div>
+        </div>
+      `;
+    } else if (passive) {
+      const trName = G.T(passive.title || id);
+      const trDesc = G.T(passive.desc || '');
+      const ic = passive.icon ? G.Icons.html(passive.icon, 26) : '⚡';
+
+      // Find moves that evolve with this passive
+      const evolutions = [];
+      if (G.Moves && G.Moves.EVO) {
+        for (const baseId in G.Moves.EVO) {
+          const [evoName, reqStat] = G.Moves.EVO[baseId];
+          if (reqStat === id) {
+            const bm = (G.Moves.ALL || []).find(m => m.id === baseId);
+            evolutions.push({ baseId, baseName: bm ? bm.name : baseId, evoName, type: bm ? bm.type : 'normal', kind: bm ? bm.kind : 'projectile' });
+          }
+        }
+      }
+
+      let evosHtml = '';
+      if (evolutions.length) {
+        evosHtml = `
+          <h4 class="sec-title" style="margin:16px 0 8px">⚡ ${G.T('Movimientos que evolucionan con esta pasiva:')} (${evolutions.length})</h4>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            ${evolutions.map(e => `
+              <div class="lvl-step" style="grid-template-columns:auto 1fr;gap:12px;padding:8px 12px">
+                <div class="row" style="gap:6px;align-items:center">
+                  ${G.UI.typeChips([e.type])}
+                  <b>${esc(G.T(e.baseName, 'move'))}</b>
+                </div>
+                <div class="row" style="gap:8px;align-items:center">
+                  <span style="color:#f43f5e;font-weight:bold">➔</span>
+                  <b class="gold">${esc(G.T(e.evoName, 'move'))}</b>
+                  <span style="font-size:11px;color:var(--muted)">(${esc(G.T(EVO_TEXTS[e.kind] || ''))})</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        evosHtml = `<p class="sub" style="margin-top:14px">${G.T('Esta mejora pasiva aporta estadísticas directas a tu Pokémon.')}</p>`;
+      }
+
+      box.innerHTML = `
+        <div class="tm-detail-card">
+          <div class="row between" style="align-items:center;flex-wrap:wrap;gap:8px">
+            <div class="row" style="gap:8px;align-items:center">
+              ${ic}
+              <h3 class="m-title" style="margin:0">${esc(trName)}</h3>
+              <span class="m-kind-badge" style="background:#eab30822;color:#facc15;border-color:#eab30866;font-weight:bold">${G.T('⚡ Pasiva en Partida')}</span>
+            </div>
+            ${passive.max ? `<span class="m-count-badge">${G.I18n.f('Nivel máx: {x}', passive.max)}</span>` : ''}
+          </div>
+          <p class="m-desc" style="font-size:16px;margin:8px 0">${esc(trDesc)}</p>
+          ${evosHtml}
+        </div>
+      `;
+    }
+  }
+
+  // ---------------- Tab 4: Habilidades ----------------
+
+  function renderAbilitiesTab() {
+    renderAbilitiesList();
+    renderAbilityDetail(selAbilityId);
+  }
+
+  function renderAbilitiesList() {
+    const box = $('abilities-list');
+    if (!box) return;
+    box.innerHTML = '';
+
+    const abilMap = G.ABIL || {};
+    const allIds = Object.keys(abilMap).sort((a, b) => {
+      const na = G.Mons ? G.Mons.abilityName(a) : (abilMap[a][0] || a);
+      const nb = G.Mons ? G.Mons.abilityName(b) : (abilMap[b][0] || b);
+      return na.localeCompare(nb);
+    });
+
+    const filtered = allIds.filter(id => {
+      if (qAbilities) {
+        const names = abilMap[id] || [];
+        const trName = String(G.Mons ? G.Mons.abilityName(id) : names[0] || '').toLowerCase();
+        const fx = G.AbilityFX && G.AbilityFX.of ? G.AbilityFX.of(id, { types: ['normal'] }) : null;
+        const trDesc = String(fx ? (fx.d || '') + ' ' + (fx.d2 || '') : '').toLowerCase();
+        return id.includes(qAbilities) || names.some(n => String(n).toLowerCase().includes(qAbilities)) || trName.includes(qAbilities) || trDesc.includes(qAbilities);
+      }
+      return true;
+    });
+
+    if (!filtered.length) {
+      box.innerHTML = `<p class="sub center" style="padding:20px">${G.T('No se encontró ninguna habilidad.')}</p>`;
+      return;
+    }
+
+    if (!filtered.includes(selAbilityId)) {
+      selAbilityId = filtered[0];
+    }
+
+    for (const id of filtered) {
+      const name = G.Mons ? G.Mons.abilityName(id) : (abilMap[id][0] || id);
+      const isCustom = !!(G.AbilityFX && G.AbilityFX.FX && G.AbilityFX.FX[id]);
+      const tag = isCustom
+        ? `<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:#a855f722;color:#c084fc;border:1px solid #a855f755">${G.T('⭐ Efecto')}</span>`
+        : `<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:#22c55e22;color:#4ade80;border:1px solid #22c55e55">${G.T('🌿 Tipo (+8%)')}</span>`;
+
+      const item = document.createElement('div');
+      item.className = 'move-row-item' + (id === selAbilityId ? ' on' : '');
+      item.innerHTML = `
+        <div class="row" style="gap:6px;align-items:center">
+          ${G.Icons.html('capsule', 16)}
+          <b class="m-name">${esc(name)}</b>
+          <span class="grow"></span>
+          ${tag}
+        </div>
+      `;
+      item.onclick = () => {
+        selAbilityId = id;
+        box.querySelectorAll('.move-row-item').forEach(x => x.classList.remove('on'));
+        item.classList.add('on');
+        renderAbilityDetail(id);
+      };
+      box.appendChild(item);
+    }
+    renderAbilityDetail(selAbilityId);
+  }
+
+  function renderAbilityDetail(id) {
+    const box = $('ability-detail');
+    if (!box) return;
+
+    const abilMap = G.ABIL || {};
+    const names = abilMap[id] || [id, id];
+    const name = G.Mons ? G.Mons.abilityName(id) : (names[0] || id);
+    const fx = G.AbilityFX && G.AbilityFX.of ? G.AbilityFX.of(id, { types: ['normal'] }) : null;
+    const isCustom = !!(G.AbilityFX && G.AbilityFX.FX && G.AbilityFX.FX[id]);
+
+    let desc = fx ? G.T(fx.d || '') : '';
+    if (fx && fx.d2) desc += ' ' + G.T(fx.d2);
+
+    // Find all pokemon that have this ability
+    const pokes = [];
+    const dexAbil = G.DEX_ABIL || {};
+    const s = G.DB.save || {};
+    const ownedMap = s.owned || {};
+    for (let dex = 1; dex <= 966; dex++) {
+      const a = dexAbil[dex];
+      if (a && (a[0] === id || a[1] === id || a[2] === id)) {
+        pokes.push({ dex, isHidden: a[2] === id && a[0] !== id && a[1] !== id });
+      }
+    }
+
+    const tagBadge = isCustom
+      ? `<span class="m-kind-badge" style="background:#a855f722;color:#c084fc;border-color:#a855f766;font-weight:bold">⭐ ${G.T('Efecto Único de Combate')}</span>`
+      : `<span class="m-kind-badge" style="background:#22c55e22;color:#4ade80;border-color:#22c55e66;font-weight:bold">🌿 ${G.T('Pasiva de Tipo')}</span>`;
+
+    box.innerHTML = `
+      <div class="tm-detail-card">
+        <div class="row between" style="align-items:center;flex-wrap:wrap;gap:8px">
+          <div class="row" style="gap:8px;align-items:center">
+            ${G.Icons.html('capsule', 26)}
+            <h3 class="m-title" style="margin:0">${esc(name)}</h3>
+            <span style="font-size:13px;color:var(--muted)">(${esc(names[1] || id)})</span>
+            ${tagBadge}
+          </div>
+          <span class="m-count-badge">${G.I18n.f('{x} Pokémon con esta habilidad', pokes.length)}</span>
+        </div>
+        <p class="m-desc" style="font-size:16px;margin:10px 0;line-height:1.5">${esc(desc)}</p>
+
+        <h4 class="sec-title" style="margin:14px 0 8px">📋 ${G.T('Pokémon que poseen esta habilidad:')}</h4>
+        <div class="tm-poke-grid" id="abil-poke-grid"></div>
+      </div>
+    `;
+
+    const grid = box.querySelector('#abil-poke-grid');
+    if (grid) {
+      for (const item of pokes) {
+        const mon = G.DEX_BY[item.dex];
+        if (!mon) continue;
+        const isOwned = !!ownedMap[item.dex];
+        const cell = document.createElement('div');
+        cell.className = 'tm-poke-cell' + (isOwned ? ' owned' : '');
+        cell.innerHTML = `
+          <div class="tp-num">#${String(item.dex).padStart(3, '0')}</div>
+          <div class="tp-sprite"></div>
+          <b class="tp-name">${esc(mon.name)}</b>
+          <div class="tp-types">${G.UI.typeChips(mon.types)}</div>
+          ${item.isHidden ? `<span class="tp-tag" style="background:#a855f733;color:#c084fc;border:1px solid #a855f766">${G.T('Oculta')}</span>` : (isOwned ? `<span class="tp-tag">${G.T('Conseguido')}</span>` : '')}
+        `;
+        const sBox = cell.querySelector('.tp-sprite');
+        if (sBox) sBox.appendChild(G.UI.spriteCanvas(item.dex, 44, 44, { lively: true }));
         grid.appendChild(cell);
       }
     }

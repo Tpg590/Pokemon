@@ -82,7 +82,7 @@
 </script>
 
 <link rel="stylesheet" href="css/style.css?v=8fc5f45a78">
-<script src="js/core/locales.js?v=2352e83ea7"></script>
+<script src="js/core/locales.js?v=8aca2e6db8"></script>
 <script src="js/noframe.js"></script>
 </head>
 <body>
@@ -187,7 +187,7 @@
         <button class="menu-item play" data-go="play">Solo<small id="menu-play-sub">Entra en la mazmorra</small></button>
         <button class="menu-item multi" data-go="multiplayer">Cooperativo<small id="menu-multi-sub">Juega en grupo con amigos</small></button>
         <button class="menu-item" data-go="dex">Pokémon<small id="menu-dex-count">Tu colección</small></button>
-        <button class="menu-item" data-go="moves">Movimientos & MT<small>Efectos, evoluciones y MTs</small></button>
+        <button class="menu-item" data-go="moves">Enciclopedia<small>Movimientos, MT, objetos y habilidades</small></button>
         <button class="menu-item" data-go="upgrades">Mejoras<small>Haz más fuerte cada run</small></button>
         <button class="menu-item" data-go="shop">Tienda Kecleon<small>Mentas, Cápsulas y MT</small></button>
         <button class="menu-item" data-go="bag">Mochila<small id="menu-bag-sub">Vacía</small></button>
@@ -455,16 +455,18 @@
   </div>
 </section>
 
-<!-- ====== Tra cứu chiêu thức & Đĩa TM ====== -->
+<!-- ====== Enciclopedia Pokémon (Movimientos, MT, Objetos & Habilidades) ====== -->
 <section id="scr-moves" class="scr dim hidden">
   <div class="box wide moves-browser-box">
     <div class="row between">
-      <h2>Movimientos & MT</h2>
+      <h2>Enciclopedia Pokémon</h2>
       <button class="btn small ghost" data-back>Volver <kbd>Esc</kbd></button>
     </div>
     <div class="tabs" id="moves-main-tabs" style="margin:10px 0 12px">
       <div class="tab on" data-tab="types">Movimientos por Tipo</div>
       <div class="tab" data-tab="tms">Discos MT y Pokémon</div>
+      <div class="tab" data-tab="items">Objetos & Pasivas</div>
+      <div class="tab" data-tab="abilities">Habilidades</div>
     </div>
     
     <!-- Tab 1: Movimientos por Tipo -->
@@ -487,6 +489,28 @@
       <div class="moves-split-layout">
         <div id="tms-list" class="moves-list"></div>
         <div id="tm-detail" class="move-detail-panel"></div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Objetos & Pasivas -->
+    <div id="moves-tab-items" class="moves-tab-pane hidden">
+      <div class="row" style="margin:8px 0">
+        <input id="items-search" class="field grow" placeholder="Buscar objetos o mejoras pasivas…" autocomplete="off">
+      </div>
+      <div class="moves-split-layout">
+        <div id="items-list" class="moves-list"></div>
+        <div id="item-detail" class="move-detail-panel"></div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Habilidades -->
+    <div id="moves-tab-abilities" class="moves-tab-pane hidden">
+      <div class="row" style="margin:8px 0">
+        <input id="abilities-search" class="field grow" placeholder="Buscar habilidad por nombre o efecto…" autocomplete="off">
+      </div>
+      <div class="moves-split-layout">
+        <div id="abilities-list" class="moves-list"></div>
+        <div id="ability-detail" class="move-detail-panel"></div>
       </div>
     </div>
   </div>
@@ -708,6 +732,6 @@
 </section>
 
 <!-- datos generados -->
-<script defer src="js/app.min.js?v=827ec2f383"></script>
+<script defer src="js/app.min.js?v=58a45a3461"></script>
 </body>
 </html>

@@ -281,6 +281,13 @@ G.Player = class Player {
         G.FX.dmgText(this.x, this.y - this.bodyH - 4, '¡Esquiva!', '#bfe8ff');
         return;
       }
+      if (ab.disguise && (!this.disguiseT || performance.now() - this.disguiseT > 60000)) {
+        this.disguiseT = performance.now();
+        this.invuln = 0.8;
+        G.FX.dmgText(this.x, this.y - this.bodyH - 4, '¡Disfraz!', '#ffda79', true);
+        G.FX.burst(this.x, this.y - this.bodyH * 0.5, '#ffda79', 8, 80);
+        return;
+      }
       if (ab.inMul) amount *= ab.inMul(this, type, cls);
     }
     if (!pure) amount *= G.Stats.taken(this.mon, cat);
@@ -293,7 +300,17 @@ G.Player = class Player {
     // Con un ataque cuerpo a cuerpo activo se recibe un 25 % menos: hay que
     // estar encima de los enemigos para pegar (iban muy por detrás).
     const close = this.activeGroup().some(m => m.kind === 'melee') ? 0.75 : 1;
-    const d = pure ? Math.max(1, amount) : Math.max(1, amount * (1 - this.reduction) * close);
+    let d = pure ? Math.max(1, amount) : Math.max(1, amount * (1 - this.reduction) * close);
+    if (this.shield && this.shield > 0) {
+      if (this.shield >= d) {
+        this.shield -= d;
+        G.FX.dmgText(this.x, this.y - this.bodyH - 4, '-' + Math.round(d) + ' 🛡️', '#70a1ff');
+        d = 0;
+      } else {
+        d -= this.shield;
+        this.shield = 0;
+      }
+    }
     this.hp -= d;
     this.invuln = 0.45;
     this.flash = 0.14;
