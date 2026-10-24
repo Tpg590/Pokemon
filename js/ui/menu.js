@@ -360,15 +360,18 @@ G.MenuUI = (() => {
       </div>` : '';
 
     const arceusPlatesHtml = (isArceus && own) ? `
-      <div class="arceus-plates-box" style="margin:10px 0;padding:8px 10px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:8px">
-        <div style="font-size:12px;font-weight:bold;color:#fde047;margin-bottom:6px">⚜️ ${isVi ? 'Bảng Đá Nguyên Thủy (Đổi Hệ Arceus):' : 'Plates of Creation (Switch Arceus Type):'}</div>
-        <div class="arceus-plates-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px">
+      <div class="arceus-plates-box" style="margin:10px 0;padding:10px 12px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.35);border-radius:10px">
+        <label for="arceus-type-select" style="display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:bold;color:#fde047;margin:0 0 8px">
+          <span>⚜️ ${isVi ? 'Bảng Đá Nguyên Thủy (Đổi Hệ Arceus):' : 'Plates of Creation (Switch Arceus Type):'}</span>
+          <span class="type" style="background:${G.U.TYPE_COLOR[curArceusType]};font-size:11px;padding:2px 8px;border-radius:4px;white-space:nowrap">${G.U.TYPE_NAME[curArceusType] || curArceusType}</span>
+        </label>
+        <select id="arceus-type-select" class="field" style="width:100%;padding:7px 10px;font-size:14px;border:2px solid rgba(255,215,0,0.45);background:#0d1838;color:#fff;border-radius:8px;cursor:pointer;outline:none">
           ${Object.keys(G.U.TYPE_NAME).map(t => `
-            <button type="button" class="arceus-plate-btn chip ${t === curArceusType ? 'on' : ''}" data-type="${t}" style="padding:3px 2px;font-size:10px;display:flex;align-items:center;justify-content:center;border-color:${t === curArceusType ? '#ffd23f' : G.U.TYPE_COLOR[t]};background:${t === curArceusType ? G.U.TYPE_COLOR[t] + '55' : 'rgba(0,0,0,0.3)'}">
-              <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${G.U.TYPE_COLOR[t]};margin-right:2px;flex-shrink:0"></span>${G.U.TYPE_NAME[t]}
-            </button>
+            <option value="${t}" ${t === curArceusType ? 'selected' : ''} style="background:#0f1f4a;color:#fff">
+              ${G.U.TYPE_NAME[t]}
+            </option>
           `).join('')}
-        </div>
+        </select>
       </div>
     ` : '';
 
@@ -436,9 +439,10 @@ G.MenuUI = (() => {
         showDetail(dex);
       };
     });
-    box.querySelectorAll('.arceus-plate-btn').forEach(b => {
-      b.onclick = () => {
-        const t = b.dataset.type;
+    const arceusSelect = $('arceus-type-select');
+    if (arceusSelect) {
+      arceusSelect.onchange = () => {
+        const t = arceusSelect.value;
         s.arceusType = t;
         if (s.pstart && s.pstart[493]) delete s.pstart[493];
         if (s.pstart2 && s.pstart2[493]) delete s.pstart2[493];
@@ -446,7 +450,7 @@ G.MenuUI = (() => {
         G.Audio.sfx('confirm');
         showDetail(493);
       };
-    });
+    }
     const eqBtn = $('mega-equip-btn');
     if (eqBtn) {
       eqBtn.onclick = () => {
