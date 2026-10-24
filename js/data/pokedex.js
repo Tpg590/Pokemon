@@ -978,4 +978,15 @@ G.DEX = [
 
 G.DEX_BY = {};
 for (const p of G.DEX) G.DEX_BY[p.dex] = p;
+if (G.DEX_BY[493]) {
+  Object.defineProperty(G.DEX_BY[493], 'types', {
+    get() {
+      const s = G.DB && G.DB.save;
+      return [(s && s.arceusType) || 'normal'];
+    },
+    set(v) { /* allow */ },
+    configurable: true,
+    enumerable: true
+  });
+}
 G.getPokemon = dex => G.DEX_BY[dex];

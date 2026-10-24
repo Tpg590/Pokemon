@@ -53,7 +53,7 @@ G.MenuUI = (() => {
 
   function open() {
     const s = G.DB.save;
-    const mon = G.DEX_BY[s.partner];
+    const mon = (G.Mons && G.Mons.monFor) ? G.Mons.monFor(s.partner) : G.DEX_BY[s.partner];
     const shiny = !!s.partnerShiny && G.DB.ownsShiny(mon.dex);
     G.UI.chrome(true);
     G.UI.show('scr-menu');
@@ -449,6 +449,11 @@ G.MenuUI = (() => {
         G.DB.commit(true);
         G.Audio.sfx('confirm');
         showDetail(493);
+        if (s.partner === 493 && $('menu-partner-info')) {
+          const shiny = !!s.partnerShiny && G.DB.ownsShiny(493);
+          $('menu-partner').style.setProperty('--stage-c', shiny ? '#9ae6ff' : G.U.TYPE_COLOR[t]);
+          $('menu-partner-info').innerHTML = G.UI.typeChips([t]) + ' ' + G.UI.stars(G.DEX_BY[493].rarity);
+        }
       };
     }
     const eqBtn = $('mega-equip-btn');

@@ -6,6 +6,31 @@
  * Cada línea en español y en inglés.
  */
 G.CHANGELOG = [
+  { d: '2026-10-24', title: [
+    'Arceus Multitipo, Tablas de la Creación y Ajuste de Misiones',
+    'Arceus Multitype, Creation Plates & Missions Rebalance',
+    'Arceus Đa Hệ (Multitype), Bảng Đá & Cân bằng Nhiệm vụ'
+  ], new: [
+    ['Arceus Multitipo: ahora puedes cambiar libremente el tipo de Arceus en la Pokédex antes de la partida, adaptando sus tipos, resistencias y movimiento inicial, con +25 % de daño en ataques de su tipo.',
+     'Arceus Multitype: you can now freely switch Arceus type in the Pokédex before runs, adapting its type, resistances and starting move, with +25% STAB damage.',
+     'Arceus Đa Hệ (Multitype): Có thể tự do chuyển đổi hệ của Arceus trong Pokédex trước trận đấu; thay đổi toàn diện thuộc tính, kháng/khắc chế, chiêu thức khởi đầu và nhận +25% sát thương kỹ năng trùng hệ.'],
+    ['Ajuste de misiones: se separan claramente las misiones cada 6 horas, diarias (dificultad ×4 y recompensas ×2) y semanales (dificultad ×7 y recompensas ×3 con hasta 3 tickets ×10 y 3.000 monedas).',
+     'Missions rebalance: clearly separated 6-hour missions, daily missions (4x difficulty and 2x rewards), and weekly missions (7x difficulty and 3x rewards with up to 3 10x tickets and 3,000 coins).',
+     'Cân bằng nhiệm vụ: Tách biệt rõ ràng nhiệm vụ mỗi 6 giờ, nhiệm vụ hàng ngày (độ khó x4, thưởng x2) và nhiệm vụ hàng tuần (độ khó x7, thưởng x3 với tới 3 vé x10 và 3.000 xu).'],
+    ['Enciclopedia de movimientos, MT y habilidades: consulta potencia, rareza (uncommon, rare, epic), efectos y Pokémon compatibles según el lore de Pokémon Database.',
+     'Move, TM and ability encyclopedia: check power, rarity (uncommon, rare, epic), effects and compatible Pokémon based on Pokémon Database lore.',
+     'Từ điển Chiêu thức, MT & Đặc tính: Tra cứu sức mạnh, độ hiếm (uncommon, rare, epic), hiệu ứng và Pokémon sở hữu theo chuẩn Pokémon Database.']
+  ], fix: [
+    ['Selector de tipo de Arceus: sustituida la cuadrícula de 18 botones por un menú desplegable limpio y sin desbordamientos.',
+     'Arceus type selector: replaced the 18-button grid with a clean dropdown menu without overflows.',
+     'Giao diện chọn hệ Arceus: Thay thế lưới 18 nút bấm bằng menu thả xuống gọn gàng, không bị tràn khung.'],
+    ['Sincronización del tipo de compañero en el menú: Arceus muestra inmediatamente su tipo y color actualizados en el menú principal.',
+     'Partner type sync in menu: Arceus immediately displays its updated type badge and color on the main menu.',
+     'Đồng bộ hệ đồng hành ở Menu: Arceus hiển thị ngay lập tức huy hiệu hệ và màu sắc tương ứng ngoài Menu chính.'],
+    ['Traducción de misiones: corregidos textos que aparecían en español o inglés en títulos y descripciones de misiones.',
+     'Mission translations: fixed texts appearing in Spanish or English in mission headers and descriptions.',
+     'Dịch thuật nhiệm vụ: Sửa các lỗi hiển thị tiếng Tây Ban Nha hoặc Anh ở tiêu đề và nội dung nhiệm vụ.']
+  ]},
   { d: '2026-10-23', title: [
     'Multijugador mejorado, enciclopedia de movimientos y donaciones MoMo',
     'Enhanced Multiplayer, Moves Encyclopedia & MoMo Support',
