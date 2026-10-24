@@ -109,8 +109,16 @@ G.Player = class Player {
    * G.Stats), con las danzas que sean de su lado (las de mejora, sin ninguna).
    */
   atkFor(m) {
-    const cat = m && m.cat, b = cat === 'physical' ? this.buffs.patk : cat === 'special' ? this.buffs.satk : null;
-    return this.atk * G.Stats.fit(this.mon, cat) * (b ? 1 + b.n * b.amount : 1) * (m && this.monoType(m.type) ? Player.MONO_K : 1);
+    if (!m) return this.atk;
+    const cat = m.cat;
+    const baseStat = cat === 'special'
+      ? (this.mon && this.mon.sa != null ? this.mon.sa : 100)
+      : (this.mon && this.mon.pa != null ? this.mon.pa : 100);
+    const statScale = baseStat / 100;
+    const b = cat === 'physical' ? this.buffs.patk : cat === 'special' ? this.buffs.satk : null;
+    const buffMul = b ? 1 + b.n * b.amount : 1;
+    const monoMul = this.monoType(m.type) ? Player.MONO_K : 1;
+    return statScale * this.atkMul * (1 + this.buffs.atk.n * this.buffs.atk.amount) * buffMul * monoMul;
   }
   /** Monotipo (19-10-2026): los de un solo tipo pegan un +20 % con los ataques de su tipo (tienen menos variedad). */
   static get MONO_K() { return 1.2; }

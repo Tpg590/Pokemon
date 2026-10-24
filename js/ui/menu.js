@@ -670,9 +670,11 @@ G.MenuUI = (() => {
     const ids = G.startChoices(upgDex).sort((a, b) => G.Moves.BY_ID[a].name.localeCompare(G.Moves.BY_ID[b].name, 'es'));
     const el = document.createElement('div');
     el.className = 'panel ban-picker';
-    el.innerHTML = `<p class="sub" style="margin:0 0 8px">Elige con qué ataque empieza. Lo puedes cambiar cuando quieras, gratis.</p>
+    el.innerHTML = `<p class="sub" style="margin:0 0 8px">Elige con qué ataque empieza. Lo puedes cambiar cuando quieras, gratis.<br><small style="color:var(--muted)">Solo ataques Poco comunes (Uncommon). Los Raros (Rare) y Épicos (Epic) requieren MTs aprendidas.</small></p>
       <div class="ban-moves">${ids.map(id => { const d = G.Moves.BY_ID[id];
-        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${d.name}${id === base ? ' <small>(de serie)</small>' : ''}</button>`; }).join('')}</div>`;
+        const rCol = d.rarity === 'epic' ? '#c084fc' : d.rarity === 'rare' ? '#60a5fa' : '#4ade80';
+        const rTag = `<span style="font-size:10px;padding:1px 4px;border-radius:3px;background:${rCol}22;color:${rCol};border:1px solid ${rCol}55;margin-left:4px;text-transform:capitalize">${d.rarity || 'uncommon'} · ${d.power || 0}P</span>`;
+        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${d.name} ${rTag}${id === base ? ' <small>(de serie)</small>' : ''}</button>`; }).join('')}</div>`;
     el.querySelectorAll('[data-id]').forEach(b => {
       b.onclick = () => {
         const id = b.dataset.id;
@@ -701,9 +703,11 @@ G.MenuUI = (() => {
       .sort((a, b) => G.Moves.BY_ID[a].name.localeCompare(G.Moves.BY_ID[b].name, 'es'));
     const el = document.createElement('div');
     el.className = 'panel ban-picker';
-    el.innerHTML = `<p class="sub" style="margin:0 0 8px">Elige el segundo ataque con el que empieza. Lo puedes cambiar cuando quieras, gratis.</p>
+    el.innerHTML = `<p class="sub" style="margin:0 0 8px">Elige el segundo ataque con el que empieza. Lo puedes cambiar cuando quieras, gratis.<br><small style="color:var(--muted)">Solo ataques Poco comunes (Uncommon). Los Raros (Rare) y Épicos (Epic) requieren MTs aprendidas.</small></p>
       <div class="ban-moves"><button class="chip ${!cur ? 'on' : ''}" data-id="">${G.T('Al azar')}</button>${ids.map(id => { const d = G.Moves.BY_ID[id];
-        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${d.name}</button>`; }).join('')}</div>`;
+        const rCol = d.rarity === 'epic' ? '#c084fc' : d.rarity === 'rare' ? '#60a5fa' : '#4ade80';
+        const rTag = `<span style="font-size:10px;padding:1px 4px;border-radius:3px;background:${rCol}22;color:${rCol};border:1px solid ${rCol}55;margin-left:4px;text-transform:capitalize">${d.rarity || 'uncommon'} · ${d.power || 0}P</span>`;
+        return `<button class="chip ${id === cur ? 'on' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${d.name} ${rTag}</button>`; }).join('')}</div>`;
     el.querySelectorAll('[data-id]').forEach(b => {
       b.onclick = () => {
         const id = b.dataset.id;

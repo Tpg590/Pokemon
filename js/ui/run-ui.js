@@ -61,8 +61,12 @@ G.RunUI = (() => {
     list.forEach((c, i) => {
       const el = document.createElement('div');
       el.className = 'card';
+      const rarityColors = { uncommon: '#2ecc71', rare: '#a55eea', epic: '#ff9f43' };
+      const rarityLabels = { uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic' };
+      const rarityChip = c.rarity ? `<span class="tag-chip" style="background:${rarityColors[c.rarity] || '#2ecc71'};font-weight:bold">${rarityLabels[c.rarity] || c.rarity.toUpperCase()}</span>` : '';
+      const powerChip = c.power ? `<span class="tag-chip cat">PWR ${c.power}</span>` : '';
       const tag = c.type === 'new'
-        ? `<span class="tag-chip" style="background:${c.color}">Nuevo · ${c.tag}</span>${c.cat ? `<span class="tag-chip cat">${c.cat}</span>` : ''}`
+        ? `${rarityChip}<span class="tag-chip" style="background:${c.color}">${c.tag}</span>${powerChip}${c.cat ? `<span class="tag-chip cat">${c.cat}</span>` : ''}`
         : c.type === 'up' || c.type === 'evo'
           ? `<span class="tag-chip" style="background:${c.color}">${c.tag}</span>`
           : `<span class="tag-chip" style="background:${c.color === '#ffd23f' ? '#ffd23f' : '#9fb1c9'}">${c.tag}</span>`;

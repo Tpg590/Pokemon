@@ -54,17 +54,22 @@ G.LevelUp = (() => {
       };
       const pool = G.Moves.poolFor(pl.mon).filter(id =>
         !pl.hasMove(id) && !(pl.banned && pl.banned.has(id)) && !(buffs >= 2 && G.Moves.BY_ID[id].kind === 'buff'));
-      // Los de su lado bueno (y los empatados y mejoras) salen el doble.
-      const weight = id => { const d = G.Moves.BY_ID[id]; return G.Stats.fit(pl.mon, d.cat) >= 0.999 ? 2 : 1; };
+      // Los ataques raros y épicos salen con menor probabilidad al subir de nivel.
+      const rarityMul = d => (d.rarity === 'epic' ? 0.25 : d.rarity === 'rare' ? 0.5 : 1.0);
+      const weight = id => {
+        const d = G.Moves.BY_ID[id];
+        const fitBonus = G.Stats.fit(pl.mon, d.cat) >= 0.999 ? 1.5 : 1.0;
+        return rarityMul(d) * fitBonus;
+      };
       for (const id of pickWeighted(pool, 6, weight)) {
         const d = G.Moves.BY_ID[id];
         out.push({
-          w: 10, type: 'new', key: 'new:' + id,
+          w: d.rarity === 'epic' ? 4 : d.rarity === 'rare' ? 7 : 10,
+          type: 'new', key: 'new:' + id,
           icon: 'move:' + id, color: G.U.TYPE_COLOR[d.type],
-          // (Físico o especial va en su propia etiqueta, con borde: ver run-ui.js. Los
-          // potenciadores no tienen categoría, pero Danza Espada y Danza Dragón suben el
-          // ataque físico y Maquinación el especial: llevan la del lado que suben.)
           tag: G.U.TYPE_NAME[d.type],
+          rarity: d.rarity || 'uncommon',
+          power: d.power || 0,
           cat: G.Stats.NAME[d.cat || (d.stat === 'patk' ? 'physical' : d.stat === 'satk' ? 'special' : '')] || '',
           title: G.T(d.name, 'move'), desc: d.desc + fitNote(pl.mon, d.cat),
           apply: p => p.addMove(id)

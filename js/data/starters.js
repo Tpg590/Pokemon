@@ -50,7 +50,13 @@ G.baseStartOf = dex => {
  * y siempre el de serie (aunque no sea de su tipo, como Confusión en Psyduck), para poder volver a él.
  */
 G.startChoices = dex => {
-  const ids = G.Moves.poolFor(G.DEX_BY[dex]).filter(id => G.Moves.BY_ID[id].kind !== 'buff');
+  const taught = (G.Mons && G.Mons.taught) ? G.Mons.taught(dex) : [];
+  const ids = G.Moves.poolFor(G.DEX_BY[dex]).filter(id => {
+    const d = G.Moves.BY_ID[id];
+    if (!d || d.kind === 'buff') return false;
+    // Chỉ hiển thị uncommon; rare và epic cần học qua TM mới có thể chọn
+    return d.rarity === 'uncommon' || taught.includes(id);
+  });
   const base = G.baseStartOf(dex);
   if (!ids.includes(base)) ids.push(base);
   return ids;
